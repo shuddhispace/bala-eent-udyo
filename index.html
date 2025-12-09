@@ -3,48 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ईंट फैक्ट्री</title>
+    <title>बाला ईंट उद्योग</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
+
     <!-- Header -->
     <header>
-        <div class="container">
-            <h1>ईंट फैक्ट्री</h1>
-            <nav>
-                <a href="pages/public/events.html">ईंट स्टॉक</a>
-                <a href="#contact">संपर्क करें</a>
-                <a href="pages/owner/dashboard.html" class="owner-login">मालिक लॉगिन</a>
-            </nav>
+        <div class="logo">बाला ईंट उद्योग</div>
+
+        <nav class="nav-links" id="nav-links">
+            <a href="#home">होम</a>
+            <a href="#services">हमारी सेवाएँ</a>
+            <a href="#contact">संपर्क</a>
+            <a href="owner-login.html" class="owner-btn">मालिक लॉगिन</a>
+        </nav>
+
+        <!-- Hamburger -->
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="container hero-content">
-            <h2>आपके लिए उच्च गुणवत्ता वाली ईंटें</h2>
-            <p>कच्ची और पक्की ईंटें, त्वरित डिलीवरी, भरोसेमंद सेवा।</p>
-            <a href="pages/public/events.html" class="btn">स्टॉक देखें</a>
+    <section class="hero" id="home">
+        <h1>गुणवत्ता वाली ईंटें • भरोसेमंद सेवा</h1>
+        <p>सही मात्रा • सही कीमत • समय पर डिलीवरी</p>
+        <a href="#contact" class="cta">संपर्क करें</a>
+    </section>
+
+    <!-- Services -->
+    <section class="services" id="services">
+        <h2>हमारी सेवाएँ</h2>
+
+        <div class="service-cards">
+
+            <div class="card">
+                <h3>✔ उच्च गुणवत्ता वाली ईंटें</h3>
+                <p>हर निर्माण कार्य के लिए मजबूत और टिकाऊ ईंटें।</p>
+            </div>
+
+            <div class="card">
+                <h3>✔ समय पर सप्लाई</h3>
+                <p>आपके स्थान पर तय समय पर डिलीवरी की सुविधा।</p>
+            </div>
+
+            <div class="card">
+                <h3>✔ विश्वसनीय परिवहन</h3>
+                <p>अनुभवी ड्राइवर और सुरक्षित ट्रांसपोर्ट की सुविधा।</p>
+            </div>
+
+            <div class="card">
+                <h3>✔ ग्राहक सहायता</h3>
+                <p>ऑर्डर, रेट और डिलीवरी से जुड़ी हर सहायता तुरंत।</p>
+            </div>
+
         </div>
     </section>
 
-    <!-- About Section -->
-    <section class="about container">
-        <h2>हमारे बारे में</h2>
-        <p>हम ईंट निर्माण और आपूर्ति में वर्षों का अनुभव रखते हैं। हमारी ईंटें उच्च गुणवत्ता वाली और टिकाऊ होती हैं।</p>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact container">
+    <!-- Contact -->
+    <section class="contact" id="contact">
         <h2>संपर्क करें</h2>
-        <p>फोन: +91 98394 54542</p>
-        <p>ईमेल: info@eentfactory.com</p>
-        <p>पता: आपका पता यहाँ</p>
+
+        <div class="contact-box">
+            <p><strong>गुलाब :</strong> 9793277780</p>
+            <p><strong>राहुल :</strong> 8736002647</p>
+            <p><strong>अजय :</strong> 9839454542</p>
+            <p><strong>ईमेल :</strong> balaeentudyog@gmail.com</p>
+        </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2025 ईंट फैक्ट्री | सभी अधिकार सुरक्षित</p>
+        © 2025 बाला ईंट उद्योग • सभी अधिकार सुरक्षित
     </footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("nav-links").classList.toggle("show");
+        }
+    </script>
+
 </body>
 </html>

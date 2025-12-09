@@ -1,0 +1,122 @@
+/* Mobile-first responsive styles for index.html
+   - Use this as the main site stylesheet (assets/css/style.css)
+   - Replace images in /assets/images/ with real photos (suggested sizes given below)
+*/
+
+/* ---------- VARIABLES ---------- */
+:root{
+  --bg:#fbfbfb;
+  --card:#ffffff;
+  --accent:#d35400;    /* brick orange */
+  --muted:#6b6b6b;
+  --radius:12px;
+  --wrap:1100px;
+}
+
+/* ---------- BASE ---------- */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+  background:var(--bg);
+  color:#222;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.5;
+}
+
+/* ---------- LAYOUT HELPERS ---------- */
+.wrap{
+  width:92%;
+  max-width:var(--wrap);
+  margin:0 auto;
+}
+
+/* ---------- HEADER ---------- */
+.site-header{
+  background:#fff;
+  border-bottom:1px solid rgba(0,0,0,0.05);
+  position:sticky;
+  top:0;
+  z-index:1200;
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.logo{font-weight:700;color:var(--accent);text-decoration:none;font-size:18px}
+.site-nav{display:flex;align-items:center;gap:14px}
+.site-nav a{color:#333;text-decoration:none;font-weight:500;padding:8px 10px;border-radius:8px}
+.site-nav .btn-primary{background:var(--accent);color:#fff;padding:8px 12px}
+.site-nav .btn-primary:hover{opacity:.95}
+
+/* hamburger */
+.nav-toggle{display:inline-flex;align-items:center;gap:4px;background:transparent;border:0;padding:8px;cursor:pointer}
+.nav-toggle span{display:block;width:20px;height:2px;background:#333;border-radius:2px}
+.nav-toggle span:nth-child(2){width:16px}
+
+/* hide nav toggle on larger screens by default */
+@media(min-width:760px){
+  .nav-toggle{display:none}
+}
+
+/* ---------- HERO ---------- */
+.hero{padding:28px 0;background:linear-gradient(180deg,#fff 0%, #fff7f2 100%)}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:center;padding:18px 0}
+.hero-left h1{
+  font-size:24px;margin:0 0 10px;color:var(--accent);line-height:1.15
+}
+.lead{color:var(--muted);margin-bottom:16px;font-size:15px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.btn{display:inline-block;border-radius:10px;text-decoration:none;font-weight:600;padding:10px 14px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-outline{background:#fff;border:1px solid rgba(0,0,0,0.08);color:#333}
+.quick-info{list-style:none;padding:0;margin:10px 0 0;display:flex;gap:10px;flex-wrap:wrap}
+.quick-info li{background:#fff;padding:8px 10px;border-radius:8px;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+
+/* hero image */
+.hero-image img{width:100%;height:auto;border-radius:14px;display:block;box-shadow:0 12px 40px rgba(0,0,0,0.08)}
+
+/* ---------- FEATURES (grid) ---------- */
+.features{display:grid;grid-template-columns:1fr;gap:12px;margin:18px auto 28px}
+.feature{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+.feature h3{margin:0 0 6px;color:var(--accent)}
+.feature p{margin:0;color:var(--muted);font-size:14px}
+
+/* ---------- CARDS ---------- */
+.cards{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:28px}
+.card{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,0.06)}
+.card img{width:100%;height:180px;object-fit:cover;display:block}
+.card-body{padding:14px}
+.card-body h4{margin:0 0 8px;color:#222}
+.card-body p{margin:0 0 12px;color:var(--muted);font-size:14px}
+.card-cta{display:inline-block;padding:8px 12px;background:var(--accent);color:#fff;border-radius:8px;text-decoration:none}
+
+/* CTA BANNER */
+.cta{background:#fff;padding:18px;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,0.04);margin-bottom:28px;text-align:center}
+.cta-inner h3{margin:0 0 6px}
+.cta-inner p{margin:0 0 12px;color:var(--muted)}
+
+/* FOOTER */
+.site-footer{padding:18px 0;background:#fff;border-top:1px solid rgba(0,0,0,0.04);margin-top:30px}
+.site-footer p{margin:0;color:var(--muted);font-size:14px}
+
+/* ---------- TABLET & DESKTOP LAYOUTS ---------- */
+@media(min-width:760px){
+  .hero-grid{grid-template-columns:1fr 520px;gap:30px}
+  .hero-left h1{font-size:30px}
+  .lead{font-size:16px}
+
+  .features{grid-template-columns:repeat(3,1fr);gap:18px}
+  .cards{grid-template-columns:repeat(3,1fr)}
+}
+
+@media(min-width:1100px){
+  .hero-left h1{font-size:36px}
+  .hero-grid{grid-template-columns:1fr 520px;align-items:center}
+  .card img{height:220px}
+}
+
+/* ---------- NAV MOBILE COLLAPSE BEHAVIOR (JS toggles .open) ---------- */
+.site-nav{position:fixed;left:0;right:0;bottom:auto;top:64px;background:var(--card);transform:translateY(-120%);opacity:0;transition:transform .28s ease,opacity .28s ease;padding:12px;flex-direction:column;gap:8px;z-index:1400;border-radius:0 0 12px 12px}
+.site-nav a{padding:10px;border-radius:8px}
+.site-nav.open{transform:translateY(0);opacity:1;box-shadow:0 12px 30px rgba(0,0,0,0.08)}
+@media(min-width:760px){ .site-nav{position:static;transform:none;opacity:1;padding:0;flex-direction:row;background:transparent;box-shadow:none} }

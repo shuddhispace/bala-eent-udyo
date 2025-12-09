@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bala Eent Udyog — Home</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/style.css" />
+
+  <!-- Small JS for mobile nav -->
+  <script defer src="assets/js/main.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="#">🧱 Bala Eent Udyog</a>
+
+      <button id="nav-toggle" aria-label="Toggle navigation" class="nav-toggle">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="site-nav" id="site-nav">
+        <a href="pages/public/events.html">उपलब्ध ईंट</a>
+        <a href="pages/public/events.html#rates">दरें</a>
+        <a href="pages/public/events.html#contact">संपर्क</a>
+        <a class="btn btn-primary" href="pages/owner/login.html">Owner Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-left">
+          <h1>गुणवत्ता वाली ईंटें, भरोसेमंद डिलीवरी</h1>
+          <p class="lead">
+            Bala Eent Udyog — कच्ची और पक्की ईंटें, फस्र्ट-क्लास उत्पादन और ट्रांसपोर्ट। स्थानीय दाम और तुरंत उपलब्धता।
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="pages/public/events.html">ईंट उपलब्धता देखें</a>
+            <a class="btn btn-outline" href="pages/owner/login.html">Owner Login</a>
+          </div>
+
+          <ul class="quick-info">
+            <li>📦 त्वरित डिलीवरी</li>
+            <li>👷 कर्मचारी ट्रैकिंग</li>
+            <li>🧾 चालान PDF (हिंदी)</li>
+          </ul>
+        </div>
+
+        <figure class="hero-image">
+          <img src="assets/images/brick-kiln.jpg" alt="भट्ठी और ईंट" width="800" height="520" />
+        </figure>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features wrap">
+      <div class="feature">
+        <h3>कच्ची / पक्की ईंट</h3>
+        <p>स्थिर गुणवत्ता, ग्राहक के अनुसार पैकिंग और मात्रा।</p>
+      </div>
+      <div class="feature">
+        <h3>ट्रांसपोर्ट सेवा</h3>
+        <p>ट्रक उपलब्ध, गाड़ी नंबर के साथ रिकॉर्ड और समय पर डिलीवरी।</p>
+      </div>
+      <div class="feature">
+        <h3>ऑनलाइन रिकॉर्ड</h3>
+        <p>कर्मचारी, खर्चे और ईंट गिनती — ब्राउज़र localStorage में सुरक्षित।</p>
+      </div>
+    </section>
+
+    <!-- CARDS GRID -->
+    <section class="cards wrap">
+      <article class="card">
+        <img src="assets/images/bricks.jpg" alt="ईंट स्टॉक">
+        <div class="card-body">
+          <h4>उपलब्ध ईंट स्टॉक</h4>
+          <p>रोज़ अपडेटेड स्टॉक, कच्चा और पक्का दोनों उपलब्ध।</p>
+          <a href="pages/public/events.html" class="card-cta">स्टॉक देखें</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <img src="assets/images/kiln.jpg" alt="भट्ठी">
+        <div class="card-body">
+          <h4>हमारी भट्ठी</h4>
+          <p>अनुभवी टीम और सामग्रियों का सख्त नियंत्रण।</p>
+          <a href="#" class="card-cta">और जानें</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <img src="assets/images/truck.jpg" alt="ट्रक">
+        <div class="card-body">
+          <h4>ट्रांसपोर्ट सर्विस</h4>
+          <p>कस्टम लोडिंग और पीडीएफ चालान के साथ शिपिंग रिकॉर्ड।</p>
+          <a href="#" class="card-cta">संपर्क करें</a>
+        </div>
+      </article>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section class="cta wrap">
+      <div class="cta-inner">
+        <h3>चाहिए bulk order या नियमित सप्लाय?</h3>
+        <p>हम बड़ी डीलरों और बिल्डिंग साइट्स के साथ काम करते हैं — अभी संपर्क करें।</p>
+        <a class="btn btn-primary" href="pages/public/events.html#contact">अभी संपर्क करें</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-left">
+        <p>© 2025 Bala Eent Udyog</p>
+      </div>
+      <div class="footer-right">
+        <p>फोन: +91 9654275704</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

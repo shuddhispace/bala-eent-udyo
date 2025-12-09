@@ -1,123 +1,186 @@
-/* Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 body {
     background: #f5f5f5;
-    color: #333;
-    line-height: 1.6;
+    color: #222;
 }
 
-/* Container */
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-/* Header */
+/* HEADER */
 header {
-    background: #fff;
-    padding: 1rem 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 25px;
+    background: white;
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.10);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
 }
 
-header h1 {
-    color: #ff6b00; /* Brick-orange */
-    display: inline-block;
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: #b53030;
 }
 
-nav {
-    float: right;
+.nav-links {
+    display: flex;
+    gap: 25px;
 }
 
-nav a {
+.nav-links a {
     text-decoration: none;
-    margin-left: 1.5rem;
+    font-size: 16px;
     color: #333;
-    font-weight: 500;
     transition: 0.3s;
 }
 
-nav a:hover {
-    color: #ff6b00;
+.owner-btn {
+    background: #b53030;
+    color: white !important;
+    padding: 6px 15px;
+    border-radius: 6px;
 }
 
-.owner-login {
-    background: #ff6b00;
-    color: #fff !important;
-    padding: 0.4rem 0.8rem;
-    border-radius: 5px;
+/* HAMBURGER */
+.hamburger {
+    width: 30px;
+    cursor: pointer;
+    display: none;
 }
 
-/* Hero Section */
+.hamburger span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #333;
+    margin: 5px 0;
+    border-radius: 3px;
+}
+
+/* HERO */
 .hero {
-    background: url('../images/bricks-background.jpg') center/cover no-repeat;
-    color: #fff;
-    padding: 6rem 0;
     text-align: center;
+    padding: 120px 20px;
+    background: linear-gradient(145deg, #ffdbd4, #ffeceb);
 }
 
-.hero h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+.hero h1 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #b53030;
 }
 
 .hero p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
+    margin-top: 10px;
+    font-size: 18px;
+    color: #444;
 }
 
-.btn {
-    background: #ff6b00;
-    color: #fff;
-    padding: 0.7rem 1.5rem;
-    border-radius: 5px;
+.cta {
+    margin-top: 20px;
+    display: inline-block;
+    background: #b53030;
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: white;
+    font-size: 17px;
     text-decoration: none;
-    transition: 0.3s;
 }
 
-.btn:hover {
-    background: #e55b00;
+/* SERVICES */
+.services {
+    padding: 60px 30px;
 }
 
-/* Sections */
-section {
-    padding: 4rem 0;
-}
-
-.about, .contact {
-    background: #fff;
-    margin: 2rem 0;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-/* Footer */
-footer {
-    background: #333;
-    color: #fff;
+.services h2 {
     text-align: center;
-    padding: 1rem 0;
+    margin-bottom: 25px;
+    font-size: 30px;
+    color: #222;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    nav {
-        float: none;
-        text-align: center;
-        margin-top: 1rem;
+.service-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+    text-align: center;
+}
+
+.card h3 {
+    color: #b53030;
+    margin-bottom: 10px;
+}
+
+/* CONTACT */
+.contact {
+    padding: 60px 30px;
+    background: #fff8f7;
+}
+
+.contact h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 30px;
+}
+
+.contact-box {
+    background: white;
+    padding: 25px;
+    max-width: 420px;
+    margin: auto;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.contact-box p {
+    margin: 10px 0;
+    font-size: 17px;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 15px;
+    background: #b53030;
+    color: white;
+    margin-top: 40px;
+}
+
+/* MOBILE RESPONSIVE */
+@media(max-width: 768px) {
+
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        background: white;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        border-radius: 10px;
     }
 
-    .hero h2 {
-        font-size: 2rem;
+    .nav-links.show {
+        display: flex;
+    }
+
+    .hamburger {
+        display: block;
     }
 }

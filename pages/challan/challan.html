@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>चालान जेनरेटर — बाला ईंट उद्योग</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/challan.css" />
+</head>
+<body>
+  <header class="site-header small">
+    <div class="container header-inner">
+      <div class="brand">बाला ईंट उद्योग — चालान</div>
+      <nav class="nav">
+        <a href="../../index.html">होम</a>
+        <a href="../../pages/owner/owner.html" class="btn">Owner</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h2>चालान विवरण भरें</h2>
+      <form id="challanForm">
+        <div class="grid">
+          <label>चालान क्रमांक <input id="challan_no" required></label>
+          <label>तारीख <input id="date" type="date" required></label>
+          <label>ग्राहक का नाम <input id="buyer_name" required></label>
+          <label>ग्राहक मोबाइल <input id="buyer_phone" placeholder="10 digits" required></label>
+          <label>पता <input id="buyer_address"></label>
+          <label>ईंट की संख्या <input id="quantity" type="number" required></label>
+          <label>दर (प्रति 1000) <input id="rate" type="number" required></label>
+          <label>कुल राशि <input id="amount" readonly></label>
+          <label>एडवांस <input id="advance" type="number" value="0"></label>
+          <label>राशि बाकी <input id="remaining" readonly></label>
+          <label>ड्राइवर का नाम <input id="driver_name"></label>
+          <label>ड्राइवर मोबाइल <input id="driver_phone" placeholder="10 digits"></label>
+          <label>वाहन संख्या <input id="vehicle"></label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="generateBtn" class="btn">चालान तैयार करें</button>
+          <button type="button" id="printBtn" class="btn ghost" style="display:none">PDF के रूप में सेव/प्रिंट करें</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="previewWrap" class="card" style="display:none;">
+      <div id="challanPrintable" class="challan">
+        <!-- printable challan will be injected here -->
+      </div>
+
+      <div style="margin-top:12px;">
+        <button class="btn whatsapp" id="sendBuyer">Buyer को भेजें</button>
+        <button class="btn whatsapp" id="sendDriver">Driver को भेजें</button>
+        <button class="btn whatsapp" id="sendOwner">Owner को भेजें</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© 2025 बाला ईंट उद्योग</div>
+  </footer>
+
+  <script src="../../assets/js/challan.js"></script>
+</body>
+</html>

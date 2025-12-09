@@ -1,0 +1,20 @@
+// Simple accessible nav toggle
+document.addEventListener('DOMContentLoaded', function () {
+  const btn = document.getElementById('nav-toggle');
+  const nav = document.getElementById('site-nav');
+
+  if (!btn || !nav) return;
+
+  btn.addEventListener('click', () => {
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+  });
+
+  // close nav when a link is clicked (good for mobile)
+  nav.addEventListener('click', (e) => {
+    if (e.target.tagName === 'A' && nav.classList.contains('open')) {
+      nav.classList.remove('open');
+      btn.classList.remove('open');
+    }
+  });
+});

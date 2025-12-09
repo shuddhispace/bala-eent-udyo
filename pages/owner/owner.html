@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Owner — बाला ईंट उद्योग</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/owner.css" />
+</head>
+<body>
+  <header class="site-header small">
+    <div class="container header-inner">
+      <div class="brand">Owner Panel</div>
+      <nav class="nav">
+        <a href="../../index.html">होम</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card" id="loginCard">
+      <h2>Owner Login (Demo OTP)</h2>
+      <p>फोन नंबर डाले और OTP 1234 डालें (demo)</p>
+      <label>Phone <input id="owner_phone_input" placeholder="10 digits"></label>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button id="sendOtpBtn" class="btn">OTP भेजें</button>
+        <button id="useDemoBtn" class="btn ghost">Use Demo Account</button>
+      </div>
+      <div id="otpArea" style="display:none; margin-top:8px;">
+        <label>Enter OTP <input id="otpInput"></label>
+        <button id="verifyBtn" class="btn">Verify</button>
+      </div>
+    </div>
+
+    <div class="card" id="dashboardCard" style="display:none;">
+      <h2>Owner Dashboard</h2>
+      <div class="grid-3">
+        <div class="stat">
+          <h3 id="totalKaccha">0</h3>
+          <p>कच्ची ईंट (कुल)</p>
+        </div>
+        <div class="stat">
+          <h3 id="totalExpenses">₹0</h3>
+          <p>कुल खर्च</p>
+        </div>
+        <div class="stat">
+          <h3 id="totalChallans">0</h3>
+          <p>चालान</p>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <a class="btn" href="../../pages/challan/challan.html">नया चालान बनाएँ</a>
+      </div>
+
+      <section style="margin-top:12px;">
+        <h3>कर्मचारी (Quick add)</h3>
+        <div style="display:flex; gap:8px;">
+          <input id="newEmpName" placeholder="नाम">
+          <input id="newEmpPhone" placeholder="फोन">
+          <button id="addEmpBtn" class="btn">Add</button>
+        </div>
+        <div id="empList" style="margin-top:8px;"></div>
+      </section>
+
+      <section style="margin-top:12px;">
+        <h3>कच्ची ईंट - रिकॉर्ड जोड़ें</h3>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <select id="empSelect"></select>
+          <input id="empCount" type="number" placeholder="count">
+          <button id="addCountBtn" class="btn">Add Count</button>
+        </div>
+        <div id="countsList" style="margin-top:8px;"></div>
+      </section>
+
+      <section style="margin-top:12px;">
+        <h3>Expenses (Quick)</h3>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <input id="expTitle" placeholder="Reason">
+          <input id="expAmount" type="number" placeholder="Amount">
+          <button id="addExpBtn" class="btn">Add Expense</button>
+        </div>
+        <div id="expList" style="margin-top:8px;"></div>
+      </section>
+
+      <div style="margin-top:12px;">
+        <button id="logoutBtn" class="btn ghost">Logout</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© 2025 बाला ईंट उद्योग</div>
+  </footer>
+
+  <script src="../../assets/js/owner.js"></script>
+</body>
+</html>

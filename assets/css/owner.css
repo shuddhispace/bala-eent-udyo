@@ -1,0 +1,2 @@
+/* small owner specific overrides */
+#empList div, #countsList div, #expList div{background:#fbfbfe;padding:8px;border-radius:8px;margin-bottom:6px}
