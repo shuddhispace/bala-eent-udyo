@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Login • Shri Bala Eent Udyog</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#b53030;
+  --primary-dark:#8e1f1f;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#fbeaea,#f6eaea);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.login-card{
+  background:#fff;
+  width:100%;
+  max-width:420px;
+  padding:40px 30px;
+  border-radius:22px;
+  box-shadow:0 25px 60px rgba(0,0,0,.2);
+}
+
+h1{
+  text-align:center;
+  color:var(--primary);
+  margin-bottom:8px;
+}
+
+p{
+  text-align:center;
+  color:#555;
+  font-size:14px;
+  margin-bottom:22px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  margin-bottom:14px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:16px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-size:18px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+
+#msg{
+  margin-top:14px;
+  text-align:center;
+  font-size:14px;
+}
+
+.success{color:#2e7d32}
+.error{color:#c62828}
+</style>
+</head>
+
+<body>
+
+<div class="login-card">
+  <h1>श्री बाला ईंट उद्योग</h1>
+  <p>Owner Secure Login</p>
+
+  <input id="userid" placeholder="Owner ID">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="loginOwner()">Login</button>
+  <div id="msg"></div>
+</div>
+
+<script>
+const OWNER_ID = "balaowner";
+const OWNER_PASS = "12345";
+
+function loginOwner(){
+  const id = userid.value.trim();
+  const pass = password.value.trim();
+  const msg = document.getElementById("msg");
+
+  if(!id || !pass){
+    msg.textContent = "सभी विवरण भरें";
+    msg.className = "error";
+    return;
+  }
+
+  if(id === OWNER_ID && pass === OWNER_PASS){
+    localStorage.setItem("OWNER_AUTH","YES");
+    msg.textContent = "Login Successful ✔";
+    msg.className = "success";
+
+    setTimeout(()=>{
+      window.location.replace("/pages/owner/owner-dashboard.html");
+    },700);
+  }else{
+    msg.textContent = "गलत ID या पासवर्ड";
+    msg.className = "error";
+  }
+}
+</script>
+
+</body>
+</html>

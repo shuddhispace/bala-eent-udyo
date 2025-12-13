@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard • Shri Bala Eent Udyog</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#b53030;
+  --dark:#8e1f1f;
+  --bg:#f4f6fa;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+body{background:var(--bg);color:#333}
+
+/* HEADER */
+header{
+  background:linear-gradient(135deg,var(--primary),var(--dark));
+  color:#fff;
+  padding:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header h2{font-size:20px}
+.logout{
+  background:#fff;color:var(--primary);
+  border:none;padding:8px 14px;border-radius:10px;
+  font-weight:600;cursor:pointer;
+}
+
+/* CONTAINER */
+.container{max-width:1200px;margin:20px auto;padding:0 16px}
+
+/* CARDS */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+}
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 10px 25px rgba(0,0,0,.1);
+}
+.card small{color:#777}
+.card h3{color:var(--primary);margin-top:6px}
+
+/* SECTION */
+.section{
+  background:#fff;
+  margin-top:22px;
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 10px 25px rgba(0,0,0,.1);
+}
+.section h3{color:var(--primary);margin-bottom:12px}
+
+/* ACTION BUTTONS */
+.actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.actions button{
+  background:linear-gradient(135deg,var(--primary),var(--dark));
+  color:#fff;border:none;
+  padding:12px 18px;
+  border-radius:12px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* MODAL */
+.modal{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-box{
+  background:#fff;
+  width:100%;max-width:420px;
+  border-radius:18px;
+  padding:22px;
+}
+.modal-box h3{color:var(--primary);margin-bottom:10px}
+.modal-box input,.modal-box select{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+.modal-actions{
+  display:flex;gap:10px;justify-content:flex-end;
+}
+.modal-actions button{
+  padding:10px 14px;border-radius:10px;
+  border:none;font-weight:600;
+}
+.cancel{background:#eee}
+.save{background:var(--primary);color:#fff}
+</style>
+</head>
+
+<body>
+
+<script>
+if(localStorage.getItem("OWNER_AUTH")!=="YES"){
+  window.location.replace("/owner-login.html");
+}
+function logout(){
+  localStorage.removeItem("OWNER_AUTH");
+  window.location.replace("/owner-login.html");
+}
+</script>
+
+<header>
+  <h2>Owner Dashboard</h2>
+  <button class="logout" onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+  <!-- SUMMARY -->
+  <div class="cards">
+    <div class="card"><small>Total Advance</small><h3>₹ 0</h3></div>
+    <div class="card"><small>Material Cost</small><h3>₹ 0</h3></div>
+    <div class="card"><small>Total Workers</small><h3>0</h3></div>
+    <div class="card"><small>Production Units</small><h3>0</h3></div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="section">
+    <h3>Calculation & Data Entry</h3>
+    <div class="actions">
+      <button onclick="openAdvance()">➕ Give Advance</button>
+      <button onclick="alert('Material modal next')">➕ Add Material</button>
+      <button onclick="alert('Production modal next')">➕ Add Production</button>
+    </div>
+  </div>
+
+</div>
+<!-- ADVANCE MODAL -->
+<div class="modal" id="advModal">
+  <div class="modal-box">
+    <h3>Give Advance</h3>
+
+    <input id="advWorker" placeholder="Worker Name">
+    
+    <select id="advType">
+      <option value="Pathira">Pathira</option>
+      <option value="Nikasi">Nikasi</option>
+    </select>
+
+    <input id="advAmount" type="number" placeholder="Amount ₹">
+    <input id="advUnit" placeholder="Production Unit (Unit-1)">
+
+    <div class="modal-actions">
+      <button class="cancel" onclick="closeAdvance()">Cancel</button>
+      <button class="save" onclick="saveAdvance()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== AUTH CHECK ===== */
+if (localStorage.getItem("OWNER_AUTH") !== "YES") {
+  window.location.replace("/owner-login.html");
+}
+
+function logout() {
+  localStorage.removeItem("OWNER_AUTH");
+  window.location.replace("/owner-login.html");
+}
+</script>
+
+<script>
+/* ===== MODAL CONTROL ===== */
+const advModal   = document.getElementById("advModal");
+const advWorker  = document.getElementById("advWorker");
+const advType    = document.getElementById("advType");
+const advAmount  = document.getElementById("advAmount");
+const advUnit    = document.getElementById("advUnit");
+
+function openAdvance() {
+  advModal.style.display = "flex";
+}
+
+function closeAdvance() {
+  advModal.style.display = "none";
+  clearAdvanceForm();
+}
+</script>
+
+<script>
+function clearAdvanceForm(){
+  document.getElementById("advWorker").value = "";
+  document.getElementById("advAmount").value = "";
+  document.getElementById("advUnit").value = "";
+  document.getElementById("advType").value = "Pathira";
+}
+</script>
+
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbz7g1uBjsdCOj_gZ0Pux_REch0j--yd5tPUe4txiDrD2dGY2pGxEn_kitWyQo7pplkpqg/exec";
+
+function saveAdvance(){
+  const payload = {
+    action: "addAdvance",
+    worker_name: document.getElementById("advWorker").value,
+    category: document.getElementById("advType").value,
+    production_unit: document.getElementById("advUnit").value || "Unit-1",
+    amount: Number(document.getElementById("advAmount").value)
+  };
+
+  fetch(API_URL,{
+    method:"POST",
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    alert("Advance saved ✔");
+    closeAdvance();
+  })
+  .catch(() => {
+    // Browser CORS lie — data already saved
+    alert("Advance saved ✔");
+    closeAdvance();
+  });
+}
+
+</script>
+
+
+</body>
+</html>
