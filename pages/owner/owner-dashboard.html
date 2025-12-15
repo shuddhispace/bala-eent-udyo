@@ -3,243 +3,267 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owner Dashboard • Shri Bala Eent Udyog</title>
+<title>Owner Dashboard • Pathira Advance</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --primary:#b53030;
-  --dark:#8e1f1f;
-  --bg:#f4f6fa;
-}
+body{font-family:Poppins;background:#f4f6fa;margin:0}
+header{background:#b53030;color:#fff;padding:16px;font-weight:600}
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
-body{background:var(--bg);color:#333}
+.container{max-width:1200px;margin:auto;padding:16px}
 
-/* HEADER */
-header{
-  background:linear-gradient(135deg,var(--primary),var(--dark));
-  color:#fff;
-  padding:18px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-header h2{font-size:20px}
-.logout{
-  background:#fff;color:var(--primary);
-  border:none;padding:8px 14px;border-radius:10px;
-  font-weight:600;cursor:pointer;
-}
-
-/* CONTAINER */
-.container{max-width:1200px;margin:20px auto;padding:0 16px}
-
-/* CARDS */
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:14px;
-}
-.card{
-  background:#fff;
-  padding:20px;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.1);
-}
-.card small{color:#777}
-.card h3{color:var(--primary);margin-top:6px}
-
-/* SECTION */
 .section{
   background:#fff;
-  margin-top:22px;
-  padding:20px;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.1);
-}
-.section h3{color:var(--primary);margin-bottom:12px}
-
-/* ACTION BUTTONS */
-.actions{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.actions button{
-  background:linear-gradient(135deg,var(--primary),var(--dark));
-  color:#fff;border:none;
-  padding:12px 18px;
-  border-radius:12px;
-  font-weight:600;
-  cursor:pointer;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08)
 }
 
-/* MODAL */
-.modal{
-  display:none;
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.6);
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-.modal-box{
-  background:#fff;
-  width:100%;max-width:420px;
-  border-radius:18px;
-  padding:22px;
-}
-.modal-box h3{color:var(--primary);margin-bottom:10px}
-.modal-box input,.modal-box select{
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
+h3{margin-bottom:12px;color:#b53030}
+
+input,select,button{
+  padding:10px;
   border-radius:10px;
   border:1px solid #ccc;
+  font-family:Poppins
 }
-.modal-actions{
-  display:flex;gap:10px;justify-content:flex-end;
+
+button{
+  background:#b53030;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  font-weight:600
 }
-.modal-actions button{
-  padding:10px 14px;border-radius:10px;
-  border:none;font-weight:600;
+
+.filters{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap
 }
-.cancel{background:#eee}
-.save{background:var(--primary);color:#fff}
+
+.summary{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap
+}
+
+.card{
+  background:#fff;
+  padding:14px;
+  border-radius:14px;
+  min-width:200px;
+  box-shadow:0 8px 18px rgba(0,0,0,.08)
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:14px
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #eee;
+  font-size:14px
+}
+
+thead{background:#f2f2f2}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  align-items:center;
+  justify-content:center
+}
+
+.modal-box{
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  width:90%;
+  max-width:420px
+}
 </style>
 </head>
 
 <body>
 
-<script>
-if(localStorage.getItem("OWNER_AUTH")!=="YES"){
-  window.location.replace("/owner-login.html");
-}
-function logout(){
-  localStorage.removeItem("OWNER_AUTH");
-  window.location.replace("/owner-login.html");
-}
-</script>
-
-<header>
-  <h2>Owner Dashboard</h2>
-  <button class="logout" onclick="logout()">Logout</button>
-</header>
+<header>Owner Dashboard • Pathira Advance</header>
 
 <div class="container">
 
-  <!-- SUMMARY -->
-  <div class="cards">
-    <div class="card"><small>Total Advance</small><h3>₹ 0</h3></div>
-    <div class="card"><small>Material Cost</small><h3>₹ 0</h3></div>
-    <div class="card"><small>Total Workers</small><h3>0</h3></div>
-    <div class="card"><small>Production Units</small><h3>0</h3></div>
+  <!-- ACTION -->
+  <div class="section">
+    <button onclick="openModal()">➕ Give Advance</button>
   </div>
 
-  <!-- ACTIONS -->
+  <!-- FILTERS -->
   <div class="section">
-    <h3>Calculation & Data Entry</h3>
-    <div class="actions">
-      <button onclick="openAdvance()">➕ Give Advance</button>
-      <button onclick="alert('Material modal next')">➕ Add Material</button>
-      <button onclick="alert('Production modal next')">➕ Add Production</button>
+    <h3>Advanced Filters</h3>
+    <div class="filters">
+      <input id="filterName" placeholder="Worker name">
+      <select id="filterPurpose">
+        <option value="">All Purpose</option>
+        <option value="Pathira">Pathira</option>
+        <option value="Nikasi">Nikasi</option>
+      </select>
+      <button onclick="loadData()">Search</button>
+      <button onclick="resetFilter()" style="background:#777">Reset</button>
     </div>
   </div>
 
+  <!-- SUMMARY -->
+  <div class="section">
+    <h3>Summary</h3>
+    <div class="summary">
+      <div class="card">
+        <small>Total Records</small>
+        <h3 id="totalCount">0</h3>
+      </div>
+      <div class="card">
+        <small>Total Advance Amount</small>
+        <h3 id="totalAmount">₹ 0</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="section">
+    <h3>Advance Records</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Worker</th>
+          <th>Amount</th>
+          <th>Purpose</th>
+          <th>Unit</th>
+          <th>Date</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
 </div>
-<!-- ADVANCE MODAL -->
-<div class="modal" id="advModal">
+
+<!-- MODAL -->
+<div class="modal" id="modal">
   <div class="modal-box">
     <h3>Give Advance</h3>
 
-    <input id="advWorker" placeholder="Worker Name">
-    
-    <select id="advType">
+    <input id="w" placeholder="Worker Name"><br><br>
+    <input id="a" type="number" placeholder="Amount"><br><br>
+
+    <select id="p">
       <option value="Pathira">Pathira</option>
       <option value="Nikasi">Nikasi</option>
-    </select>
+    </select><br><br>
 
-    <input id="advAmount" type="number" placeholder="Amount ₹">
-    <input id="advUnit" placeholder="Production Unit (Unit-1)">
+    <input id="u" value="Unit-1"><br><br>
 
-    <div class="modal-actions">
-      <button class="cancel" onclick="closeAdvance()">Cancel</button>
-      <button class="save" onclick="saveAdvance()">Save</button>
-    </div>
+    <button onclick="save()">Save</button>
+    <button onclick="closeModal()" style="background:#ccc;color:#000">Cancel</button>
   </div>
 </div>
 
-<script>
-/* ===== AUTH CHECK ===== */
-if (localStorage.getItem("OWNER_AUTH") !== "YES") {
-  window.location.replace("/owner-login.html");
-}
+<!-- POST FORM -->
+<form id="postForm"
+  action="https://script.google.com/macros/s/AKfycbzPBjI7WZK5xBPeZ-ANrrCemBv5rGEwFhfYLmVKoeZXOI329L40HZGFVYm6le5yEwsFWQ/exec"
+  method="POST"
+  target="hiddenFrame">
+  <input type="hidden" name="worker_name" id="fw">
+  <input type="hidden" name="amount" id="fa">
+  <input type="hidden" name="purpose" id="fp">
+  <input type="hidden" name="production_unit" id="fu">
+</form>
 
-function logout() {
-  localStorage.removeItem("OWNER_AUTH");
-  window.location.replace("/owner-login.html");
-}
-</script>
-
-<script>
-/* ===== MODAL CONTROL ===== */
-const advModal   = document.getElementById("advModal");
-const advWorker  = document.getElementById("advWorker");
-const advType    = document.getElementById("advType");
-const advAmount  = document.getElementById("advAmount");
-const advUnit    = document.getElementById("advUnit");
-
-function openAdvance() {
-  advModal.style.display = "flex";
-}
-
-function closeAdvance() {
-  advModal.style.display = "none";
-  clearAdvanceForm();
-}
-</script>
+<iframe name="hiddenFrame" id="hiddenFrame" style="display:none"></iframe>
 
 <script>
-function clearAdvanceForm(){
-  document.getElementById("advWorker").value = "";
-  document.getElementById("advAmount").value = "";
-  document.getElementById("advUnit").value = "";
-  document.getElementById("advType").value = "Pathira";
-}
-</script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzPBjI7WZK5xBPeZ-ANrrCemBv5rGEwFhfYLmVKoeZXOI329L40HZGFVYm6le5yEwsFWQ/exec";
+const iframe = document.getElementById("hiddenFrame");
 
+/* MODAL */
+function openModal(){ modal.style.display="flex"; }
+function closeModal(){ modal.style.display="none"; }
 
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbz7g1uBjsdCOj_gZ0Pux_REch0j--yd5tPUe4txiDrD2dGY2pGxEn_kitWyQo7pplkpqg/exec";
+/* SAVE ADVANCE */
+function save(){
+  if(!w.value || !a.value){
+    alert("Worker name and amount required");
+    return;
+  }
 
-function saveAdvance(){
-  const payload = {
-    action: "addAdvance",
-    worker_name: document.getElementById("advWorker").value,
-    category: document.getElementById("advType").value,
-    production_unit: document.getElementById("advUnit").value || "Unit-1",
-    amount: Number(document.getElementById("advAmount").value)
+  fw.value = w.value.trim();
+  fa.value = a.value;
+  fp.value = p.value;
+  fu.value = u.value || "Unit-1";
+
+  iframe.onload = function(){
+    alert("✅ Advance added successfully");
+    loadData();
+    iframe.onload = null;
   };
 
-  fetch(API_URL,{
-    method:"POST",
-    body: JSON.stringify(payload)
-  })
-  .then(() => {
-    alert("Advance saved ✔");
-    closeAdvance();
-  })
-  .catch(() => {
-    // Browser CORS lie — data already saved
-    alert("Advance saved ✔");
-    closeAdvance();
-  });
+  postForm.submit();
+  closeModal();
+
+  w.value="";
+  a.value="";
 }
 
-</script>
+/* LOAD DATA + TOTAL */
+function loadData(){
+  const name = filterName.value;
+  const purpose = filterPurpose.value;
 
+  tableBody.innerHTML = "<tr><td colspan='6'>Loading...</td></tr>";
+
+  fetch(`${API_URL}?name=${encodeURIComponent(name)}&purpose=${encodeURIComponent(purpose)}`)
+    .then(r=>r.json())
+    .then(data=>{
+      tableBody.innerHTML="";
+      let total = 0;
+
+      data.forEach(r=>{
+        total += Number(r.amount) || 0;
+
+        const dt = new Date(r.created_date);
+        const date = dt.toLocaleDateString("en-IN");
+        const time = dt.toLocaleTimeString("en-IN");
+
+        tableBody.innerHTML += `
+          <tr>
+            <td>${r.worker_name}</td>
+            <td>₹ ${r.amount}</td>
+            <td>${r.purpose}</td>
+            <td>${r.production_unit}</td>
+            <td>${date}</td>
+            <td>${time}</td>
+          </tr>`;
+      });
+
+      totalCount.innerText = data.length;
+      totalAmount.innerText = "₹ " + total;
+    });
+}
+
+/* RESET FILTER */
+function resetFilter(){
+  filterName.value="";
+  filterPurpose.value="";
+  loadData();
+}
+
+/* INITIAL LOAD */
+loadData();
+</script>
 
 </body>
 </html>

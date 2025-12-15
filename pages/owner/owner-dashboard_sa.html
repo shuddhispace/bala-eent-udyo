@@ -13,23 +13,12 @@
   --dark:#8e1f1f;
   --bg:#f4f6fa;
   --card:#ffffff;
-  --text:#333;
-  --muted:#777;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Poppins,sans-serif;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+body{background:var(--bg);color:#333}
 
-body{
-  background:var(--bg);
-  color:var(--text);
-}
-
-/* ===== HEADER ===== */
+/* HEADER */
 header{
   background:linear-gradient(135deg,var(--primary),var(--dark));
   color:#fff;
@@ -38,105 +27,106 @@ header{
   justify-content:space-between;
   align-items:center;
 }
-
-header h2{
-  font-size:20px;
-  font-weight:700;
-}
-
+header h2{font-size:18px}
 .logout{
-  background:#fff;
-  color:var(--primary);
-  border:none;
-  padding:8px 14px;
-  border-radius:10px;
-  font-weight:600;
-  cursor:pointer;
+  background:#fff;color:var(--primary);
+  border:none;padding:8px 14px;border-radius:10px;
+  font-weight:600;cursor:pointer;
 }
 
-/* ===== CONTAINER ===== */
-.container{
-  max-width:1200px;
-  margin:20px auto;
-  padding:0 16px;
-}
+/* CONTAINER */
+.container{max-width:1200px;margin:auto;padding:16px}
 
-/* ===== SUMMARY CARDS ===== */
+/* CARDS */
 .cards{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
   gap:14px;
 }
-
 .card{
   background:var(--card);
+  padding:18px;
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+.card small{color:#777}
+.card h3{color:var(--primary);margin-top:6px}
+
+/* SECTION */
+.section{
+  background:#fff;
+  margin-top:20px;
   padding:18px;
   border-radius:18px;
   box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
+.section h3{color:var(--primary);margin-bottom:12px}
 
-.card small{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.card h3{
-  margin-top:6px;
-  color:var(--primary);
-  font-size:22px;
-}
-
-/* ===== SECTION ===== */
-.section{
-  background:var(--card);
-  margin-top:22px;
-  padding:20px;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-
-.section h3{
-  color:var(--primary);
-  margin-bottom:14px;
-  font-size:18px;
-}
-
-/* ===== ACTION BUTTONS ===== */
-.actions{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-}
-
-.actions button{
+/* BUTTON */
+button{
   background:linear-gradient(135deg,var(--primary),var(--dark));
   color:#fff;
   border:none;
-  padding:12px 18px;
+  padding:12px 16px;
   border-radius:12px;
   font-weight:600;
   cursor:pointer;
 }
 
-/* ===== RESPONSIVE ===== */
-@media(max-width:600px){
-  header h2{font-size:18px}
+/* FILTERS */
+.filters{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:10px;
 }
+.filters input,.filters select{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;margin-top:14px}
+th,td{padding:10px;font-size:14px;text-align:left}
+thead{background:#f3f3f3}
+tbody tr{border-bottom:1px solid #eee}
+
+/* MODAL */
+.modal{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+.modal-box{
+  background:#fff;
+  width:95%;max-width:420px;
+  border-radius:18px;
+  padding:20px;
+}
+.modal-box input,.modal-box select{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+.modal-actions{display:flex;gap:10px}
+.modal-actions button{flex:1}
 </style>
 </head>
 
 <body>
 
-<!-- ================= AUTH CHECK ================= -->
 <script>
-/* 🔐 OWNER AUTH CHECK */
-if(localStorage.getItem("OWNER_AUTH") !== "YES"){
-  window.location.replace("owner-login.html");
+if(localStorage.getItem("OWNER_AUTH")!=="YES"){
+  location.replace("/owner-login.html");
 }
-
 function logout(){
   localStorage.removeItem("OWNER_AUTH");
-  window.location.replace("owner-login.html");
+  location.replace("/owner-login.html");
 }
 </script>
 
@@ -144,94 +134,135 @@ function logout(){
   <h2>Owner Dashboard</h2>
   <button class="logout" onclick="logout()">Logout</button>
 </header>
-<!-- ===== ADVANCE MODAL ===== -->
-<div id="advanceModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:1000">
-  <div style="background:#fff;width:100%;max-width:420px;border-radius:18px;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.3)">
-    
-    <h3 style="color:#b53030;margin-bottom:12px">Give Advance</h3>
 
-    <input id="advWorker" placeholder="Worker Name" style="width:100%;padding:12px;margin-bottom:10px;border-radius:10px;border:1px solid #ccc">
+<div class="container">
 
-    <select id="advType" style="width:100%;padding:12px;margin-bottom:10px;border-radius:10px">
-      <option value="">Select Type</option>
-      <option value="Pathira">Pathira</option>
-      <option value="Nikasi">Nikasi</option>
-    </select>
-
-    <input id="advAmount" type="number" placeholder="Amount (₹)" style="width:100%;padding:12px;margin-bottom:10px;border-radius:10px;border:1px solid #ccc">
-
-    <input id="advUnit" placeholder="Production Unit (Unit-1)" style="width:100%;padding:12px;margin-bottom:14px;border-radius:10px;border:1px solid #ccc">
-
-    <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button onclick="closeAdvance()" style="padding:10px 14px;border-radius:10px;border:1px solid #999;background:#fff">Cancel</button>
-      <button onclick="saveAdvance()" style="padding:10px 16px;border-radius:10px;border:none;background:#b53030;color:#fff">Save</button>
-    </div>
-
+  <!-- SUMMARY -->
+  <div class="cards">
+    <div class="card"><small>Total Advance</small><h3 id="sumTotal">₹ 0</h3></div>
+    <div class="card"><small>Total Pathira</small><h3 id="sumPathira">₹ 0</h3></div>
+    <div class="card"><small>Total Nikasi</small><h3 id="sumNikasi">₹ 0</h3></div>
+    <div class="card"><small>Total Records</small><h3 id="sumCount">0</h3></div>
   </div>
-</div>
 
-  <!-- ===== ACTIONS ===== -->
+  <!-- ACTION -->
   <div class="section">
-    <h3>Calculation & Data Entry</h3>
-    <div class="actions">
-      <button onclick="openAdvance()">➕ Give Advance</button>
-      <button onclick="openMaterial()">➕ Add Material</button>
-      <button onclick="openProduction()">➕ Add Production</button>
+    <button onclick="openAdvance()">➕ Give Advance</button>
+  </div>
+
+  <!-- FILTER PANEL -->
+  <div class="section">
+    <h3>Advanced Filters</h3>
+    <div class="filters">
+      <input id="fName" placeholder="Worker name">
+      <select id="fPurpose">
+        <option value="">All Purpose</option>
+        <option>Pathira</option>
+        <option>Nikasi</option>
+      </select>
+      <input id="fUnit" placeholder="Unit (Unit-1)">
+      <input type="date" id="fFrom">
+      <input type="date" id="fTo">
+      <button onclick="loadData()">Apply</button>
     </div>
   </div>
 
+  <!-- TABLE -->
+  <div class="section">
+    <h3>Advance Records</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Worker</th>
+          <th>Purpose</th>
+          <th>Amount</th>
+          <th>Unit</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="dataBody"></tbody>
+    </table>
+  </div>
 </div>
 
-<!-- ================= SCRIPT ================= -->
+<!-- ADVANCE MODAL -->
+<div class="modal" id="advModal">
+  <div class="modal-box">
+    <h3>Give Advance</h3>
+
+    <input id="advWorker" placeholder="Worker Name">
+    <select id="advPurpose">
+      <option>Pathira</option>
+      <option>Nikasi</option>
+    </select>
+    <input id="advAmount" type="number" placeholder="Amount ₹">
+    <input id="advUnit" value="Unit-1">
+
+    <div class="modal-actions">
+      <button onclick="closeAdvance()" style="background:#ddd;color:#000">Cancel</button>
+      <button onclick="saveAdvance()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- HIDDEN FORM -->
+<form id="advanceForm"
+  action="https://script.google.com/macros/s/AKfycbyjJtuTB2iO5iPU-Dbpj59d_1OjsJy6gSIIBq53uT-WizQF0KF9V9hpiFTgZ7GgEZCy6A/exec"
+  method="POST" target="hiddenFrame">
+  <input type="hidden" name="worker_name" id="hWorker">
+  <input type="hidden" name="amount" id="hAmount">
+  <input type="hidden" name="production_unit" id="hUnit">
+  <input type="hidden" name="purpose" id="hPurpose">
+</form>
+<iframe name="hiddenFrame" style="display:none"></iframe>
+
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbz7g1uBjsdCOj_gZ0Pux_REch0j--yd5tPUe4txiDrD2dGY2pGxEn_kitWyQo7pplkpqg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjJtuTB2iO5iPU-Dbpj59d_1OjsJy6gSIIBq53uT-WizQF0KF9V9hpiFTgZ7GgEZCy6A/exec";
 
-/* ===== OPEN / CLOSE MODAL ===== */
-function openAdvance(){
-  document.getElementById("advanceModal").style.display="flex";
-}
-function closeAdvance(){
-  document.getElementById("advanceModal").style.display="none";
-}
+const advModal = document.getElementById("advModal");
 
-/* ===== SAVE ADVANCE ===== */
+function openAdvance(){advModal.style.display="flex"}
+function closeAdvance(){advModal.style.display="none"}
+
 function saveAdvance(){
-  const worker = advWorker.value.trim();
-  const type   = advType.value;
-  const amount = advAmount.value;
-  const unit   = advUnit.value || "Unit-1";
+  hWorker.value = advWorker.value;
+  hAmount.value = advAmount.value;
+  hUnit.value = advUnit.value;
+  hPurpose.value = advPurpose.value;
 
-  if(!worker || !type || !amount){
-    alert("Fill all required fields");
-    return;
-  }
-
-  const payload = {
-    action: "addAdvance",
-    worker_name: worker,
-    advance_type: type,
-    amount: Number(amount),
-    production_unit: unit
-  };
-
-  fetch(API_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify(payload)
-  })
-  .then(r=>r.json())
-  .then(res=>{
-    if(res.success){
-      alert("Advance Saved ✔");
-      closeAdvance();
-    }else{
-      alert("Failed ❌");
-    }
-  })
-  .catch(()=>alert("Network Error ❌"));
+  advanceForm.submit();
+  closeAdvance();
+  setTimeout(loadData,1000);
 }
-</script>
 
+function loadData(){
+  fetch(SCRIPT_URL+"?action=read")
+    .then(r=>r.json())
+    .then(rows=>{
+      let total=0,p=0,n=0;
+      dataBody.innerHTML="";
+      rows.forEach(r=>{
+        total+=r.amount;
+        if(r.purpose=="Pathira")p+=r.amount;
+        if(r.purpose=="Nikasi")n+=r.amount;
+        dataBody.innerHTML+=`
+          <tr>
+            <td>${r.worker_name}</td>
+            <td>${r.purpose}</td>
+            <td>₹ ${r.amount}</td>
+            <td>${r.production_unit}</td>
+            <td>${r.created_date}</td>
+          </tr>`;
+      });
+      sumTotal.innerText="₹ "+total;
+      sumPathira.innerText="₹ "+p;
+      sumNikasi.innerText="₹ "+n;
+      sumCount.innerText=rows.length;
+    });
+}
+
+loadData();
+</script>
 
 </body>
 </html>
