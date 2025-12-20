@@ -3,167 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owner Dashboard • Shri Bala Eent Udyog</title>
+<title>Owner Dashboard • Pathira Advance</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --primary:#b53030;
-  --dark:#8e1f1f;
-  --bg:#f4f6fa;
-  --card:#ffffff;
-}
+body{font-family:Poppins;background:#f4f6fa;margin:0}
+header{background:#b53030;color:#fff;padding:16px;font-weight:600}
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
-body{background:var(--bg);color:#333}
-
-/* HEADER */
-header{
-  background:linear-gradient(135deg,var(--primary),var(--dark));
-  color:#fff;
-  padding:16px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-header h2{font-size:18px}
-.logout{
-  background:#fff;color:var(--primary);
-  border:none;padding:8px 14px;border-radius:10px;
-  font-weight:600;cursor:pointer;
-}
-
-/* CONTAINER */
 .container{max-width:1200px;margin:auto;padding:16px}
 
-/* CARDS */
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:14px;
-}
-.card{
-  background:var(--card);
-  padding:18px;
-  border-radius:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-.card small{color:#777}
-.card h3{color:var(--primary);margin-top:6px}
-
-/* SECTION */
 .section{
   background:#fff;
-  margin-top:20px;
-  padding:18px;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-.section h3{color:var(--primary);margin-bottom:12px}
-
-/* BUTTON */
-button{
-  background:linear-gradient(135deg,var(--primary),var(--dark));
-  color:#fff;
-  border:none;
-  padding:12px 16px;
-  border-radius:12px;
-  font-weight:600;
-  cursor:pointer;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08)
 }
 
-/* FILTERS */
-.filters{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:10px;
-}
-.filters input,.filters select{
+h3{margin-bottom:12px;color:#b53030}
+
+input,select,button{
   padding:10px;
   border-radius:10px;
   border:1px solid #ccc;
+  font-family:Poppins
 }
 
-/* TABLE */
-table{width:100%;border-collapse:collapse;margin-top:14px}
-th,td{padding:10px;font-size:14px;text-align:left}
-thead{background:#f3f3f3}
-tbody tr{border-bottom:1px solid #eee}
+button{
+  background:#b53030;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  font-weight:600
+}
 
-/* MODAL */
+.filters{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap
+}
+
+.summary{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap
+}
+
+.card{
+  background:#fff;
+  padding:14px;
+  border-radius:14px;
+  min-width:200px;
+  box-shadow:0 8px 18px rgba(0,0,0,.08)
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:14px
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #eee;
+  font-size:14px
+}
+
+thead{background:#f2f2f2}
+
 .modal{
   display:none;
-  position:fixed;inset:0;
+  position:fixed;
+  inset:0;
   background:rgba(0,0,0,.6);
-  justify-content:center;
   align-items:center;
-  z-index:999;
+  justify-content:center
 }
+
 .modal-box{
   background:#fff;
-  width:95%;max-width:420px;
-  border-radius:18px;
   padding:20px;
+  border-radius:16px;
+  width:90%;
+  max-width:420px
 }
-.modal-box input,.modal-box select{
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-}
-.modal-actions{display:flex;gap:10px}
-.modal-actions button{flex:1}
 </style>
 </head>
 
 <body>
 
-<script>
-if(localStorage.getItem("OWNER_AUTH")!=="YES"){
-  location.replace("/owner-login.html");
-}
-function logout(){
-  localStorage.removeItem("OWNER_AUTH");
-  location.replace("/owner-login.html");
-}
-</script>
-
-<header>
-  <h2>Owner Dashboard</h2>
-  <button class="logout" onclick="logout()">Logout</button>
-</header>
+<header>Owner Dashboard • Pathira Advance</header>
 
 <div class="container">
 
-  <!-- SUMMARY -->
-  <div class="cards">
-    <div class="card"><small>Total Advance</small><h3 id="sumTotal">₹ 0</h3></div>
-    <div class="card"><small>Total Pathira</small><h3 id="sumPathira">₹ 0</h3></div>
-    <div class="card"><small>Total Nikasi</small><h3 id="sumNikasi">₹ 0</h3></div>
-    <div class="card"><small>Total Records</small><h3 id="sumCount">0</h3></div>
-  </div>
-
   <!-- ACTION -->
   <div class="section">
-    <button onclick="openAdvance()">➕ Give Advance</button>
+    <button onclick="openModal()">➕ Give Advance</button>
   </div>
 
-  <!-- FILTER PANEL -->
+  <!-- FILTERS -->
   <div class="section">
     <h3>Advanced Filters</h3>
     <div class="filters">
-      <input id="fName" placeholder="Worker name">
-      <select id="fPurpose">
+      <input id="filterName" placeholder="Worker name">
+      <select id="filterPurpose">
         <option value="">All Purpose</option>
-        <option>Pathira</option>
-        <option>Nikasi</option>
+        <option value="Pathira">Pathira</option>
+        <option value="Nikasi">Nikasi</option>
       </select>
-      <input id="fUnit" placeholder="Unit (Unit-1)">
-      <input type="date" id="fFrom">
-      <input type="date" id="fTo">
-      <button onclick="loadData()">Apply</button>
+      <button onclick="loadData()">Search</button>
+      <button onclick="resetFilter()" style="background:#777">Reset</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="section">
+    <h3>Summary</h3>
+    <div class="summary">
+      <div class="card">
+        <small>Total Records</small>
+        <h3 id="totalCount">0</h3>
+      </div>
+      <div class="card">
+        <small>Total Advance Amount</small>
+        <h3 id="totalAmount">₹ 0</h3>
+      </div>
     </div>
   </div>
 
@@ -174,93 +139,129 @@ function logout(){
       <thead>
         <tr>
           <th>Worker</th>
-          <th>Purpose</th>
           <th>Amount</th>
+          <th>Purpose</th>
           <th>Unit</th>
           <th>Date</th>
+          <th>Time</th>
         </tr>
       </thead>
-      <tbody id="dataBody"></tbody>
+      <tbody id="tableBody"></tbody>
     </table>
   </div>
+
 </div>
 
-<!-- ADVANCE MODAL -->
-<div class="modal" id="advModal">
+<!-- MODAL -->
+<div class="modal" id="modal">
   <div class="modal-box">
     <h3>Give Advance</h3>
 
-    <input id="advWorker" placeholder="Worker Name">
-    <select id="advPurpose">
-      <option>Pathira</option>
-      <option>Nikasi</option>
-    </select>
-    <input id="advAmount" type="number" placeholder="Amount ₹">
-    <input id="advUnit" value="Unit-1">
+    <input id="w" placeholder="Worker Name"><br><br>
+    <input id="a" type="number" placeholder="Amount"><br><br>
 
-    <div class="modal-actions">
-      <button onclick="closeAdvance()" style="background:#ddd;color:#000">Cancel</button>
-      <button onclick="saveAdvance()">Save</button>
-    </div>
+    <select id="p">
+      <option value="Pathira">Pathira</option>
+      <option value="Nikasi">Nikasi</option>
+    </select><br><br>
+
+    <input id="u" value="Unit-1"><br><br>
+
+    <button onclick="save()">Save</button>
+    <button onclick="closeModal()" style="background:#ccc;color:#000">Cancel</button>
   </div>
 </div>
 
-<!-- HIDDEN FORM -->
-<form id="advanceForm"
-  action="https://script.google.com/macros/s/AKfycbyjJtuTB2iO5iPU-Dbpj59d_1OjsJy6gSIIBq53uT-WizQF0KF9V9hpiFTgZ7GgEZCy6A/exec"
-  method="POST" target="hiddenFrame">
-  <input type="hidden" name="worker_name" id="hWorker">
-  <input type="hidden" name="amount" id="hAmount">
-  <input type="hidden" name="production_unit" id="hUnit">
-  <input type="hidden" name="purpose" id="hPurpose">
+<!-- POST FORM -->
+<form id="postForm"
+  action="https://script.google.com/macros/s/AKfycbzPBjI7WZK5xBPeZ-ANrrCemBv5rGEwFhfYLmVKoeZXOI329L40HZGFVYm6le5yEwsFWQ/exec"
+  method="POST"
+  target="hiddenFrame">
+  <input type="hidden" name="worker_name" id="fw">
+  <input type="hidden" name="amount" id="fa">
+  <input type="hidden" name="purpose" id="fp">
+  <input type="hidden" name="production_unit" id="fu">
 </form>
-<iframe name="hiddenFrame" style="display:none"></iframe>
+
+<iframe name="hiddenFrame" id="hiddenFrame" style="display:none"></iframe>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjJtuTB2iO5iPU-Dbpj59d_1OjsJy6gSIIBq53uT-WizQF0KF9V9hpiFTgZ7GgEZCy6A/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzPBjI7WZK5xBPeZ-ANrrCemBv5rGEwFhfYLmVKoeZXOI329L40HZGFVYm6le5yEwsFWQ/exec";
+const iframe = document.getElementById("hiddenFrame");
 
-const advModal = document.getElementById("advModal");
+/* MODAL */
+function openModal(){ modal.style.display="flex"; }
+function closeModal(){ modal.style.display="none"; }
 
-function openAdvance(){advModal.style.display="flex"}
-function closeAdvance(){advModal.style.display="none"}
+/* SAVE ADVANCE */
+function save(){
+  if(!w.value || !a.value){
+    alert("Worker name and amount required");
+    return;
+  }
 
-function saveAdvance(){
-  hWorker.value = advWorker.value;
-  hAmount.value = advAmount.value;
-  hUnit.value = advUnit.value;
-  hPurpose.value = advPurpose.value;
+  fw.value = w.value.trim();
+  fa.value = a.value;
+  fp.value = p.value;
+  fu.value = u.value || "Unit-1";
 
-  advanceForm.submit();
-  closeAdvance();
-  setTimeout(loadData,1000);
+  iframe.onload = function(){
+    alert("✅ Advance added successfully");
+    loadData();
+    iframe.onload = null;
+  };
+
+  postForm.submit();
+  closeModal();
+
+  w.value="";
+  a.value="";
 }
 
+/* LOAD DATA + TOTAL */
 function loadData(){
-  fetch(SCRIPT_URL+"?action=read")
+  const name = filterName.value;
+  const purpose = filterPurpose.value;
+
+  tableBody.innerHTML = "<tr><td colspan='6'>Loading...</td></tr>";
+
+  fetch(`${API_URL}?name=${encodeURIComponent(name)}&purpose=${encodeURIComponent(purpose)}`)
     .then(r=>r.json())
-    .then(rows=>{
-      let total=0,p=0,n=0;
-      dataBody.innerHTML="";
-      rows.forEach(r=>{
-        total+=r.amount;
-        if(r.purpose=="Pathira")p+=r.amount;
-        if(r.purpose=="Nikasi")n+=r.amount;
-        dataBody.innerHTML+=`
+    .then(data=>{
+      tableBody.innerHTML="";
+      let total = 0;
+
+      data.forEach(r=>{
+        total += Number(r.amount) || 0;
+
+        const dt = new Date(r.created_date);
+        const date = dt.toLocaleDateString("en-IN");
+        const time = dt.toLocaleTimeString("en-IN");
+
+        tableBody.innerHTML += `
           <tr>
             <td>${r.worker_name}</td>
-            <td>${r.purpose}</td>
             <td>₹ ${r.amount}</td>
+            <td>${r.purpose}</td>
             <td>${r.production_unit}</td>
-            <td>${r.created_date}</td>
+            <td>${date}</td>
+            <td>${time}</td>
           </tr>`;
       });
-      sumTotal.innerText="₹ "+total;
-      sumPathira.innerText="₹ "+p;
-      sumNikasi.innerText="₹ "+n;
-      sumCount.innerText=rows.length;
+
+      totalCount.innerText = data.length;
+      totalAmount.innerText = "₹ " + total;
     });
 }
 
+/* RESET FILTER */
+function resetFilter(){
+  filterName.value="";
+  filterPurpose.value="";
+  loadData();
+}
+
+/* INITIAL LOAD */
 loadData();
 </script>
 
