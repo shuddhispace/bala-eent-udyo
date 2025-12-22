@@ -12,8 +12,10 @@
 body{
   margin:0;
   font-family:Poppins;
-  background:#f4f6fa;
+  background:linear-gradient(135deg,#f4f6fa,#eef1f7);
 }
+
+/* Layout */
 .wrapper{
   min-height:100vh;
   display:flex;
@@ -21,24 +23,29 @@ body{
   justify-content:center;
   padding:16px;
 }
+
 .card{
   width:100%;
-  max-width:600px;
+  max-width:620px;
   background:#fff;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 12px 30px rgba(0,0,0,.1)
+  border-radius:20px;
+  padding:22px;
+  box-shadow:0 15px 35px rgba(0,0,0,.12)
 }
+
 h2{
   text-align:center;
   color:#b53030;
-  margin-bottom:16px
+  margin-bottom:18px
 }
+
+/* Form */
 .form-grid{
   display:grid;
   grid-template-columns:1fr;
   gap:12px
 }
+
 input,select,button{
   width:100%;
   padding:14px;
@@ -47,19 +54,58 @@ input,select,button{
   font-family:Poppins;
   font-size:15px
 }
+
 button{
   background:#b53030;
   color:#fff;
   border:none;
   font-weight:600;
-  cursor:pointer
+  cursor:pointer;
+  transition:.2s
 }
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed
+}
+button:hover:not(:disabled){
+  transform:translateY(-1px)
+}
+
 .note{
-  margin-top:12px;
+  margin-top:10px;
   text-align:center;
   font-size:13px;
-  color:#555
+  color:#666
 }
+
+/* Result Box */
+#resultBox{
+  display:none;
+  margin-top:18px;
+  padding:14px;
+  border-radius:14px;
+  background:#f9fafb;
+  text-align:center
+}
+#resultMsg{
+  font-weight:600;
+  font-size:15px
+}
+.result-actions{
+  margin-top:12px;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap
+}
+.result-actions button{
+  width:auto;
+  padding:10px 14px;
+  border-radius:10px;
+  font-size:14px
+}
+
+/* Responsive */
 @media(min-width:600px){
   .form-grid{grid-template-columns:1fr 1fr}
   .full{grid-column:1/-1}
@@ -71,32 +117,49 @@ button{
 
 <div class="wrapper">
   <div class="card">
+
     <h2>🧾 ईंट चालान</h2>
 
     <div class="form-grid">
-      <input id="buyerInput" placeholder="Buyer Name (English)">
-      <input id="driverInput" placeholder="Driver Name (English)">
-      <input id="vehicleInput" placeholder="Vehicle Number">
+      <input id="buyerInput" placeholder="खरीदार का नाम (English)">
+<input id="driverInput" placeholder="ड्राइवर का नाम (English)">
+<input id="vehicleInput" placeholder="वाहन नंबर">
 
-      <select id="brickInput">
-        <option value="1 नंबर">1 नंबर</option>
-        <option value="2 नंबर">2 नंबर</option>
-        <option value="खंजर">खंजर</option>
-      </select>
+<select id="brickInput">
+  <option value="1 नंबर">1 नंबर</option>
+  <option value="2 नंबर">2 नंबर</option>
+  <option value="खंजर">खंजर</option>
+</select>
 
-      <input id="qtyInput" type="number" placeholder="Quantity" class="full">
+<input id="qtyInput" type="number" placeholder="मात्रा" class="full">
+<input id="priceInput" type="number" placeholder="कुल कीमत (₹)" class="full">
 
-      <button class="full" onclick="generate()">Generate Challan</button>
+      <input id="throughInput" placeholder="ईंट किसके द्वारा जा रही है" class="full">
+
+      <button class="full" id="genBtn" onclick="generate()">चालान बनाएं</button>
     </div>
 
-    <div class="note">चालान PDF अपने आप बनेगा और सेव होगा</div>
+    <div class="note">चालान सुरक्षित रूप से सेव किया जाएगा</div>
+
+    <!-- RESULT BOX -->
+    <div id="resultBox">
+      <div id="resultMsg"></div>
+
+      <div class="result-actions">
+        <button id="viewPdfBtn" style="display:none;">📄 View PDF</button>
+        <button id="historyBtn" style="display:none;">📚 Challan History</button>
+      </div>
+    </div>
+
   </div>
 </div>
+
+
 
 <!-- HIDDEN FORM -->
 <form id="challanForm"
   method="POST"
-  action="https://script.google.com/macros/s/AKfycbx1X-ujH-pJJ2GDlPbyOKW3dARHw7iG7cmlABrQg6t7S1tkBP0Iz-222ZnFP1Q2Sr_cXQ/exec"
+  action="https://script.google.com/macros/s/AKfycbwLpdJzOaRKoVQ8m2GDGdbxWkydOX0dfFkTynsp4ZajhJ71OackU4EDj1WuxW8uI1npWQ/exec"
   target="hiddenFrame">
 
   <input type="hidden" name="buyer_name" id="f_buyer">
@@ -106,81 +169,119 @@ button{
   <input type="hidden" name="vehicle_no" id="f_vehicle">
   <input type="hidden" name="brick_type" id="f_brick">
   <input type="hidden" name="quantity" id="f_qty">
+  <input type="hidden" name="total_price" id="f_total_price">
+  <input type="hidden" name="through" id="f_through">
 </form>
 
 <iframe name="hiddenFrame" style="display:none"></iframe>
 
 <script>
+/* Hindi translation */
 async function mapNameToHindiDynamic(name){
-  if(!name) return "";
-
-  try {
-    const encoded = encodeURIComponent(name);
-    const response = await fetch(
-      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=hi&dt=t&q=${encoded}`
+  if(!name) return name;
+  try{
+    const res = await fetch(
+      "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=hi&dt=t&q=" +
+      encodeURIComponent(name)
     );
-    const result = await response.json();
-    return result[0][0][0] || name;
-  } catch(err) {
-    console.error("Translation error:", err);
+    const data = await res.json();
+    return data[0][0][0] || name;
+  }catch(e){
     return name;
   }
 }
-async function generate() {
-  const buyerInput   = document.getElementById("buyerInput");
-  const driverInput  = document.getElementById("driverInput");
-  const vehicleInput = document.getElementById("vehicleInput");
-  const brickInput   = document.getElementById("brickInput");
-  const qtyInput     = document.getElementById("qtyInput");
 
-  const buyer   = buyerInput.value.trim();
-  const driver  = driverInput.value.trim();
-  const vehicle = vehicleInput.value.trim();
-  const brick   = brickInput.value;
-  const qty     = qtyInput.value;
+/* Clear form */
+function clearForm(){
+  buyerInput.value="";
+  driverInput.value="";
+  vehicleInput.value="";
+  qtyInput.value="";
+  priceInput.value="";
+  throughInput.value="";
+  brickInput.selectedIndex=0;
+}
 
-  if (!buyer || !driver || !vehicle || !qty) {
-    alert("❌ All fields are required");
+/* Generate challan */
+async function generate(){
+  const btn = genBtn;
+  const resultBox = document.getElementById("resultBox");
+  const resultMsg = document.getElementById("resultMsg");
+  const viewBtn = document.getElementById("viewPdfBtn");
+  const historyBtn = document.getElementById("historyBtn");
+
+  resultBox.style.display="none";
+  viewBtn.style.display="none";
+  historyBtn.style.display="none";
+
+  btn.disabled=true;
+  btn.innerText="Generating...";
+
+  const buyer=buyerInput.value.trim();
+  const driver=driverInput.value.trim();
+  const vehicle=vehicleInput.value.trim();
+  const brick=brickInput.value;
+  const qty=qtyInput.value;
+  const price=priceInput.value;
+  const through=throughInput.value;
+
+  if(!buyer||!driver||!vehicle||!qty||!price||!through){
+    alert("❌ सभी फ़ील्ड भरना ज़रूरी है");
+    btn.disabled=false;
+    btn.innerText="Generate Challan";
     return;
   }
 
-  // Convert names to Hindi (dynamic)
-  const buyerHi  = await mapNameToHindiDynamic(buyer);
-  const driverHi = await mapNameToHindiDynamic(driver);
+  let buyerHi=buyer, driverHi=driver;
+  buyerHi = await mapNameToHindiDynamic(buyer);
+  driverHi = await mapNameToHindiDynamic(driver);
 
-  // Prepare form data
-  const formData = new FormData();
-  formData.append("buyer_name", buyer);
-  formData.append("buyer_name_hindi", buyerHi);
-  formData.append("driver_name", driver);
-  formData.append("driver_name_hindi", driverHi);
-  formData.append("vehicle_no", vehicle);
-  formData.append("brick_type", brick);
-  formData.append("quantity", qty);
+  const fd=new FormData();
+  fd.append("buyer_name",buyer);
+  fd.append("buyer_name_hindi",buyerHi);
+  fd.append("driver_name",driver);
+  fd.append("driver_name_hindi",driverHi);
+  fd.append("vehicle_no",vehicle);
+  fd.append("brick_type",brick);
+  fd.append("quantity",qty);
+  fd.append("total_price",price);
+  fd.append("through",through);
 
-  try {
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbx1X-ujH-pJJ2GDlPbyOKW3dARHw7iG7cmlABrQg6t7S1tkBP0Iz-222ZnFP1Q2Sr_cXQ/exec",
-      { method: "POST", body: formData }
+  try{
+    const res=await fetch(
+      "https://script.google.com/macros/s/AKfycbwLpdJzOaRKoVQ8m2GDGdbxWkydOX0dfFkTynsp4ZajhJ71OackU4EDj1WuxW8uI1npWQ/exec",
+      {method:"POST",body:fd}
     );
+    const out=await res.json();
 
-    const result = await response.json();
+    resultBox.style.display="block";
 
-    if (result.status === "SUCCESS" && result.pdfUrl) {
-      alert("✅ Challan Generated Successfully!");
-      // Open PDF in new tab
-      window.open(result.pdfUrl, "_blank");
-    } else {
-      alert("❌ PDF URL not found in response.");
+    if(out.status==="SUCCESS"){
+      resultMsg.style.color="green";
+      resultMsg.innerText="✅ Challan generated successfully";
+
+      viewBtn.style.display="inline-block";
+      historyBtn.style.display="inline-block";
+
+      viewBtn.onclick=()=>window.open(out.pdfUrl,"_blank");
+      historyBtn.onclick=()=>location.href="challan_history.html";
+
+      clearForm();
+    }else{
+      resultMsg.style.color="red";
+      resultMsg.innerText="❌ Challan generation failed";
+      clearForm();
     }
-  } catch (err) {
-    console.error(err);
-    alert("❌ Failed to generate challan. Check console for details.");
+  }catch(e){
+    resultBox.style.display="block";
+    resultMsg.style.color="red";
+    resultMsg.innerText="❌ Server error";
   }
+
+  btn.disabled=false;
+  btn.innerText="Generate Challan";
 }
-
 </script>
-
 
 </body>
 </html>

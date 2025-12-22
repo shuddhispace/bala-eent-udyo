@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>Challan History</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:Poppins;
+  background:#f4f6fa;
+}
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+h2{
+  text-align:center;
+  color:#b53030;
+  margin-bottom:20px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+th,td{
+  padding:12px;
+  border-bottom:1px solid #eee;
+  font-size:14px;
+  text-align:left;
+}
+th{
+  background:#b53030;
+  color:#fff;
+}
+tr:hover{
+  background:#f9f9f9;
+}
+.btn{
+  padding:6px 10px;
+  border-radius:6px;
+  background:#b53030;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  font-size:13px;
+}
+.btn:hover{
+  opacity:.85;
+}
+@media(max-width:768px){
+  table,thead,tbody,tr,td,th{
+    display:block;
+  }
+  th{
+    display:none;
+  }
+  tr{
+    margin-bottom:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:10px;
+  }
+  td{
+    border:none;
+    padding:6px 0;
+  }
+  td::before{
+    content:attr(data-label);
+    font-weight:600;
+    display:block;
+    color:#555;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>📚 चालान इतिहास</h2>
+
+  <table id="historyTable">
+    <thead>
+      <tr>
+        <th>चालान नं</th>
+        <th>दिनांक</th>
+        <th>खरीदार</th>
+        <th>वाहन</th>
+        <th>मात्रा</th>
+        <th>राशि</th>
+        <th>PDF</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+async function loadHistory(){
+  try {
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbwLpdJzOaRKoVQ8m2GDGdbxWkydOX0dfFkTynsp4ZajhJ71OackU4EDj1WuxW8uI1npWQ/exec?mode=history"
+    );
+    const data = await res.json();
+
+    const tbody = document.querySelector("#historyTable tbody");
+    tbody.innerHTML = "";
+
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td data-label="चालान">${row[0]}</td>
+        <td data-label="दिनांक">${row[1]}</td>
+        <td data-label="खरीदार">${row[3]}</td>
+        <td data-label="वाहन">${row[6]}</td>
+        <td data-label="मात्रा">${row[8]}</td>
+        <td data-label="राशि">₹ ${row[9]}</td>
+        <td data-label="PDF">
+          <button class="btn" onclick="window.open('${row[11]}','_blank')">
+            View
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch(err) {
+    alert("❌ History load failed");
+    console.error(err);
+  }
+}
+
+
+loadHistory();
+</script>
+
+</body>
+</html>
