@@ -159,7 +159,7 @@ button:hover:not(:disabled){
 <!-- HIDDEN FORM -->
 <form id="challanForm"
   method="POST"
-  action="https://script.google.com/macros/s/AKfycbwLpdJzOaRKoVQ8m2GDGdbxWkydOX0dfFkTynsp4ZajhJ71OackU4EDj1WuxW8uI1npWQ/exec"
+  action="https://script.google.com/macros/s/AKfycbxA-uSYj-CBBo45ypIPQhT51nfrRm1H1KHrUazYZccMVSNWB2VW2Ccd-dnRher8kd-E/exec"
   target="hiddenFrame">
 
   <input type="hidden" name="buyer_name" id="f_buyer">
@@ -249,7 +249,7 @@ async function generate(){
 
   try{
     const res=await fetch(
-      "https://script.google.com/macros/s/AKfycbwLpdJzOaRKoVQ8m2GDGdbxWkydOX0dfFkTynsp4ZajhJ71OackU4EDj1WuxW8uI1npWQ/exec",
+      "https://script.google.com/macros/s/AKfycbxA-uSYj-CBBo45ypIPQhT51nfrRm1H1KHrUazYZccMVSNWB2VW2Ccd-dnRher8kd-E/exec",
       {method:"POST",body:fd}
     );
     const out=await res.json();
