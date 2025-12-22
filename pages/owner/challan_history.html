@@ -1,146 +1,63 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Challan History</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 body{
-  margin:0;
   font-family:Poppins;
+  margin:0;
   background:#f4f6fa;
 }
-.container{
-  max-width:1100px;
-  margin:auto;
-  padding:20px;
-}
-h2{
+.header{
+  padding:14px;
   text-align:center;
-  color:#b53030;
-  margin-bottom:20px;
+  background:#b53030;
+  color:#fff;
 }
-table{
-  width:100%;
-  border-collapse:collapse;
+.list{
+  padding:14px;
+  display:grid;
+  gap:12px;
+}
+.card{
   background:#fff;
-  border-radius:12px;
-  overflow:hidden;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 8px 20px rgba(0,0,0,.1);
 }
-th,td{
-  padding:12px;
-  border-bottom:1px solid #eee;
-  font-size:14px;
-  text-align:left;
-}
-th{
-  background:#b53030;
-  color:#fff;
-}
-tr:hover{
-  background:#f9f9f9;
-}
+.card b{color:#b53030}
 .btn{
-  padding:6px 10px;
-  border-radius:6px;
+  display:inline-block;
+  margin-top:8px;
+  padding:8px 12px;
   background:#b53030;
   color:#fff;
-  border:none;
-  cursor:pointer;
-  font-size:13px;
-}
-.btn:hover{
-  opacity:.85;
-}
-@media(max-width:768px){
-  table,thead,tbody,tr,td,th{
-    display:block;
-  }
-  th{
-    display:none;
-  }
-  tr{
-    margin-bottom:12px;
-    border:1px solid #ddd;
-    border-radius:10px;
-    padding:10px;
-  }
-  td{
-    border:none;
-    padding:6px 0;
-  }
-  td::before{
-    content:attr(data-label);
-    font-weight:600;
-    display:block;
-    color:#555;
-  }
+  border-radius:8px;
+  text-decoration:none;
 }
 </style>
 </head>
 
 <body>
-
-<div class="container">
-  <h2>📚 चालान इतिहास</h2>
-
-  <table id="historyTable">
-    <thead>
-      <tr>
-        <th>चालान नं</th>
-        <th>दिनांक</th>
-        <th>खरीदार</th>
-        <th>वाहन</th>
-        <th>मात्रा</th>
-        <th>राशि</th>
-        <th>PDF</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
+<div class="header">📚 Challan History</div>
+<div class="list" id="list"></div>
 
 <script>
-async function loadHistory(){
-  try {
-    const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbzKZu7pUQRJhMe0au0-TgFvhtBRa0xRfs4TofJKSNBl4SOWAa36qY48QjyEIYVAMd3JbQ/exec?mode=history"
-    );
-    const data = await res.json();
-
-    const tbody = document.querySelector("#historyTable tbody");
-    tbody.innerHTML = "";
-
-    data.forEach(row => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td data-label="चालान">${row[0]}</td>
-        <td data-label="दिनांक">${row[1]}</td>
-        <td data-label="खरीदार">${row[3]}</td>
-        <td data-label="वाहन">${row[6]}</td>
-        <td data-label="मात्रा">${row[8]}</td>
-        <td data-label="राशि">₹ ${row[9]}</td>
-        <td data-label="PDF">
-          <button class="btn" onclick="window.open('${row[11]}','_blank')">
-            View
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  } catch(err) {
-    alert("❌ History load failed");
-    console.error(err);
-  }
-}
-
-
-loadHistory();
+fetch("https://script.google.com/macros/s/AKfycbwiYYyKbw6RfqogKOEL9_H0QaX-BSaVWYzA1KYgGeljuV-wjwq2aSPerROHO89uGgh2ZQ/exec?mode=history")
+.then(r=>r.json())
+.then(data=>{
+  const list=document.getElementById("list");
+  data.forEach(r=>{
+    list.innerHTML+=`
+      <div class="card">
+        <b>${r[0]}</b><br>
+        Buyer: ${r[3]}<br>
+        Vehicle: ${r[5]}<br>
+        Amount: ₹ ${r[8]}<br>
+        <a class="btn" target="_blank" href="${r[10]}">View PDF</a>
+      </div>`;
+  });
+});
 </script>
-
 </body>
 </html>
