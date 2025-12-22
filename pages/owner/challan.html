@@ -247,36 +247,47 @@ async function generate(){
   fd.append("total_price",price);
   fd.append("through",through);
 
-  try{
-    const res=await fetch(
-      "https://script.google.com/macros/s/AKfycbzKZu7pUQRJhMe0au0-TgFvhtBRa0xRfs4TofJKSNBl4SOWAa36qY48QjyEIYVAMd3JbQ/exec",
-      {method:"POST",body:fd}
-    );
-    const out=await res.json();
+  try {
+  const res = await fetch(
+    "https://script.google.com/macros/s/AKfycbzKZu7pUQRJhMe0au0-TgFvhtBRa0xRfs4TofJKSNBl4SOWAa36qY48QjyEIYVAMd3JbQ/exec",
+    { method: "POST", body: fd }
+  );
 
-    resultBox.style.display="block";
+  const text = await res.text();
+  console.log("SERVER RESPONSE:", text);
 
-    if(out.status==="SUCCESS"){
-      resultMsg.style.color="green";
-      resultMsg.innerText="✅ Challan generated successfully";
-
-      viewBtn.style.display="inline-block";
-      historyBtn.style.display="inline-block";
-
-      viewBtn.onclick=()=>window.open(out.pdfUrl,"_blank");
-      historyBtn.onclick=()=>location.href="challan_history.html";
-
-      clearForm();
-    }else{
-      resultMsg.style.color="red";
-      resultMsg.innerText="❌ Challan generation failed";
-      clearForm();
-    }
-  }catch(e){
-    resultBox.style.display="block";
-    resultMsg.style.color="red";
-    resultMsg.innerText="❌ Server error";
+  let out;
+  try {
+    out = JSON.parse(text);
+  } catch {
+    throw new Error("Invalid JSON response");
   }
+
+  resultBox.style.display = "block";
+
+  if (out.status === "SUCCESS") {
+    resultMsg.style.color = "green";
+    resultMsg.innerText = "✅ चालान सफलतापूर्वक बन गया";
+
+    viewBtn.style.display = "inline-block";
+    historyBtn.style.display = "inline-block";
+
+    viewBtn.onclick = () => window.open(out.pdfUrl, "_blank");
+    historyBtn.onclick = () => location.href = "challan_history.html";
+
+    clearForm();
+  } else {
+    resultMsg.style.color = "red";
+    resultMsg.innerText = "❌ चालान नहीं बन पाया";
+  }
+
+} catch (e) {
+  console.error(e);
+  resultBox.style.display = "block";
+  resultMsg.style.color = "red";
+  resultMsg.innerText = "❌ Server error";
+}
+
 
   btn.disabled=false;
   btn.innerText="Generate Challan";
