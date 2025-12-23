@@ -1,63 +1,245 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Challan History</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
+:root{
+  --primary:#b53030;
+  --dark:#1f2937;
+  --bg:#f4f6fa;
+  --card:#ffffff;
+}
+
+*{box-sizing:border-box}
+
 body{
-  font-family:Poppins;
   margin:0;
-  background:#f4f6fa;
+  font-family:Poppins;
+  background:var(--bg);
+  color:#111827;
 }
+
+/* Header */
 .header{
-  padding:14px;
+  padding:18px;
   text-align:center;
-  background:#b53030;
+  background:linear-gradient(135deg,#b53030,#8f1d1d);
   color:#fff;
+  font-size:18px;
+  font-weight:600;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
 }
-.list{
-  padding:14px;
-  display:grid;
-  gap:12px;
+
+/* Container */
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:16px;
 }
-.card{
+
+/* Controls */
+.controls{
   background:#fff;
-  border-radius:14px;
   padding:14px;
-  box-shadow:0 8px 20px rgba(0,0,0,.1);
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+  display:grid;
+  gap:10px;
+  margin-bottom:16px;
 }
-.card b{color:#b53030}
-.btn{
-  display:inline-block;
+
+.controls input{
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  font-family:Poppins;
+}
+
+.summary{
   margin-top:8px;
-  padding:8px 12px;
-  background:#b53030;
+  font-weight:600;
+  color:#065f46;
+  font-size:16px;
+}
+
+/* Grid */
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+/* Card */
+.card{
+  background:var(--card);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+  position:relative;
+  transition:.25s;
+}
+
+.card:hover{
+  transform:translateY(-3px);
+}
+
+/* Date */
+.date{
+  position:absolute;
+  top:14px;
+  right:14px;
+  background:#fee2e2;
+  color:#991b1b;
+  font-size:11px;
+  padding:4px 10px;
+  border-radius:20px;
+  font-weight:600;
+}
+
+.buyer{
+  font-size:16px;
+  font-weight:600;
+  color:var(--primary);
+  margin-bottom:6px;
+}
+
+.info{
+  font-size:14px;
+  color:#374151;
+  line-height:1.6;
+}
+
+.amount{
+  margin-top:10px;
+  font-size:18px;
+  font-weight:600;
+  color:#065f46;
+}
+
+/* Actions */
+.actions{
+  margin-top:14px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:9px 14px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#b53030,#8f1d1d);
   color:#fff;
-  border-radius:8px;
   text-decoration:none;
+  font-size:13px;
+  font-weight:600;
+  box-shadow:0 6px 16px rgba(181,48,48,.45);
+}
+
+.wa{
+  background:linear-gradient(135deg,#25D366,#1ebe5d);
+  box-shadow:0 6px 16px rgba(37,211,102,.45);
+}
+
+/* Responsive */
+@media(min-width:600px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .controls{grid-template-columns:1fr 1fr}
+}
+@media(min-width:992px){
+  .grid{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
 
 <body>
+
 <div class="header">📚 Challan History</div>
-<div class="list" id="list"></div>
+
+<div class="container">
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <input id="search" placeholder="🔍 Search buyer / vehicle">
+    <input id="fromDate" type="date">
+    <input id="toDate" type="date">
+    <div class="summary" id="totalBox">Total Amount: ₹ 0</div>
+  </div>
+
+  <!-- LIST -->
+  <div class="grid" id="list"></div>
+
+</div>
 
 <script>
-fetch("https://script.google.com/macros/s/AKfycby6seRRb3qWV-pqNZo3O9DYSO7QSLm28p-tzWqH5w0B5u3t5cO6o-noeCRX3hLwL7mW/exec?mode=history")
+const API="https://script.google.com/macros/s/AKfycby6seRRb3qWV-pqNZo3O9DYSO7QSLm28p-tzWqH5w0B5u3t5cO6o-noeCRX3hLwL7mW/exec?mode=history";
+let rows=[];
+
+fetch(API)
 .then(r=>r.json())
 .then(data=>{
+  rows=data;
+  render();
+});
+
+document.getElementById("search").oninput=render;
+document.getElementById("fromDate").onchange=render;
+document.getElementById("toDate").onchange=render;
+
+function render(){
   const list=document.getElementById("list");
-  data.forEach(r=>{
+  const q=document.getElementById("search").value.toLowerCase();
+  const from=document.getElementById("fromDate").value;
+  const to=document.getElementById("toDate").value;
+
+  let total=0;
+  list.innerHTML="";
+
+  rows.forEach(r=>{
+    const buyer=r[3].toLowerCase();
+    const vehicle=r[5].toLowerCase();
+    const date=r[1];
+    const amount=Number(r[8]);
+
+    if(q && !buyer.includes(q) && !vehicle.includes(q)) return;
+    if(from && date<from) return;
+    if(to && date>to) return;
+
+    total+=amount;
+
     list.innerHTML+=`
       <div class="card">
-        <b>${r[0]}</b><br>
-        Buyer: ${r[3]}<br>
-        Vehicle: ${r[5]}<br>
-        Amount: ₹ ${r[8]}<br>
-        <a class="btn" target="_blank" href="${r[10]}">View PDF</a>
+        <div class="date">${date}</div>
+        <div class="buyer">${r[3]}</div>
+
+        <div class="info">
+          🚚 Vehicle: ${r[5]}<br>
+          🧱 Type: ${r[6]}<br>
+          📦 Qty: ${r[7]}
+        </div>
+
+        <div class="amount">₹ ${amount}</div>
+
+        <div class="actions">
+          <a class="btn" target="_blank" href="${r[11]}">📄 PDF</a>
+          <a class="btn wa" target="_blank"
+            href="https://wa.me/?text=${encodeURIComponent(
+              '🧾 ईंट चालान\nBuyer: '+r[3]+'\nAmount: ₹'+amount+'\nPDF: '+r[11]
+            )}">
+            📲 WhatsApp
+          </a>
+        </div>
       </div>`;
   });
-});
+
+  document.getElementById("totalBox").innerText=
+    "Total Amount: ₹ " + total;
+}
 </script>
+
 </body>
 </html>
