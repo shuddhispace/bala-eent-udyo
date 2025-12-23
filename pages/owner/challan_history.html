@@ -6,13 +6,14 @@
 <title>Challan History</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
   --primary:#b53030;
-  --dark:#1f2937;
   --bg:#f4f6fa;
   --card:#ffffff;
+  --green:#065f46;
 }
 
 *{box-sizing:border-box}
@@ -21,7 +22,6 @@ body{
   margin:0;
   font-family:Poppins;
   background:var(--bg);
-  color:#111827;
 }
 
 /* Header */
@@ -32,10 +32,9 @@ body{
   color:#fff;
   font-size:18px;
   font-weight:600;
-  box-shadow:0 6px 18px rgba(0,0,0,.25);
 }
 
-/* Container */
+/* Layout */
 .container{
   max-width:1200px;
   margin:auto;
@@ -45,104 +44,119 @@ body{
 /* Controls */
 .controls{
   background:#fff;
-  padding:14px;
-  border-radius:16px;
+  padding:16px;
+  border-radius:18px;
   box-shadow:0 10px 30px rgba(0,0,0,.1);
   display:grid;
-  gap:10px;
-  margin-bottom:16px;
+  gap:12px;
+  margin-bottom:20px;
 }
 
 .controls input{
-  padding:10px 12px;
-  border-radius:10px;
+  padding:12px 14px;
+  border-radius:12px;
   border:1px solid #e5e7eb;
   font-family:Poppins;
 }
 
 .summary{
-  margin-top:8px;
   font-weight:600;
-  color:#065f46;
+  color:var(--green);
   font-size:16px;
+}
+
+/* Graph */
+.graphBox{
+  background:#fff;
+  padding:16px;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+  margin-bottom:22px;
 }
 
 /* Grid */
 .grid{
   display:grid;
   grid-template-columns:1fr;
-  gap:16px;
+  gap:18px;
 }
 
 /* Card */
 .card{
   background:var(--card);
-  border-radius:18px;
-  padding:16px;
+  border-radius:20px;
+  padding:18px;
   box-shadow:0 10px 30px rgba(0,0,0,.1);
   position:relative;
-  transition:.25s;
 }
 
-.card:hover{
-  transform:translateY(-3px);
-}
-
-/* Date */
+/* Date badge */
 .date{
   position:absolute;
-  top:14px;
-  right:14px;
+  top:16px;
+  right:16px;
   background:#fee2e2;
   color:#991b1b;
   font-size:11px;
-  padding:4px 10px;
-  border-radius:20px;
+  padding:5px 12px;
+  border-radius:999px;
   font-weight:600;
 }
 
+/* Buyer */
 .buyer{
   font-size:16px;
   font-weight:600;
   color:var(--primary);
-  margin-bottom:6px;
+  margin-bottom:8px;
 }
 
+/* Info */
 .info{
   font-size:14px;
   color:#374151;
-  line-height:1.6;
+  line-height:1.7;
+  margin-bottom:14px;
 }
 
+/* Divider */
+.divider{
+  height:1px;
+  background:linear-gradient(to right, transparent, #e5e7eb, transparent);
+  margin:14px 0;
+}
+
+/* Amount */
 .amount{
-  margin-top:10px;
+  padding:10px 16px;
+  background:#ecfdf5;
+  border-radius:14px;
   font-size:18px;
   font-weight:600;
-  color:#065f46;
+  color:var(--green);
+  display:inline-block;
 }
 
 /* Actions */
 .actions{
-  margin-top:14px;
+  margin-top:16px;
   display:flex;
-  gap:10px;
+  gap:12px;
   flex-wrap:wrap;
 }
 
 .btn{
-  padding:9px 14px;
-  border-radius:12px;
+  padding:10px 16px;
+  border-radius:14px;
   background:linear-gradient(135deg,#b53030,#8f1d1d);
   color:#fff;
   text-decoration:none;
   font-size:13px;
   font-weight:600;
-  box-shadow:0 6px 16px rgba(181,48,48,.45);
 }
 
 .wa{
   background:linear-gradient(135deg,#25D366,#1ebe5d);
-  box-shadow:0 6px 16px rgba(37,211,102,.45);
 }
 
 /* Responsive */
@@ -150,6 +164,7 @@ body{
   .grid{grid-template-columns:repeat(2,1fr)}
   .controls{grid-template-columns:1fr 1fr}
 }
+
 @media(min-width:992px){
   .grid{grid-template-columns:repeat(3,1fr)}
 }
@@ -162,12 +177,15 @@ body{
 
 <div class="container">
 
-  <!-- CONTROLS -->
+  <!-- SEARCH -->
   <div class="controls">
-    <input id="search" placeholder="🔍 Search buyer / vehicle">
-    <input id="fromDate" type="date">
-    <input id="toDate" type="date">
+    <input id="search" placeholder="🔍 Search buyer / vehicle / amount">
     <div class="summary" id="totalBox">Total Amount: ₹ 0</div>
+  </div>
+
+  <!-- GRAPH -->
+  <div class="graphBox">
+    <canvas id="chart"></canvas>
   </div>
 
   <!-- LIST -->
@@ -177,53 +195,46 @@ body{
 
 <script>
 const API="https://script.google.com/macros/s/AKfycby6seRRb3qWV-pqNZo3O9DYSO7QSLm28p-tzWqH5w0B5u3t5cO6o-noeCRX3hLwL7mW/exec?mode=history";
-let rows=[];
+let rows=[], chart;
 
 fetch(API)
 .then(r=>r.json())
 .then(data=>{
-  rows=data;
+  rows=data.reverse(); // 🆕 Latest First
   render();
 });
 
 document.getElementById("search").oninput=render;
-document.getElementById("fromDate").onchange=render;
-document.getElementById("toDate").onchange=render;
 
 function render(){
   const list=document.getElementById("list");
   const q=document.getElementById("search").value.toLowerCase();
-  const from=document.getElementById("fromDate").value;
-  const to=document.getElementById("toDate").value;
+  let total=0, labels=[], values=[];
 
-  let total=0;
   list.innerHTML="";
 
   rows.forEach(r=>{
     const buyer=r[3].toLowerCase();
     const vehicle=r[5].toLowerCase();
-    const date=r[1];
     const amount=Number(r[8]);
 
-    if(q && !buyer.includes(q) && !vehicle.includes(q)) return;
-    if(from && date<from) return;
-    if(to && date>to) return;
+    if(q && !buyer.includes(q) && !vehicle.includes(q) && !String(amount).includes(q)) return;
 
     total+=amount;
+    labels.push(r[1]);
+    values.push(amount);
 
     list.innerHTML+=`
       <div class="card">
-        <div class="date">${date}</div>
+        <div class="date">${r[1]}</div>
         <div class="buyer">${r[3]}</div>
-
         <div class="info">
           🚚 Vehicle: ${r[5]}<br>
           🧱 Type: ${r[6]}<br>
           📦 Qty: ${r[7]}
         </div>
-
+        <div class="divider"></div>
         <div class="amount">₹ ${amount}</div>
-
         <div class="actions">
           <a class="btn" target="_blank" href="${r[11]}">📄 PDF</a>
           <a class="btn wa" target="_blank"
@@ -236,8 +247,27 @@ function render(){
       </div>`;
   });
 
-  document.getElementById("totalBox").innerText=
-    "Total Amount: ₹ " + total;
+  document.getElementById("totalBox").innerText="Total Amount: ₹ "+total;
+  drawChart(labels,values);
+}
+
+function drawChart(labels,values){
+  if(chart) chart.destroy();
+  chart=new Chart(document.getElementById("chart"),{
+    type:"bar",
+    data:{
+      labels:labels,
+      datasets:[{
+        label:"Amount",
+        data:values,
+        backgroundColor:"#b53030"
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}}
+    }
+  });
 }
 </script>
 
