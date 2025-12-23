@@ -150,9 +150,9 @@ button:hover:not(:disabled){
       <select id="brickInput">
         <option value="1 नंबर">1 नंबर</option>
         <option value="2 नंबर">2 नंबर</option>
+        <option value="जर">सेमा (3 नंबर)</option>
         <option value="खंजर">खंजर</option>
-        <option value="गुड़िया">गुड़िया</option>
-        <option value="जर">जर</option>
+        <option value="गुड़िया">गुडिया</option>
       </select>
 
       <input id="qtyInput" type="number" placeholder="मात्रा" class="full">
@@ -160,12 +160,12 @@ button:hover:not(:disabled){
 
       <!-- THROUGH ENGLISH -->
       <input id="throughInput" placeholder="ईंट किसके द्वारा जा रही है" class="full">
-      <input 
+      <!-- <input 
   id="throughHindiPreview"
   class="full"
   placeholder="हिंदी प्रीव्यू"
   readonly
->
+> -->
 
 
       <button class="full" id="genBtn" onclick="generate()">चालान बनाएं</button>
@@ -185,7 +185,7 @@ button:hover:not(:disabled){
 
   </div>
 </div>
-
+<!-- 
 <script>
 /* Hindi translation */
 async function translateToHindi(text){
@@ -279,7 +279,116 @@ async function generate(){
   btn.disabled=false;
   btn.innerText="चालान बनाएं";
 }
+</script> -->
+
+<script>
+async function translateToHindi(text){
+  if(!text) return "";
+  try{
+    const res = await fetch(
+      "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=hi&dt=t&q=" +
+      encodeURIComponent(text)
+    );
+    const data = await res.json();
+    return data[0][0][0] || text;
+  }catch(e){
+    return text;
+  }
+}
+
+async function generate(){
+  const btn = genBtn;
+  const resultBox = document.getElementById("resultBox");
+  const resultMsg = document.getElementById("resultMsg");
+  const viewBtn = document.getElementById("viewPdfBtn");
+
+  btn.disabled = true;
+  btn.innerText = "Generating...";
+
+  const buyer = buyerInput.value.trim();
+  const driver = driverInput.value.trim();
+  const vehicle = vehicleInput.value.trim();
+  const brick = brickInput.value;
+  const qty = qtyInput.value;
+  const price = priceInput.value;
+  const through = throughInput.value.trim();
+
+  if(!buyer || !driver || !vehicle || !qty || !price || !through){
+    alert("❌ सभी फ़ील्ड भरना ज़रूरी है");
+    btn.disabled=false;
+    btn.innerText="चालान बनाएं";
+    return;
+  }
+
+  const buyerHi = await translateToHindi(buyer);
+  const driverHi = await translateToHindi(driver);
+
+  const fd = new FormData();
+  fd.append("buyer_name", buyer);
+  fd.append("buyer_name_hindi", buyerHi);
+  fd.append("driver_name", driver);
+  fd.append("driver_name_hindi", driverHi);
+  fd.append("vehicle_no", vehicle);
+  fd.append("brick_type", brick);
+  fd.append("quantity", qty);
+  fd.append("total_price", price);
+  fd.append("through", through);
+
+  try{
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycby6seRRb3qWV-pqNZo3O9DYSO7QSLm28p-tzWqH5w0B5u3t5cO6o-noeCRX3hLwL7mW/exec",
+      { method:"POST", body:fd }
+    );
+
+    const out = JSON.parse(await res.text());
+
+    if(out.status === "SUCCESS"){
+      resultBox.style.display="block";
+      resultMsg.style.color="green";
+      resultMsg.innerText="✅ चालान सफलतापूर्वक बन गया";
+
+      // View PDF
+      viewBtn.style.display="inline-block";
+      viewBtn.onclick = () => window.open(out.pdfUrl, "_blank");
+
+      // WhatsApp Share Button
+      const waBtn = document.createElement("button");
+      waBtn.innerText = "📲 WhatsApp पर भेजें";
+      waBtn.style.background = "#25D366";
+      waBtn.style.color = "#fff";
+      waBtn.style.border = "none";
+      waBtn.style.borderRadius = "10px";
+      waBtn.style.padding = "10px 14px";
+      waBtn.style.fontWeight = "600";
+      waBtn.onclick = () => {
+        const msg =
+          `🧾 ईंट चालान\n\n` +
+          `खरीदार: ${buyerHi}\n` +
+          `राशि: ₹${price}\n\n` +
+          `PDF देखें:\n${out.pdfUrl}`;
+        window.open(
+          "https://wa.me/?text=" + encodeURIComponent(msg),
+          "_blank"
+        );
+      };
+
+      document.querySelector(".result-actions").appendChild(waBtn);
+
+    }else{
+      throw "fail";
+    }
+
+  }catch(e){
+    resultBox.style.display="block";
+    resultMsg.style.color="red";
+    resultMsg.innerText="❌ Server error";
+  }
+
+  btn.disabled=false;
+  btn.innerText="चालान बनाएं";
+}
 </script>
+
 
 </body>
 </html>
