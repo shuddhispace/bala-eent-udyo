@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Login • Shri Bala Eent Udyog</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#b53030;
+  --primary-dark:#8e1f1f;
+  --bg-gradient:linear-gradient(135deg,#fbeaea,#f6eaea);
+  --glass:rgba(255,255,255,0.15);
+  --glass-hover:rgba(255,255,255,0.25);
+  --transition:.35s ease-in-out;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif;}
+
+body{
+  min-height:100vh;
+  background:var(--bg-gradient);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.login-card{
+  background:var(--glass);
+  backdrop-filter:blur(18px);
+  width:100%;
+  max-width:420px;
+  padding:40px 30px;
+  border-radius:28px;
+  box-shadow:0 25px 60px rgba(0,0,0,.2);
+  border:1px solid rgba(255,255,255,.2);
+  transition:all var(--transition);
+}
+
+.login-card:hover{
+  background:var(--glass-hover);
+  box-shadow:0 30px 70px rgba(0,0,0,.25);
+}
+
+h1{
+  text-align:center;
+  color:var(--primary);
+  margin-bottom:8px;
+  font-size:28px;
+}
+
+p{
+  text-align:center;
+  color:#fff;
+  font-size:14px;
+  margin-bottom:22px;
+}
+input{
+  width:100%;
+  padding:16px;
+  margin-bottom:16px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.3);
+  font-size:16px;
+  background:rgba(255,255,255,0.25); /* lighter so text is visible */
+  color:#000; /* black for input text */
+  outline:none;
+  transition:all var(--transition);
+}
+
+input::placeholder{
+  color:rgba(0,0,0,0.6);
+}
+
+input:focus{
+  border:1px solid var(--primary);
+  box-shadow:0 4px 16px rgba(181,48,48,.35);
+  background:rgba(255,255,255,0.35);
+}
+
+
+button{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:16px;
+  font-size:18px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 12px 30px rgba(181,48,48,.5);
+  transition:all var(--transition);
+}
+
+button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 16px 36px rgba(181,48,48,.55);
+}
+
+#msg{
+  margin-top:14px;
+  text-align:center;
+  font-size:14px;
+}
+
+.success{color:#2e7d32}
+.error{color:#c62828}
+
+/* Responsive */
+@media(max-width:480px){
+  .login-card{
+    padding:30px 20px;
+  }
+  h1{font-size:24px;}
+  input, button{padding:14px;font-size:16px;}
+}
+
+@media(min-width:768px){
+  .login-card{padding:45px 40px;}
+  h1{font-size:32px;}
+  input, button{padding:18px;font-size:17px;}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-card">
+  <h1>श्री बाला ईंट उद्योग</h1>
+  <p>Owner Secure Login</p>
+
+  <input id="userid" placeholder="Owner ID">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="loginOwner()">Login</button>
+  <div id="msg"></div>
+</div>
+
+<script>
+const OWNER_ID = "balaowner";
+const OWNER_PASS = "12345";
+async function loginOwner(){
+  const id = userid.value.trim();
+  const pass = password.value.trim();
+  const msg = document.getElementById("msg");
+
+  if(!id || !pass){ msg.textContent="सभी विवरण भरें"; msg.className="error"; return; }
+
+  try{
+    const res = await fetch('http://localhost:5000/api/auth/login',{
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ username:id, password:pass })
+    });
+    const data = await res.json();
+    if(res.ok){
+      localStorage.setItem("OWNER_AUTH","YES");
+      localStorage.setItem("OWNER_NAME",data.owner.name);
+      msg.textContent=data.msg; msg.className="success";
+      setTimeout(()=> window.location.href="pages/owner/owner-dashboard.html",700);
+    } else {
+      msg.textContent=data.msg; msg.className="error";
+    }
+  } catch(err){
+    msg.textContent="Server Error"; msg.className="error";
+  }
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard • Shri Bala Eent Udyog</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet" href="../../css/dashboard.css">
+</head>
+
+<body>
+<div id="toastContainer"></div>
+
+<header class="header">
+  <h1>श्री बाला ईंट उद्योग</h1>
+  <span id="datetime"></span>
+</header>
+
+<main class="container">
+
+  <!-- Add this inside <main class="container"> or wherever you want -->
+<section class="panel">
+  <button id="openOwnerLedger" class="ledger-btn">📜 Owner Ledger</button>
+</section>
+
+
+  <!-- ===== STATS ===== -->
+  <section class="stats">
+    <div class="card stat-card">
+      <div class="icon">👷</div>
+      <div class="info">
+        <label>कर्मचारी</label>
+        <h2 id="employeeCount">0</h2>
+      </div>
+    </div>
+
+    <div class="card stat-card blue">
+      <div class="icon">💰</div>
+      <div class="info">
+        <label>कुल Advance</label>
+        <h2 id="totalAdvance">₹0</h2>
+      </div>
+    </div>
+
+    <div class="card stat-card red">
+      <div class="icon">💸</div>
+      <div class="info">
+        <label>कुल खर्च</label>
+        <h2 id="totalExpense">₹0</h2>
+      </div>
+    </div>
+
+    <div class="card stat-card green">
+      <div class="icon">📊</div>
+      <div class="info">
+        <label>कुल देय</label>
+        <h2 id="totalPayable">₹0</h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ADD EMPLOYEE ===== -->
+  <section class="panel form-panel">
+    <h3>➕ नया कर्मचारी</h3>
+    <form id="addEmployeeForm">
+      <input id="empName" placeholder="नाम" required>
+      <input id="empPhone" placeholder="फोन नंबर">
+      <input id="empAdvance" type="number" placeholder="Advance ₹">
+      <button>जोड़ें</button>
+    </form>
+  </section>
+
+  <!-- ===== EMPLOYEE TABLE ===== -->
+  <section class="panel table-panel">
+    <h3>👷 कर्मचारी सूची</h3>
+    <input id="employeeSearch" class="search" placeholder="कर्मचारी खोजें">
+    <div class="table-wrap">
+      <table id="employeeTable">
+        <thead>
+          <tr>
+            <th>ID</th><th>नाम</th><th>Advance</th><th>खर्च</th><th>उत्पादन ₹</th><th>Balance</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== EXPENSE ===== -->
+  <section class="panel form-panel">
+    <h3>💸 खर्च जोड़ें</h3>
+    <input id="expenseSearch" class="search" placeholder="कर्मचारी खोजें">
+    <select id="expenseEmployee"></select>
+    <input id="expenseAmount" type="number" placeholder="राशि ₹">
+    <input id="expenseNote" placeholder="विवरण">
+    <button id="addExpenseBtn">जोड़ें</button>
+  </section>
+
+  <div class="table-wrap">
+    <table id="expenseTable">
+      <thead>
+        <tr>
+          <th>कर्मचारी</th>
+          <th>राशि</th>
+          <th>विवरण</th>
+          <th>दिनांक / समय</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- ===== PRODUCTION ===== -->
+  <section class="panel form-panel">
+    <h3>🏭 Production Entry</h3>
+    <input id="prodSearch" class="search" placeholder="कर्मचारी खोजें">
+    <select id="prodEmployee"></select>
+    <input id="prodQty" type="number" placeholder="ईंट संख्या">
+    <input id="prodPrice" type="number" placeholder="₹ प्रति ईंट">
+    <button id="addProdBtn">जोड़ें</button>
+  </section>
+
+  <div class="table-wrap">
+    <table id="productionTable">
+      <thead>
+        <tr>
+          <th>कर्मचारी</th>
+          <th>Qty</th>
+          <th>₹ प्रति ईंट</th>
+          <th>कुल ₹</th>
+          <th>दिनांक / समय</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</main>
+
+<script src="../../js/dashboard.js"></script>
+</body>
+</html>

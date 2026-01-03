@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>श्री बाला ईंट उद्योग</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/dashboard.js"></script>
+
+<style>
+:root {
+  --primary:#b53030;
+  --secondary:#fcd34d;
+  --bg-dark:#0f172a;
+  --glass:rgba(255,255,255,.08);
+  --glass-hover:rgba(255,255,255,.15);
+  --transition:.4s ease-in-out;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:Poppins, sans-serif;}
+body{background:var(--bg-dark);color:#fff;scroll-behavior:smooth;}
+
+/* ===== HEADER ===== */
+/* ===== HEADER ===== */
+header {
+  position:fixed; top:0; width:100%; height:72px;
+  z-index:1000;
+  background:rgba(0,0,0,0.35); /* semi-transparent to blend with hero */
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  transition:background 0.3s ease;
+}
+
+header.scrolled {
+  background:rgba(0,0,0,0.55); /* slightly darker when scrolling */
+}
+
+.header-inner{
+  max-width:1200px;
+  margin:auto;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+}
+
+.logo{
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:.5px;
+  color:#fff;
+}
+
+/* NAV LINKS */
+.nav-links{
+  display:flex;
+  gap:24px;
+  align-items:center;
+}
+
+.nav-links a{
+  color:#fff;
+  text-decoration:none;
+  font-weight:500;
+  position:relative;
+  padding:6px 0;
+}
+.nav-links a::after{
+  content:"";
+  position:absolute;
+  left:0; bottom:-4px;
+  width:0; height:2px; background:#b53030;
+  transition:width .3s;
+}
+.nav-links a:hover::after{width:100%}
+
+.owner-link{
+  padding:10px 18px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#b53030,#8f1d1d);
+  box-shadow:0 8px 24px rgba(181,48,48,.45);
+  font-weight:600;
+}
+
+/* HAMBURGER */
+.hamburger{
+  display:none;
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  position:relative;
+  z-index:1100; /* make sure it’s above overlay */
+}
+.hamburger span{
+  position:absolute; width:24px; height:2px;
+  background:#fff; transition:.35s;
+}
+.hamburger span:nth-child(1){transform:translateY(-7px);}
+.hamburger span:nth-child(3){transform:translateY(7px);}
+.hamburger.active span:nth-child(1){transform:rotate(45deg);}
+.hamburger.active span:nth-child(2){opacity:0;}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg);}
+
+/* MOBILE NAV */
+.mobile-nav{
+  position:fixed;
+  top:72px; left:0; right:0;
+  background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(16px);
+  transform:translateY(-120%);
+  transition:transform .45s cubic-bezier(.4,0,.2,1);
+  padding:30px;
+  z-index:1050;
+}
+.mobile-nav.show{transform:translateY(0);}
+.mobile-nav a{
+  display:block; padding:16px 10px;
+  font-size:16px; border-radius:12px;
+  color:#fff; text-decoration:none;
+}
+.mobile-nav a:hover{background:rgba(255,255,255,.1);}
+
+/* Overlay */
+.overlay{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.5);
+  opacity:0; pointer-events:none;
+  transition:.3s;
+  z-index:1040;
+}
+.overlay.show{opacity:1; pointer-events:auto;}
+
+/* Responsive */
+@media(max-width:768px){
+  .nav-links{display:none;}
+  .hamburger{display:flex;}
+}
+
+/* ===== HERO ===== */
+.hero{
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  text-align:center; padding:24px;
+  background:linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.75)),
+             url("https://images.unsplash.com/photo-1600585154340-be6161a56a0c") center/cover no-repeat;
+}
+.hero h1{
+  font-size:40px;
+  font-weight:700;
+  margin-bottom:16px;
+}
+.hero p{
+  font-size:18px;
+  color:#e5e7eb;
+  margin-bottom:28px;
+}
+.cta{
+  display:inline-block;
+  padding:14px 28px;
+  background:linear-gradient(135deg,var(--primary),#8f1d1d);
+  color:#fff;
+  border-radius:30px;
+  font-weight:600;
+  text-decoration:none;
+  box-shadow:0 12px 28px rgba(181,48,48,.5);
+  transition:all .35s;
+}
+.cta:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(181,48,48,.55);}
+
+/* ===== SERVICES ===== */
+section{padding:100px 24px; max-width:1200px; margin:auto;}
+section h2{text-align:center;font-size:28px;margin-bottom:50px;}
+.services-grid{
+  display:grid; grid-template-columns:1fr; gap:24px;
+}
+.service{
+  background:var(--glass); border-radius:20px;
+  border:1px solid rgba(255,255,255,.12); padding:28px;
+  backdrop-filter:blur(18px); transition:all .35s;
+}
+.service:hover{transform:translateY(-6px);background:var(--glass-hover);}
+.service h3{margin-bottom:12px;font-size:18px;}
+
+/* ===== CONTACT ===== */
+.contact-box{
+  max-width:520px;margin:auto;
+  background:var(--glass);border-radius:22px;
+  border:1px solid rgba(255,255,255,.12);
+  padding:36px; backdrop-filter:blur(18px);
+}
+.contact-box p{margin-bottom:18px;font-size:15px;}
+.contact-box a{color:var(--secondary);text-decoration:none;}
+
+/* ===== FOOTER ===== */
+footer{
+  text-align:center;
+  padding:20px;
+  background:#020617;
+  font-size:14px;
+  color:#9ca3af;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(min-width:768px){.services-grid{grid-template-columns:repeat(2,1fr);}.hero h1{font-size:48px;}}
+@media(min-width:1024px){.services-grid{grid-template-columns:repeat(4,1fr);}}
+
+@media(max-width:768px){
+  .nav-links{display:none;}
+  .hamburger{display:flex;}
+}
+
+.contact-box a.contact-btn {
+  display:inline-block;
+  padding:10px 18px;
+  margin-top:4px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#b53030,#8f1d1d);
+  color:#fff;
+  text-decoration:none;
+  font-weight:500;
+  transition:all 0.3s;
+}
+.contact-box a.contact-btn:hover {
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(181,48,48,.5);
+}
+/* Contact Grid */
+.contact-grid {
+  display:grid;
+  gap:24px;
+  max-width:1000px;
+  margin:auto;
+  grid-template-columns:1fr; /* mobile default */
+}
+
+.contact-card{
+  background:var(--glass);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;
+  padding:28px 24px;
+  backdrop-filter:blur(18px);
+  text-align:center;
+  transition:all 0.35s ease;
+}
+.contact-card:hover{
+  transform:translateY(-6px);
+  background:rgba(255,255,255,.12);
+  box-shadow:0 16px 40px rgba(181,48,48,.45);
+}
+
+.contact-card h3{
+  font-size:18px;
+  margin-bottom:18px;
+}
+
+.contact-card .contact-btn{
+  display:block;
+  margin:8px auto;
+  padding:12px 20px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--primary),#8f1d1d);
+  color:#fff;
+  text-decoration:none;
+  font-weight:500;
+  transition:all 0.3s;
+}
+.contact-card .contact-btn:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 28px rgba(181,48,48,.5);
+}
+
+/* Grid responsive */
+@media(min-width:768px){
+  .contact-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(min-width:1024px){
+  .contact-grid{grid-template-columns:repeat(3,1fr);}
+}
+
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">श्री बाला ईंट उद्योग</div>
+
+    <nav class="nav-links">
+      <a href="#home">होम</a>
+      <a href="#services">सेवाएँ</a>
+      <a href="#contact">संपर्क</a>
+      <a href="owner-login.html" class="owner-link">मालिक लॉगिन</a>
+    </nav>
+
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="#home">होम</a>
+  <a href="#services">सेवाएँ</a>
+  <a href="#contact">संपर्क</a>
+  <a href="owner-login.html" class="owner-link">मालिक लॉगिन</a>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+
+<!-- HERO -->
+<div class="hero" id="home">
+  <div>
+    <h1>मजबूत ईंटें • भरोसेमंद उद्योग</h1>
+    <p>उत्तम गुणवत्ता • उचित मूल्य • समय पर डिलीवरी</p>
+    <a href="#contact" class="cta">संपर्क करें</a>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <h2>हमारी सेवाएँ</h2>
+  <div class="services-grid">
+    <div class="service"><h3>🏆 प्रीमियम ईंटें</h3><p>मजबूत और टिकाऊ ईंटें हर निर्माण के लिए।</p></div>
+    <div class="service"><h3>🚚 समय पर सप्लाई</h3><p>तेज और सुरक्षित डिलीवरी।</p></div>
+    <div class="service"><h3>📦 सुरक्षित परिवहन</h3><p>अनुभवी टीम और सही पैकिंग।</p></div>
+    <div class="service"><h3>📞 ग्राहक सहायता</h3><p>हर जानकारी एक कॉल पर।</p></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+ <section id="contact">
+  <h2>संपर्क करें</h2>
+  <div class="contact-grid">
+    <!-- Rahul Card -->
+    <div class="contact-card">
+      <h3>📞 राहुल</h3>
+      <a href="tel:8736002647" class="contact-btn">Call Rahul</a>
+      <a href="https://wa.me/918736002647" target="_blank" class="contact-btn">WhatsApp Rahul</a>
+    </div>
+
+    <!-- Bala Eent Card -->
+    <div class="contact-card">
+      <h3>📞 Bala Eent</h3>
+      <a href="tel:9839454542" class="contact-btn">Call Ajay</a>
+      <a href="https://wa.me/919839454542" target="_blank" class="contact-btn">WhatsApp Ajay</a>
+    </div>
+
+    <!-- Address Card -->
+    <div class="contact-card">
+      <h3>📍 पता</h3>
+      <a href="https://www.google.com/maps/search/?api=1&query=सिथौली+पानी+टंकी+प्रयागराज" target="_blank" class="contact-btn">
+        सिथौली पानी टंकी, प्रयागराज
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+© <span id="year"></span> श्री बाला ईंट उद्योग • सभी अधिकार सुरक्षित
+</footer>
+
+<script>
+// Hamburger toggle
+const hamburger = document.getElementById("hamburger");
+const mobileNav = document.getElementById("mobileNav");
+const overlay = document.getElementById("overlay");
+
+// Toggle menu
+function toggleMenu() {
+  hamburger.classList.toggle("active");
+  mobileNav.classList.toggle("show");
+  overlay.classList.toggle("show");
+}
+
+hamburger.addEventListener("click", toggleMenu);
+overlay.addEventListener("click", toggleMenu);
+
+// Close mobile menu when a link is clicked
+document.querySelectorAll(".mobile-nav a").forEach(link => {
+  link.addEventListener("click", () => {
+    hamburger.classList.remove("active");
+    mobileNav.classList.remove("show");
+    overlay.classList.remove("show");
+  });
+});
+
+// Smooth scroll for header links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if(target){
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+
+// Optional: change header bg on scroll
+window.addEventListener("scroll", () => {
+  const header = document.querySelector("header");
+  if (window.scrollY > 50) header.classList.add("scrolled");
+  else header.classList.remove("scrolled");
+});
+
+
+// Dynamic Year
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

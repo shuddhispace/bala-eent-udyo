@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>कर्मचारी प्रबंधन</title>
+
+<link rel="stylesheet" href="../../css/common.css">
+<link rel="stylesheet" href="../../css/employee.css">
+</head>
+
+<body>
+
+<header class="header">
+  <h1>👷 कर्मचारी प्रबंधन</h1>
+</header>
+
+<main class="container">
+
+<section class="form-card">
+  <h3>नया कर्मचारी जोड़ें</h3>
+
+  <input id="name" placeholder="कर्मचारी का नाम">
+  <input id="advance" type="number" placeholder="Advance राशि">
+  <input id="ratio" type="number" placeholder="कमाई हिस्सा (%)">
+
+  <button onclick="addEmployee()">जोड़ें</button>
+</section>
+
+<section class="list-card">
+  <h3>कर्मचारी सूची</h3>
+  <div id="employeeList"></div>
+</section>
+
+</main>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/employee.js"></script>
+</body>
+</html>

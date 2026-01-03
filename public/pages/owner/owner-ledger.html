@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Ledger Dashboard</title>
+  <link rel="stylesheet" href="/pages/owner/owner-ledger.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <h1>Owner Ledger</h1>
+  <div class="filters">
+    <select id="ownerFilter">
+      <option value="">All Owners</option>
+    </select>
+    <select id="dateFilter">
+      <option value="all">All Time</option>
+      <option value="today">Today</option>
+      <option value="week">This Week</option>
+      <option value="month">This Month</option>
+      <option value="year">This Year</option>
+    </select>
+  </div>
+</header>
+
+<section class="summary">
+  <div class="card blue">
+    <h3>Total Investment</h3>
+    <p id="sumInvestment">₹0</p>
+  </div>
+  <div class="card green">
+    <h3>Total Profit</h3>
+    <p id="sumProfit">₹0</p>
+  </div>
+  <div class="card red">
+    <h3>Total Withdrawal</h3>
+    <p id="sumWithdrawal">₹0</p>
+  </div>
+  <div class="card dark">
+    <h3>Net Balance</h3>
+    <p id="sumBalance">₹0</p>
+  </div>
+</section>
+
+<section class="owners" id="ownersList"></section>
+
+<!-- Add Owner Form -->
+<section class="form-card">
+  <h2>Add Owner</h2>
+  <form id="addOwnerForm">
+    <input type="text" id="ownerNameInput" placeholder="Owner Name" required />
+    <button type="submit">Add Owner</button>
+  </form>
+</section>
+
+<!-- Ledger Entry Form -->
+<section class="form-card">
+  <h2>Add Ledger Entry</h2>
+  <form id="ledgerForm">
+    <select id="ownerSelect" required></select>
+    <select id="typeSelect" required>
+      <option value="INVEST">Investment</option>
+      <option value="PROFIT">Profit</option>
+      <option value="WITHDRAW">Withdrawal</option>
+    </select>
+    <input type="number" id="amountInput" placeholder="Amount" required />
+    <input type="text" id="noteInput" placeholder="Note (optional)" />
+    <input type="date" id="dateInput" />
+    <button type="submit">Save</button>
+  </form>
+</section>
+
+<section class="ledger">
+  <h2>Ledger</h2>
+  <div class="ledger-list" id="ledgerList"></div>
+</section>
+
+<script src="/pages/owner/owner-ledger.js"></script>
+</body>
+</html>

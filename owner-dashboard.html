@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard • श्री बाला ईंट उद्योग</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #b53030;
+  --primary-dark: #8f1d1d;
+  --secondary: #fcd34d;
+  --bg-dark: #0f172a;
+  --bg-light: #f8f8f8;
+  --glass: rgba(255,255,255,0.08);
+  --glass-hover: rgba(255,255,255,0.15);
+  --transition: 0.4s ease-in-out;
+}
+
+* { box-sizing: border-box; margin:0; padding:0; font-family: 'Poppins', sans-serif; }
+body { background: var(--bg-light); color: #000; }
+
+/* ===== HEADER ===== */
+header {
+  position: fixed; top:0; left:0; width:100%; height:64px;
+  background: var(--primary); color: #fff; z-index: 1000;
+  display: flex; align-items:center; justify-content: space-between;
+  padding:0 24px; box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+header .logo { font-size:20px; font-weight:700; }
+header nav { display:flex; gap:16px; }
+header nav a { color:#fff; text-decoration:none; font-weight:500; }
+.hamburger { display:none; flex-direction: column; justify-content:center; cursor:pointer; gap:5px; }
+.hamburger span { display:block; width:24px; height:3px; background:#fff; border-radius:3px; transition:.3s; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  position: fixed; top:64px; left:0; height: calc(100% - 64px);
+  width:250px; background: #111827; color:#fff; padding:20px; display:flex; flex-direction: column; gap:20px;
+  transition: transform .3s ease-in-out; transform: translateX(0);
+}
+.sidebar.hide { transform: translateX(-100%); }
+.sidebar h2 { font-size:18px; margin-bottom:12px; }
+.sidebar a { color:#fff; text-decoration:none; padding:10px; display:block; border-radius:8px; transition:.3s; }
+.sidebar a:hover { background: rgba(181,48,48,0.5); }
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  margin-left:250px; padding:80px 24px 24px 24px;
+  transition: margin-left .3s ease-in-out;
+}
+.main.full { margin-left:0; }
+
+.cards { display:grid; grid-template-columns:1fr; gap:20px; }
+.card {
+  background: #fff; border-radius:16px; padding:24px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1); transition:.3s;
+}
+.card:hover { transform: translateY(-5px); box-shadow:0 14px 30px rgba(0,0,0,0.15); }
+.card h3 { font-size:18px; margin-bottom:12px; }
+.card p { font-size:16px; color:#333; }
+
+/* TABLE */
+.table-container { overflow-x:auto; margin-top:20px; }
+table { width:100%; border-collapse: collapse; }
+th, td { padding:12px 16px; border-bottom:1px solid #ddd; text-align:left; }
+th { background: var(--primary); color:#fff; font-weight:600; }
+tr:hover { background: var(--glass-hover); }
+
+/* ===== FOOTER ===== */
+footer { text-align:center; padding:20px; color:#555; margin-top:40px; }
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px) {
+  .main { margin-left:0; padding-top:100px; }
+  .sidebar { position:fixed; z-index:1000; height:100%; top:0; transform:translateX(-100%); }
+  .sidebar.show { transform:translateX(0); }
+  .hamburger { display:flex; }
+}
+@media(max-width:768px) {
+  .cards { grid-template-columns:1fr; }
+}
+@media(min-width:1025px) {
+  .cards { grid-template-columns: repeat(2,1fr); }
+}
+@media(min-width:1400px) {
+  .cards { grid-template-columns: repeat(3,1fr); }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">श्री बाला ईंट उद्योग</div>
+  <nav class="desktop-nav">
+    <a href="#">Dashboard</a>
+    <a href="#">Employees</a>
+    <a href="#">Investments</a>
+    <a href="#">Production</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </nav>
+  <div class="hamburger" id="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</header>
+
+<div class="sidebar" id="sidebar">
+  <h2>मेनू</h2>
+  <a href="#dashboard">डैशबोर्ड</a>
+  <a href="#employees">कर्मचारी</a>
+  <a href="#investments">निवेश</a>
+  <a href="#production">उत्पादन</a>
+  <a href="#" onclick="logout()">लॉगआउट</a>
+</div>
+
+<div class="main" id="mainContent">
+  <section id="dashboard">
+    <h2>डैशबोर्ड</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>कुल निवेश</h3>
+        <p id="totalInvestment">₹0</p>
+      </div>
+      <div class="card">
+        <h3>कुल आय</h3>
+        <p id="totalEarnings">₹0</p>
+      </div>
+      <div class="card">
+        <h3>कर्मचारी औसत</h3>
+        <p id="employeeAvg">₹0</p>
+      </div>
+      <div class="card">
+        <h3>ईंट उत्पादन (कुल)</h3>
+        <p id="totalProduction">0</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="employees">
+    <h2>कर्मचारी सूची</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>नाम</th>
+            <th>पद</th>
+            <th>पूर्व भुगतान</th>
+            <th>कुल उत्पादन</th>
+            <th>आय</th>
+          </tr>
+        </thead>
+        <tbody id="employeeTable">
+          <!-- JS will populate -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="investments">
+    <h2>निवेश विवरण</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>तारीख</th>
+            <th>राशि</th>
+            <th>ईंट बिक्री</th>
+            <th>लाभ</th>
+          </tr>
+        </thead>
+        <tbody id="investmentTable">
+          <!-- JS will populate -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="production">
+    <h2>उत्पादन रिकॉर्ड</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>तारीख</th>
+            <th>कर्मचारी</th>
+            <th>ईंट संख्या</th>
+            <th>आय</th>
+          </tr>
+        </thead>
+        <tbody id="productionTable">
+          <!-- JS will populate -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<footer>
+© <span id="year"></span> श्री बाला ईंट उद्योग • सभी अधिकार सुरक्षित
+</footer>
+
+<script>
+// Hamburger toggle
+const hamburger = document.getElementById("hamburger");
+const sidebar = document.getElementById("sidebar");
+const mainContent = document.getElementById("mainContent");
+
+hamburger.addEventListener("click", () => {
+  sidebar.classList.toggle("show");
+});
+
+// Dynamic Year
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// Logout placeholder
+function logout(){
+  localStorage.removeItem("OWNER_AUTH");
+  window.location.href = "/pages/owner-login.html";
+}
+
+// Example: Populate tables dynamically with JS
+// You can replace this with actual API calls
+
+const employees = [
+  { name:"राहुल", role:"प्रबंधक", advance:1000, production:5000, earning:3500 },
+  { name:"अजय", role:"सहायक", advance:500, production:3000, earning:2100 },
+];
+const investments = [
+  { date:"2025-12-28", amount:50000, bricks:1200, profit:18000 },
+];
+const productions = [
+  { date:"2025-12-28", employee:"राहुल", bricks:500, earning:3500 },
+];
+
+const empTable = document.getElementById("employeeTable");
+employees.forEach(emp => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td>${emp.name}</td><td>${emp.role}</td><td>₹${emp.advance}</td><td>${emp.production}</td><td>₹${emp.earning}</td>`;
+  empTable.appendChild(tr);
+});
+
+const invTable = document.getElementById("investmentTable");
+investments.forEach(inv => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td>${inv.date}</td><td>₹${inv.amount}</td><td>${inv.bricks}</td><td>₹${inv.profit}</td>`;
+  invTable.appendChild(tr);
+});
+
+const prodTable = document.getElementById("productionTable");
+productions.forEach(prod => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td>${prod.date}</td><td>${prod.employee}</td><td>${prod.bricks}</td><td>₹${prod.earning}</td>`;
+  prodTable.appendChild(tr);
+});
+
+// Example: Update cards dynamically
+document.getElementById("totalInvestment").textContent = "₹" + employees.reduce((a,b)=>a+b.advance,0);
+document.getElementById("totalEarnings").textContent = "₹" + employees.reduce((a,b)=>a+b.earning,0);
+document.getElementById("employeeAvg").textContent = "₹" + (employees.reduce((a,b)=>a+b.earning,0)/employees.length).toFixed(2);
+document.getElementById("totalProduction").textContent = productions.reduce((a,b)=>a+b.bricks,0);
+
+</script>
+
+</body>
+</html>

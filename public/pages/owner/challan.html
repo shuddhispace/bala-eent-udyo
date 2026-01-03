@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brick Challan</title>
+</head>
+<body>
+
+<h2>🧱 ईंट चालान</h2>
+
+<input id="mobile" placeholder="मोबाइल नंबर"><br><br>
+<input id="buyerNameHi" placeholder="खरीदार नाम"><br><br>
+<input id="driverHi" placeholder="ड्राइवर नाम"><br><br>
+<input id="vehicle" placeholder="वाहन नंबर"><br><br>
+
+<select id="brick">
+  <option value="1 नंबर">1 नंबर</option>
+  <option value="2 नंबर">2 नंबर</option>
+  <option value="सेमा (3 नंबर)">सेमा (3 नंबर)</option>
+  <option value="खंजर">खंजर</option>
+  <option value="गुडिया">गुडिया</option>
+</select><br><br>
+
+<input id="qty" type="number" placeholder="मात्रा"><br><br>
+<input id="amount" type="number" placeholder="राशि"><br><br>
+<input id="usedNow" type="number" placeholder="Advance Used (0 if none)"><br><br>
+
+<button onclick="save()">चालान बनाएं</button>
+
+<script>
+function save() {
+  const data = {
+    mobile: document.getElementById("mobile").value,
+    buyerNameHi: document.getElementById("buyerNameHi").value,
+    driverHi: document.getElementById("driverHi").value,
+    vehicle: document.getElementById("vehicle").value,
+    brick: document.getElementById("brick").value,
+    qty: document.getElementById("qty").value,
+    amount: document.getElementById("amount").value,
+    usedNow: document.getElementById("usedNow").value,
+    kiske: "स्वयं"
+  };
+
+  google.script.run
+    .withSuccessHandler(r => {
+      if (r.success) {
+        window.open(r.pdfUrl);
+      } else {
+        alert(r.message);
+      }
+    })
+    .submitChallan(data);
+}
+</script>
+
+</body>
+</html>
