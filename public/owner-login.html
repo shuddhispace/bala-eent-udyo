@@ -142,36 +142,46 @@ button:hover{
 </div>
 
 <script>
-const OWNER_ID = "balaowner";
-const OWNER_PASS = "12345";
 async function loginOwner(){
   const id = userid.value.trim();
   const pass = password.value.trim();
   const msg = document.getElementById("msg");
 
-  if(!id || !pass){ msg.textContent="सभी विवरण भरें"; msg.className="error"; return; }
+  if(!id || !pass){
+    msg.textContent="सभी विवरण भरें";
+    msg.className="error";
+    return;
+  }
 
   try{
-    const res = await fetch('http://localhost:5000/api/auth/login',{
+    const res = await fetch('/api/auth/login',{
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
       body: JSON.stringify({ username:id, password:pass })
     });
+
     const data = await res.json();
+
     if(res.ok){
       localStorage.setItem("OWNER_AUTH","YES");
       localStorage.setItem("OWNER_NAME",data.owner.name);
-      msg.textContent=data.msg; msg.className="success";
-      setTimeout(()=> window.location.href="pages/owner/owner-dashboard.html",700);
+      msg.textContent=data.msg;
+      msg.className="success";
+      setTimeout(()=>{
+        window.location.href="pages/owner/owner-dashboard.html";
+      },700);
     } else {
-      msg.textContent=data.msg; msg.className="error";
+      msg.textContent=data.msg || "Login failed";
+      msg.className="error";
     }
   } catch(err){
-    msg.textContent="Server Error"; msg.className="error";
+    msg.textContent="Server Error";
+    msg.className="error";
+    console.error(err);
   }
 }
-
 </script>
+
 
 </body>
 </html>
