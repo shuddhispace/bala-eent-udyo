@@ -145,11 +145,13 @@ footer { text-align:center; padding:20px; color:#555; margin-top:40px; }
       <table>
         <thead>
           <tr>
-            <th>नाम</th>
-            <th>पद</th>
-            <th>पूर्व भुगतान</th>
-            <th>कुल उत्पादन</th>
-            <th>आय</th>
+            <th>ID</th>
+              <th>नाम</th>
+              <th>अग्रिम</th>
+              <th>खर्च</th>
+              <th>कुल ईंट</th>
+              <th>कुल उत्पादन</th>
+              <th>बैलेंस</th>
           </tr>
         </thead>
         <tbody id="employeeTable">
@@ -157,6 +159,19 @@ footer { text-align:center; padding:20px; color:#555; margin-top:40px; }
         </tbody>
       </table>
     </div>
+    <div class="pagination">
+      <button id="prevPage">⬅ Prev</button>
+      <span id="pageInfo"></span>
+      <button id="nextPage">Next ➡</button>
+      <button id="showAll">Show All</button>
+    </div>  
+    <select id="pageLimitSelect">
+      <option value="10">10 rows</option>
+      <option value="20">20 rows</option>
+      <option value="50">50 rows</option>
+    </select>
+
+
   </section>
 
   <section id="investments">

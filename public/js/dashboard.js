@@ -57,12 +57,45 @@ setInterval(() => {
 let employees = [];
 
 // ====== Load Employees ======
-async function loadEmployees() {
-  const res = await fetch(`${API}/employees`);
-  employees = await res.json();
+let currentPage = 1;
+let pageLimit = 10;
+let totalEmployees = 0;
+
+async function loadEmployees(showAll = false) {
+  const url = showAll
+    ? `${API}/employees?limit=100000`
+    : `${API}/employees?page=${currentPage}&limit=${pageLimit}`;
+
+  const res = await fetch(url);
+  const json = await res.json();
+
+  employees = json.data;
+  totalEmployees = json.totalCount;
+
   renderEmployees(employees);
   fillSelects(employees);
+
+  if (showAll) {
+    document.getElementById("pageInfo").innerText =
+      `All ${totalEmployees} records`;
+    document.getElementById("prevPage").disabled = true;
+    document.getElementById("nextPage").disabled = true;
+  } else {
+    updatePagination(totalEmployees);
+  }
 }
+
+
+function updatePagination(total) {
+  const totalPages = Math.ceil(total / pageLimit) || 1;
+
+  document.getElementById("pageInfo").innerText =
+    `Page ${currentPage} of ${totalPages}`;
+
+  document.getElementById("prevPage").disabled = currentPage <= 1;
+  document.getElementById("nextPage").disabled = currentPage >= totalPages;
+}
+
 
 // ====== Fill Select Boxes ======
 function fillSelects(list) {
@@ -92,23 +125,61 @@ function renderEmployees(list) {
         <td>${e.name}</td>
         <td>₹${e.advance || 0}</td>
         <td>₹${e.totalExpense || 0}</td>
+        <td>${e.totalBricks || 0}</td>   
         <td>₹${e.totalProduction || 0}</td>
         <td>₹${e.balance || 0}</td>
       </tr>
     `;
   });
 
-  employeeCount.innerText = list.length;
-  totalAdvance.innerText = "₹" + adv;
+  employeeCount.innerText = totalEmployees;
+  // totalAdvance.innerText = "₹" + adv;
+  totalAdvance.innerText = "₹" + adv + " (Page)";
   totalExpense.innerText = "₹" + exp;
   totalPayable.innerText = "₹" + pay;
 }
 
+document.getElementById("pageLimitSelect").onchange = e => {
+  pageLimit = Number(e.target.value);
+  currentPage = 1;
+  loadEmployees();
+};
+
+document.getElementById("prevPage").onclick = () => {
+  if (currentPage > 1) {
+    currentPage--;
+    loadEmployees();
+  }
+};
+
+document.getElementById("nextPage").onclick = () => {
+  currentPage++;
+  loadEmployees();
+};
+
+document.getElementById("showAll").onclick = () => {
+  currentPage = 1;
+  loadEmployees(true);
+};
+
+
+
 // ====== Search Handlers ======
 employeeSearch.oninput = e => {
-  const v = e.target.value.toLowerCase();
-  renderEmployees(employees.filter(x => x.name.toLowerCase().includes(v)));
+  const v = e.target.value.trim().toLowerCase();
+
+  if (!v) {
+    loadEmployees();
+    return;
+  }
+
+  loadEmployees(true).then(() => {
+    renderEmployees(
+      employees.filter(x => x.name.toLowerCase().includes(v))
+    );
+  });
 };
+
 
 expenseSearch.oninput = e => {
   const v = e.target.value.toLowerCase();

@@ -169,3 +169,60 @@ tbody tr:hover { background:#e3f2fd; }
   form button { font-size:0.85rem; padding:8px; }
   .ledger-btn { font-size:0.9rem; padding:8px 16px; width:100%; text-align:center; }
 }
+/* ===== PAGINATION ===== */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 12px;
+  background: #f9fafc;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.pagination button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.pagination button:hover {
+  background: #115293;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.pagination button:disabled {
+  background: #b0bec5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.pagination span {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  padding: 0 8px;
+}
+
+/* Mobile friendly */
+@media (max-width: 600px) {
+  .pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pagination button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
