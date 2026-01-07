@@ -172,6 +172,13 @@ tbody tr:hover { background:#e3f2fd; }
 /* ===== PAGINATION ===== */
 .pagination {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+/* .pagination {
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -180,7 +187,7 @@ tbody tr:hover { background:#e3f2fd; }
   background: #f9fafc;
   border-radius: 12px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-}
+} */
 
 .pagination button {
   background: #1976d2;
@@ -224,5 +231,84 @@ tbody tr:hover { background:#e3f2fd; }
   .pagination button {
     padding: 6px 12px;
     font-size: 0.85rem;
+  }
+}
+/* ===== EMPLOYEE TABLE UI ===== */
+.employee-table {
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.employee-table thead th {
+  background: linear-gradient(135deg, #b53030, #8f1d1d);
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.employee-table tbody td {
+  font-size: 0.9rem;
+}
+
+.employee-table .loading-row {
+  text-align: center;
+  padding: 20px;
+  color: #777;
+  font-style: italic;
+}
+
+.employee-table tfoot .total-row {
+  background: #fdf3f3;
+  font-weight: 600;
+  border-top: 2px solid #b53030;
+}
+
+.employee-table tfoot td {
+  color: #8f1d1d;
+}
+
+/* ===== CONTROLS ===== */
+.employee-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.page-limit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-limit select {
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.show-all {
+  background: #444;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.show-all:hover {
+  background: #222;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 700px) {
+  .employee-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination {
+    justify-content: center;
   }
 }

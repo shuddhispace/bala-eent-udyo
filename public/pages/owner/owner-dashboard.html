@@ -3,143 +3,277 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owner Dashboard • Shri Bala Eent Udyog</title>
+<title>👑 Owner Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --primary:#6a1b9a;
+  --green:#2e7d32;
+  --red:#c62828;
+  --orange:#ef6c00;
+  --bg:#f4f6f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Poppins;
+  background:var(--bg);
+  color:#333;
+}
 
-<link rel="stylesheet" href="../../css/dashboard.css">
+/* ===== HEADER ===== */
+header{
+  background:var(--primary);
+  color:#fff;
+  padding:16px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header h1{margin:0;font-size:20px}
+.menu-btn{
+  font-size:26px;
+  cursor:pointer;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  position:fixed;
+  top:0; left:-260px;
+  width:260px; height:100%;
+  background:#fff;
+  box-shadow:4px 0 20px rgba(0,0,0,.15);
+  padding:20px;
+  transition:.3s;
+  z-index:9999;
+}
+.sidebar.open{left:0}
+.sidebar a{
+  display:block;
+  padding:14px;
+  margin-bottom:10px;
+  border-radius:12px;
+  color:#333;
+  text-decoration:none;
+  font-weight:600;
+}
+.sidebar a:hover{background:#eee}
+
+/* overlay */
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  z-index:9998;
+}
+.overlay.show{display:block}
+
+/* ===== MAIN ===== */
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+
+/* ===== SUMMARY CARDS ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;
+}
+.card{
+  background:var(--card);
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+.card h3{margin:0 0 8px;font-size:14px;color:#777}
+.card span{
+  font-size:26px;
+  font-weight:700;
+}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.orange{color:var(--orange)}
+
+/* ===== OWNER PROFIT ===== */
+.owner-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+  margin-top:20px;
+}
+.owner-card{
+  background:#fff;
+  padding:16px;
+  border-radius:14px;
+  box-shadow:0 4px 16px rgba(0,0,0,.08);
+}
+.owner-card.loss{
+  border:2px solid var(--red);
+  background:#ffebee;
+}
+.owner-card h4{margin:0;font-size:16px}
+.owner-card small{color:#777}
+.owner-card .profit{
+  font-size:22px;
+  font-weight:700;
+  margin-top:6px;
+}
+.badge{
+  display:inline-block;
+  background:var(--red);
+  color:#fff;
+  padding:4px 8px;
+  border-radius:8px;
+  font-size:12px;
+  margin-top:6px;
+}
+
+/* ===== MOBILE ===== */
+@media(max-width:600px){
+  header h1{font-size:18px}
+}
+</style>
 </head>
 
 <body>
-<div id="toastContainer"></div>
 
-<header class="header">
-  <h1>श्री बाला ईंट उद्योग</h1>
-  <span id="datetime"></span>
+<header>
+  <h1>👑 Owner Dashboard</h1>
+  <div class="menu-btn" id="menuBtn">☰</div>
 </header>
 
-<main class="container">
+<div class="sidebar" id="sidebar">
+  <a href="/pages/owner/karmchari.html">👷 कर्मचारी</a>
+  <a href="/pages/owner/employee-kharch.html">💸 खर्च</a>
+  <a href="/pages/owner/production-entry.html">🏭 उत्पादन</a>
+  <a href="/pages/owner/owner-ledger.html">📒 Owner Ledger</a>
+</div>
+<div class="overlay" id="overlay"></div>
 
-  <!-- Add this inside <main class="container"> or wherever you want -->
-<section class="panel">
-  <button id="openOwnerLedger" class="ledger-btn">📜 Owner Ledger</button>
-</section>
+<div class="container">
 
-
-  <!-- ===== STATS ===== -->
-  <section class="stats">
-    <div class="card stat-card">
-      <div class="icon">👷</div>
-      <div class="info">
-        <label>कर्मचारी</label>
-        <h2 id="employeeCount">0</h2>
-      </div>
-    </div>
-
-    <div class="card stat-card blue">
-      <div class="icon">💰</div>
-      <div class="info">
-        <label>कुल Advance</label>
-        <h2 id="totalAdvance">₹0</h2>
-      </div>
-    </div>
-
-    <div class="card stat-card red">
-      <div class="icon">💸</div>
-      <div class="info">
-        <label>कुल खर्च</label>
-        <h2 id="totalExpense">₹0</h2>
-      </div>
-    </div>
-
-    <div class="card stat-card green">
-      <div class="icon">📊</div>
-      <div class="info">
-        <label>कुल देय</label>
-        <h2 id="totalPayable">₹0</h2>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== ADD EMPLOYEE ===== -->
-  <section class="panel form-panel">
-    <h3>➕ नया कर्मचारी</h3>
-    <form id="addEmployeeForm">
-      <input id="empName" placeholder="नाम" required>
-      <input id="empPhone" placeholder="फोन नंबर">
-      <input id="empAdvance" type="number" placeholder="Advance ₹">
-      <button>जोड़ें</button>
-    </form>
-  </section>
-
-  <!-- ===== EMPLOYEE TABLE ===== -->
-  <section class="panel table-panel">
-    <h3>👷 कर्मचारी सूची</h3>
-    <input id="employeeSearch" class="search" placeholder="कर्मचारी खोजें">
-    <div class="table-wrap">
-      <table id="employeeTable">
-        <thead>
-          <tr>
-            <th>ID</th><th>नाम</th><th>Advance</th><th>खर्च</th><th>उत्पादन ₹</th><th>Balance</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- ===== EXPENSE ===== -->
-  <section class="panel form-panel">
-    <h3>💸 खर्च जोड़ें</h3>
-    <input id="expenseSearch" class="search" placeholder="कर्मचारी खोजें">
-    <select id="expenseEmployee"></select>
-    <input id="expenseAmount" type="number" placeholder="राशि ₹">
-    <input id="expenseNote" placeholder="विवरण">
-    <button id="addExpenseBtn">जोड़ें</button>
-  </section>
-
-  <div class="table-wrap">
-    <table id="expenseTable">
-      <thead>
-        <tr>
-          <th>कर्मचारी</th>
-          <th>राशि</th>
-          <th>विवरण</th>
-          <th>दिनांक / समय</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+<!-- SUMMARY -->
+<div class="grid">
+  <div class="card">
+    <h3>कुल कर्मचारी</h3>
+    <span id="totalEmployees">0</span>
   </div>
-
-  <!-- ===== PRODUCTION ===== -->
-  <section class="panel form-panel">
-    <h3>🏭 Production Entry</h3>
-    <input id="prodSearch" class="search" placeholder="कर्मचारी खोजें">
-    <select id="prodEmployee"></select>
-    <input id="prodQty" type="number" placeholder="ईंट संख्या">
-    <input id="prodPrice" type="number" placeholder="₹ प्रति ईंट">
-    <button id="addProdBtn">जोड़ें</button>
-  </section>
-
-  <div class="table-wrap">
-    <table id="productionTable">
-      <thead>
-        <tr>
-          <th>कर्मचारी</th>
-          <th>Qty</th>
-          <th>₹ प्रति ईंट</th>
-          <th>कुल ₹</th>
-          <th>दिनांक / समय</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <div class="card">
+    <h3>कुल Advance</h3>
+    <span id="totalAdvance">₹0</span>
   </div>
+  <div class="card">
+    <h3>कुल ईंट Qty</h3>
+    <span id="totalBricks">0</span>
+  </div>
+  <div class="card">
+    <h3>उत्पादन राशि</h3>
+    <span class="green" id="totalProduction">₹0</span>
+  </div>
+  <div class="card">
+    <h3>कुल खर्च</h3>
+    <span class="red" id="totalExpense">₹0</span>
+  </div>
+</div>
 
-</main>
+<!-- OWNER PROFIT -->
+<h2 style="margin-top:30px">👑 Owner-wise Profit / Loss</h2>
+<div class="owner-grid" id="ownerGrid"></div>
 
-<script src="../../js/dashboard.js"></script>
+</div>
+
+<script>
+/* ===== MENU LOGIC ===== */
+const sidebar=document.getElementById("sidebar");
+const overlay=document.getElementById("overlay");
+const menuBtn=document.getElementById("menuBtn");
+
+function closeMenu(){
+  sidebar.classList.remove("open");
+  overlay.classList.remove("show");
+}
+menuBtn.onclick=()=>{
+  sidebar.classList.add("open");
+  overlay.classList.add("show");
+};
+overlay.onclick=closeMenu;
+window.onresize=closeMenu;
+document.querySelectorAll(".sidebar a").forEach(a=>{
+  a.onclick=closeMenu;
+});
+
+/* ===== DASHBOARD LOGIC ===== */
+async function loadDashboard(){
+  /* EMPLOYEES */
+  const empRes=await fetch("/api/employees/all");
+  const empJson=await empRes.json();
+  const employees=empJson.data||[];
+  document.getElementById("totalEmployees").innerText=employees.length;
+
+  let adv=0;
+  employees.forEach(e=>adv+=e.advance||0);
+  document.getElementById("totalAdvance").innerText="₹"+adv;
+
+  /* EXPENSES */
+  const expRes=await fetch("/api/expenses?limit=100000");
+  const expJson=await expRes.json();
+  const expenses=expJson.data||[];
+
+  let totalExp=0;
+  expenses.forEach(e=>totalExp+=e.amount||0);
+  document.getElementById("totalExpense").innerText="₹"+totalExp;
+
+  /* PRODUCTION */
+  const prodRes=await fetch("/api/production");
+  const productions=await prodRes.json();
+
+  let bricks=0, prodAmt=0;
+  productions.forEach(p=>{
+    bricks+=p.qty||0;
+    prodAmt+=(p.qty||0)*(p.price||0);
+  });
+  document.getElementById("totalBricks").innerText=bricks;
+  document.getElementById("totalProduction").innerText="₹"+prodAmt;
+
+  /* OWNER PROFIT */
+  const ownersRes=await fetch("/api/owners");
+  const owners=await ownersRes.json();
+
+  const ownerGrid=document.getElementById("ownerGrid");
+  ownerGrid.innerHTML="";
+
+  owners.forEach(o=>{
+    const oExp=expenses.filter(e=>e.ownerName===o.name)
+                       .reduce((s,e)=>s+e.amount,0);
+
+    const oProd=productions
+      .filter(p=>expenses.some(e=>e.employee==p.employee && e.ownerName===o.name))
+      .reduce((s,p)=>s+(p.qty*p.price),0);
+
+    const profit=oProd-oExp;
+
+    const div=document.createElement("div");
+    div.className="owner-card"+(profit<0?" loss":"");
+    div.innerHTML=`
+      <h4>${o.name}</h4>
+      <small>Production: ₹${oProd}</small><br>
+      <small>Expense: ₹${oExp}</small>
+      <div class="profit ${profit<0?'red':'green'}">
+        ₹${profit}
+      </div>
+      ${profit<0?'<div class="badge">⚠️ Loss</div>':''}
+    `;
+    ownerGrid.appendChild(div);
+  });
+}
+
+loadDashboard();
+</script>
+
 </body>
 </html>

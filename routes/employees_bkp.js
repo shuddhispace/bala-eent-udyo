@@ -1,9 +1,9 @@
+
 const router = require("express").Router();
 const Employee = require("../models/Employee");
 const Expense = require("../models/Expense");
 const Production = require("../models/Production");
 
-// Existing paginated GET route
 router.get("/", async (req, res) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
@@ -24,6 +24,7 @@ router.get("/", async (req, res) => {
     const totalBricks = productions.reduce((a,b)=>a+b.qty,0);
     const totalProduction = productions.reduce((a, b) => a + (b.qty * b.price), 0);
 
+
     result.push({
       ...emp.toObject(),
       totalExpense,
@@ -39,21 +40,10 @@ router.get("/", async (req, res) => {
   });
 });
 
-// POST - add new employee
 router.post("/", async (req, res) => {
   const emp = new Employee(req.body);
   await emp.save();
   res.json(emp);
-});
-
-// NEW: GET all employees (for dropdown)
-router.get("/all", async (req, res) => {
-  try {
-    const employees = await Employee.find(); // fetch all without pagination
-    res.json({ data: employees });
-  } catch (err) {
-    res.status(500).json({ msg: "Server error" });
-  }
 });
 
 module.exports = router;

@@ -1,150 +1,197 @@
-const API = "/api";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Owner Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const ownersList = document.getElementById("ownersList");
-const ownerSelect = document.getElementById("ownerSelect");
-const ledgerList = document.getElementById("ledgerList");
-const ownerFilter = document.getElementById("ownerFilter");
-const dateFilter = document.getElementById("dateFilter");
+<style>
+*{box-sizing:border-box;font-family:system-ui,sans-serif}
+body{margin:0;background:#f4f6fa;color:#222}
 
-const sumInvestment = document.getElementById("sumInvestment");
-const sumProfit = document.getElementById("sumProfit");
-const sumWithdrawal = document.getElementById("sumWithdrawal");
-const sumBalance = document.getElementById("sumBalance");
-
-const addOwnerForm = document.getElementById("addOwnerForm");
-const ownerNameInput = document.getElementById("ownerNameInput");
-
-const ledgerForm = document.getElementById("ledgerForm");
-const typeSelect = document.getElementById("typeSelect");
-const amountInput = document.getElementById("amountInput");
-const noteInput = document.getElementById("noteInput");
-const dateInput = document.getElementById("dateInput");
-
-let owners = [];
-let ledger = [];
-
-// Load Owners
-async function loadOwners() {
-  const res = await fetch(`${API}/owners`);
-  owners = await res.json();
-
-  ownersList.innerHTML = "";
-  ownerSelect.innerHTML = "";
-  ownerFilter.innerHTML = `<option value="">All Owners</option>`;
-
-  owners.forEach(o => {
-    const bal = calculateOwnerBalance(o._id);
-    ownersList.innerHTML += `
-      <div class="owner-card">
-        <strong>${o.name}</strong>
-        <div class="balance ${bal>=0?"positive":"negative"}">₹${bal}</div>
-      </div>
-    `;
-    ownerSelect.innerHTML += `<option value="${o._id}">${o.name}</option>`;
-    ownerFilter.innerHTML += `<option value="${o._id}">${o.name}</option>`;
-  });
+header{
+  background:#111;color:#fff;
+  padding:14px;font-size:18px
 }
 
-// Load Ledger
-async function loadLedger() {
-  const res = await fetch(`${API}/ledger`);
+.summary{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;padding:15px
+}
+.card{
+  padding:14px;border-radius:10px;color:#fff
+}
+.blue{background:#1976d2}
+.green{background:#2e7d32}
+.red{background:#c62828}
+.dark{background:#333}
+
+.owners{
+  display:flex;gap:12px;
+  padding:15px;overflow-x:auto
+}
+.owner-card{
+  background:#fff;padding:12px;
+  border-radius:10px;
+  min-width:180px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1)
+}
+.balance{font-size:18px;font-weight:700}
+.positive{color:#2e7d32}
+.negative{color:#c62828}
+
+.ledger{padding:15px}
+.ledger-item{
+  background:#fff;padding:10px;
+  border-radius:8px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;font-size:14px;
+  margin-bottom:8px
+}
+.invest{border-left:4px solid #1976d2}
+.profit{border-left:4px solid #2e7d32}
+.withdraw{border-left:4px solid #c62828}
+
+.pagination{
+  display:flex;gap:10px;
+  justify-content:center;margin-top:10px
+}
+button{
+  padding:6px 12px;
+  border:none;border-radius:6px;
+  background:#111;color:#fff;
+  cursor:pointer
+}
+button:disabled{opacity:.4}
+
+@media(max-width:700px){
+  .ledger-item{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>Owner Dashboard</header>
+
+<div class="summary">
+  <div class="card blue">Investment<br><b id="sumInvestment">₹0</b></div>
+  <div class="card green">Profit<br><b id="sumProfit">₹0</b></div>
+  <div class="card red">Withdraw<br><b id="sumWithdrawal">₹0</b></div>
+  <div class="card dark">Balance<br><b id="sumBalance">₹0</b></div>
+</div>
+
+<div class="owners" id="ownersList"></div>
+
+<div class="ledger" id="ledgerList"></div>
+
+<script>
+/* ===== SAME LOGIC AS YOUR WORKING BACKEND ===== */
+const API = "/api";
+
+/* STATE */
+let owners = [];
+let ledger = [];
+let page = 1;
+const PAGE_SIZE = 10;
+
+/* LOAD OWNERS */
+async function loadOwners(){
+  const res = await fetch(API + "/owners");
+  owners = await res.json();
+  renderOwners();
+}
+
+/* LOAD LEDGER */
+async function loadLedger(){
+  const res = await fetch(API + "/ledger");
   ledger = await res.json();
   renderLedger();
 }
 
-// Calculate Owner Balance
-function calculateOwnerBalance(ownerId){
-  return ledger
-    .filter(l => l.ownerId === ownerId)
-    .reduce((sum,l)=> sum + l.amount, 0);
+/* OWNER SUMMARY (CALCULATED FROM LEDGER – SAME AS BACKEND IDEA) */
+function ownerSummary(ownerId){
+  let invest=0, profit=0, withdraw=0;
+  ledger.filter(l=>l.ownerId===ownerId).forEach(l=>{
+    if(l.type==="INVEST") invest+=l.amount;
+    if(l.type==="PROFIT") profit+=l.amount;
+    if(l.type==="WITHDRAW") withdraw+=Math.abs(l.amount);
+  });
+  return {
+    invest, profit, withdraw,
+    balance: invest + profit - withdraw,
+    percent: invest ? ((profit/invest)*100).toFixed(2) : "0.00"
+  };
 }
 
-// Apply Filters
-function applyFilters(list){
-  let data = [...list];
-  if(ownerFilter.value){
-    data = data.filter(l => l.ownerId === ownerFilter.value);
-  }
-  if(dateFilter.value !== "all"){
-    const now = new Date();
-    data = data.filter(l => {
-      const d = new Date(l.date);
-      if(dateFilter.value==="today") return d.toDateString()===now.toDateString();
-      if(dateFilter.value==="week") return (now-d)/86400000 <=7;
-      if(dateFilter.value==="month") return d.getMonth()===now.getMonth();
-      if(dateFilter.value==="year") return d.getFullYear()===now.getFullYear();
-    });
-  }
-  return data;
+/* RENDER OWNER CARDS */
+function renderOwners(){
+  const box = document.getElementById("ownersList");
+  box.innerHTML="";
+  owners.forEach(o=>{
+    const s = ownerSummary(o._id);
+    box.innerHTML+=`
+      <div class="owner-card">
+        <b>${o.name}</b>
+        <div class="balance ${s.balance>=0?"positive":"negative"}">
+          ₹${s.balance.toLocaleString("en-IN")}
+        </div>
+        <div style="font-size:12px">
+          Invested: ₹${s.invest.toLocaleString("en-IN")}<br>
+          Profit: ₹${s.profit.toLocaleString("en-IN")}<br>
+          Withdraw: ₹${s.withdraw.toLocaleString("en-IN")}<br>
+          Profit %: ${s.percent}%
+        </div>
+      </div>
+    `;
+  });
 }
 
-// Render Ledger
+/* RENDER LEDGER WITH PAGINATION */
 function renderLedger(){
-  const data = applyFilters(ledger);
-  ledgerList.innerHTML = "";
+  const list = document.getElementById("ledgerList");
+  list.innerHTML="";
 
   let invest=0, profit=0, withdraw=0;
+  const start=(page-1)*PAGE_SIZE;
+  const data=ledger.slice(start,start+PAGE_SIZE);
 
   data.forEach(l=>{
     if(l.type==="INVEST") invest+=l.amount;
     if(l.type==="PROFIT") profit+=l.amount;
     if(l.type==="WITHDRAW") withdraw+=Math.abs(l.amount);
 
-    ledgerList.innerHTML += `
+    list.innerHTML+=`
       <div class="ledger-item ${l.type.toLowerCase()}">
         <div>${new Date(l.date).toLocaleDateString()}</div>
-        <div>${owners.find(o=>o._id===l.ownerId)?.name || "Unknown"}</div>
+        <div>${l.owner}</div>
         <div>${l.type}</div>
         <div>₹${l.amount}</div>
-        <div>${l.note||"-"}</div>
+        <div>${l.note}</div>
       </div>
     `;
   });
 
-  sumInvestment.innerText = "₹"+invest;
-  sumProfit.innerText = "₹"+profit;
-  sumWithdrawal.innerText = "₹"+withdraw;
-  sumBalance.innerText = "₹"+(invest+profit-withdraw);
+  document.getElementById("sumInvestment").innerText="₹"+invest;
+  document.getElementById("sumProfit").innerText="₹"+profit;
+  document.getElementById("sumWithdrawal").innerText="₹"+withdraw;
+  document.getElementById("sumBalance").innerText="₹"+(invest+profit-withdraw);
+
+  list.innerHTML+=`
+    <div class="pagination">
+      <button ${page===1?"disabled":""} onclick="page--;renderLedger()">Prev</button>
+      <span>Page ${page}</span>
+      <button ${(page*PAGE_SIZE)>=ledger.length?"disabled":""}
+        onclick="page++;renderLedger()">Next</button>
+    </div>
+  `;
 }
 
-// Add Owner
-addOwnerForm.onsubmit = async e=>{
-  e.preventDefault();
-  const name = ownerNameInput.value.trim();
-  if(!name) return alert("Enter owner name");
-  const res = await fetch(`${API}/owners`, {
-    method:"POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ name })
-  });
-  if(!res.ok){ alert("Failed to add owner"); return; }
-  ownerNameInput.value="";
-  await loadOwners();
-  alert("Owner added successfully");
-};
-
-// Add Ledger Entry
-ledgerForm.onsubmit = async e=>{
-  e.preventDefault();
-  const body = {
-    ownerId: ownerSelect.value,
-    type: typeSelect.value,
-    amount: typeSelect.value==="WITHDRAW"? -Number(amountInput.value) : Number(amountInput.value),
-    note: noteInput.value,
-    date: dateInput.value || new Date()
-  };
-  await fetch(`${API}/ledger`, {
-    method:"POST",
-    headers: { "Content-Type":"application/json" },
-    body: JSON.stringify(body)
-  });
-  ledgerForm.reset();
-  await loadLedger();
-  await loadOwners();
-};
-
-ownerFilter.onchange = renderLedger;
-dateFilter.onchange = renderLedger;
-
-// Initial load
+/* INIT */
 loadLedger().then(loadOwners);
+</script>
+
+</body>
+</html>

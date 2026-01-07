@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>कर्मचारी खर्च</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{--brand:#b53030}
+*{box-sizing:border-box}
+body{margin:0;font-family:Poppins;background:#f4f6f9}
+header{background:var(--brand);color:#fff;padding:16px 20px;font-size:20px;font-weight:600}
+.container{max-width:1200px;margin:auto;padding:16px}
+.card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.08);margin-bottom:20px}
+h3{margin-top:0}
+input,select{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;margin-bottom:14px;font-size:15px}
+button{padding:14px 20px;border-radius:12px;border:none;background:var(--brand);color:#fff;font-weight:600;cursor:pointer;position:relative}
+button.secondary{background:#eee;color:#333}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th{background:var(--brand);color:#fff;padding:14px;text-align:left}
+td{padding:14px;border-bottom:1px solid #eee}
+.owner-cell{color:var(--brand);font-weight:600;cursor:pointer}
+.owner-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.owner-box{background:#fafafa;padding:16px;border-radius:14px}
+.owner-box span{display:block;margin-top:6px;font-size:22px;color:var(--brand);font-weight:700}
+.pagination{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:14px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999}
+.modal-content{background:#fff;max-width:800px;margin:6% auto;padding:20px;border-radius:18px;max-height:80vh;overflow:auto}
+@media(max-width:600px){header{font-size:18px}.modal-content{margin:10% 12px}#toast{left:50%;transform:translateX(-50%);bottom:30px;}}
+#toast{transition:all .4s ease;position:fixed;bottom:20px;right:20px;min-width:260px;padding:16px 18px;border-radius:14px;font-weight:600;color:#fff;display:none;z-index:10000;box-shadow:0 10px 30px rgba(0,0,0,.2);text-align:center;}
+.spinner{width:18px;height:18px;border:3px solid #fff;border-top:3px solid rgba(255,255,255,0.4);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;margin-left:8px;vertical-align:middle}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<header>💸 कर्मचारी खर्च</header>
+
+<div class="container">
+
+<!-- OWNER SUMMARY -->
+<div class="card">
+<h3>👑 Owner-wise कुल खर्च</h3>
+<div id="ownerSummary" class="owner-summary"></div>
+</div>
+
+<!-- ADD EXPENSE -->
+<div class="card">
+<h3>➕ खर्च जोड़ें</h3>
+<div class="grid">
+ <select id="employeeSelect"></select>
+ <select id="ownerSelect"></select>
+ <input type="number" id="amountInput" placeholder="राशि">
+ <input type="date" id="dateInput">
+</div>
+<button id="addExpenseBtn" onclick="addExpense()">खर्च जोड़ें</button>
+</div>
+
+<!-- FILTERS -->
+<div class="card">
+<h3>🔍 खोज</h3>
+<div class="grid">
+ <input id="searchEmployee" placeholder="कर्मचारी नाम खोजें">
+ <input id="searchOwner" placeholder="Owner नाम खोजें">
+</div>
+</div>
+
+<!-- TABLE -->
+<div class="card">
+<h3>📊 खर्च इतिहास</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>कर्मचारी</th>
+<th>ID</th>
+<th>Owner</th>
+<th>राशि</th>
+<th>तारीख</th>
+</tr>
+</thead>
+<tbody id="expenseTableBody"></tbody>
+</table>
+</div>
+<div class="pagination">
+ <div id="pageInfo"></div>
+ <div>
+  <button class="secondary" onclick="prevPage()">⬅</button>
+  <button onclick="nextPage()">➡</button>
+ </div>
+</div>
+</div>
+
+</div>
+
+<!-- OWNER MODAL -->
+<div class="modal" id="ownerModal">
+ <div class="modal-content">
+  <h3 id="ownerModalTitle"></h3>
+  <button class="secondary" onclick="closeOwnerModal()">Close</button>
+  <div class="table-wrap">
+   <table>
+    <tbody id="ownerExpenseBody"></tbody>
+   </table>
+  </div>
+ </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+let allExpenses=[];
+let filteredExpenses=[];
+let page=1, limit=10, totalPages=1;
+
+// load employees
+async function loadEmployees() {
+  try {
+    const r = await fetch("/api/employees/all"); // <-- change here
+    const j = await r.json();
+    employeeSelect.innerHTML = "<option value=''>कर्मचारी चुनें</option>";
+    j.data.forEach(e => {
+      employeeSelect.innerHTML += `<option value="${e._id}">${e.name} (${e.empId})</option>`;
+    });
+  } catch (err) {
+    showToast("Employee fetch failed", "error");
+    console.error(err);
+  }
+}
+
+
+// load owners
+async function loadOwners(){
+ const r=await fetch("/api/owners");
+ const owners=await r.json();
+ ownerSelect.innerHTML="<option value=''>Owner चुनें</option>";
+ owners.forEach(o=>{
+  ownerSelect.innerHTML+=`<option value="${o.name}">${o.name}</option>`;
+ });
+}
+
+// load expenses with pagination
+async function loadExpenses(){
+ const r=await fetch(`/api/expenses?page=${page}&limit=${limit}`);
+ const j=await r.json();
+ allExpenses=j.data;
+ totalPages=j.pages;
+ applyFilters();
+}
+
+// filter by employee / owner
+function applyFilters(){
+ const emp=searchEmployee.value.toLowerCase();
+ const own=searchOwner.value.toLowerCase();
+ filteredExpenses=allExpenses.filter(e=>
+  e.employee.name.toLowerCase().includes(emp) &&
+  e.ownerName.toLowerCase().includes(own)
+ );
+ renderTable();
+ renderOwnerSummary();
+ updatePageInfo();
+}
+
+// table render
+function renderTable(){
+ expenseTableBody.innerHTML="";
+ filteredExpenses.forEach(e=>{
+  const date = e.expenseDate ? new Date(e.expenseDate) : new Date(e.createdAt);
+  const formattedDate = !e.expenseDate ? date.toLocaleString("hi-IN", {weekday:"long", day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"}) : date.toLocaleDateString("hi-IN");
+  expenseTableBody.innerHTML+=`
+  <tr>
+   <td>${e.employee.name}</td>
+   <td>${e.employee.empId}</td>
+   <td class="owner-cell" onclick="openOwnerModal('${e.ownerName}')">${e.ownerName}</td>
+   <td>₹${e.amount}</td>
+   <td>${formattedDate}</td>
+  </tr>`;
+ });
+}
+
+// owner summary
+function renderOwnerSummary(){
+ const map={};
+ filteredExpenses.forEach(e=>map[e.ownerName]=(map[e.ownerName]||0)+e.amount);
+ ownerSummary.innerHTML="";
+ Object.keys(map).forEach(o=>{
+  ownerSummary.innerHTML+=`<div class="owner-box"><b>${o}</b><span>₹${map[o]}</span></div>`;
+ });
+}
+
+// pagination info
+function updatePageInfo(){
+ const start=(page-1)*limit+1;
+ const end=start+filteredExpenses.length-1;
+ pageInfo.innerText=`Showing ${start}-${end} of ${filteredExpenses.length} entries`;
+}
+
+// modal
+function openOwnerModal(owner){
+ ownerModal.style.display="block";
+ ownerModalTitle.innerText=owner;
+ ownerExpenseBody.innerHTML="";
+ allExpenses.filter(e=>e.ownerName===owner).forEach(e=>{
+  const date = e.expenseDate ? new Date(e.expenseDate) : new Date(e.createdAt);
+  const formattedDate = !e.expenseDate ? date.toLocaleString("hi-IN", {weekday:"long", day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"}) : date.toLocaleDateString("hi-IN");
+  ownerExpenseBody.innerHTML+=`<tr><td>${e.employee.name}</td><td>₹${e.amount}</td><td>${formattedDate}</td></tr>`;
+ });
+}
+function closeOwnerModal(){ ownerModal.style.display="none"; }
+
+// toast
+function showToast(msg, type="success"){
+ const toast=document.getElementById("toast");
+ toast.style.background = type==="success" ? "#2e7d32" : type==="error" ? "#c62828" : "#333";
+ toast.innerText=msg;
+ toast.style.display="block";
+ toast.style.opacity="1";
+ toast.style.transform="translateY(0)";
+ // sound & vibration
+ if(type==="success"){ new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3').play().catch(()=>{}); navigator.vibrate?.(100);}
+ if(type==="error"){ navigator.vibrate?.([200,100,200]);}
+ setTimeout(()=>{
+  toast.style.opacity="0";
+  toast.style.transform="translateY(20px)";
+ },2500);
+ setTimeout(()=>{toast.style.display="none"},3000);
+}
+
+// add expense with backend error + spinner
+async function addExpense(){
+ if(!employeeSelect.value || !ownerSelect.value || !amountInput.value){
+  showToast("❌ सभी फ़ील्ड भरना अनिवार्य है","error"); return;
+ }
+ const btn=document.getElementById("addExpenseBtn");
+ const originalText=btn.innerHTML;
+ btn.disabled=true; btn.innerHTML="जोड़ रहे हैं... <span class='spinner'></span>";
+ try{
+  const res=await fetch("/api/expenses",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+   employee:employeeSelect.value,
+   ownerName:ownerSelect.value,
+   amount:+amountInput.value,
+   expenseDate:dateInput.value||null
+  })});
+  const data=await res.json();
+  if(!res.ok) throw new Error(data.msg || "Server Error");
+  amountInput.value=""; dateInput.value="";
+  showToast("✔ खर्च सफलतापूर्वक जोड़ दिया गया","success");
+  loadExpenses();
+ }catch(err){ showToast("❌ "+err.message,"error"); }
+ finally{ btn.disabled=false; btn.innerHTML=originalText; }
+}
+
+// pagination
+function nextPage(){ if(page<totalPages){ page++; loadExpenses();} }
+function prevPage(){ if(page>1){ page--; loadExpenses();} }
+
+// filters live
+searchEmployee.oninput=applyFilters;
+searchOwner.oninput=applyFilters;
+
+// initial load
+loadEmployees();
+loadOwners();
+loadExpenses();
+</script>
+
+</body>
+</html>

@@ -1,81 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Owner Ledger Dashboard</title>
-  <link rel="stylesheet" href="/pages/owner/owner-ledger.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;font-family:Poppins,sans-serif}
+body{margin:0;background:#f4f6fa;color:#222}
+
+/* HEADER */
+header{background:#111;color:#fff;padding:14px;display:flex;justify-content:space-between;align-items:center}
+header h1{font-size:16px;margin:0}
+
+/* SEARCH */
+.search-box{padding:10px}
+.search-box input{width:100%;padding:12px;border-radius:10px;border:1px solid #ccc}
+
+/* OWNER CARDS */
+.owners{display:flex;gap:12px;overflow-x:auto;padding:10px}
+.owner-card{background:#fff;min-width:240px;border-radius:14px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.owner-card h3{margin:0 0 6px;font-size:16px}
+.owner-row{display:flex;justify-content:space-between;font-size:14px;margin:4px 0}
+.warn{color:#c62828;font-weight:600}
+.ok{color:#2e7d32;font-weight:600}
+
+/* FORMS */
+.form-card{background:#fff;margin:10px;padding:12px;border-radius:14px}
+.form-card h3{margin:0 0 10px;font-size:15px}
+form{display:grid;gap:8px}
+input,select,button{padding:10px;border-radius:8px;border:1px solid #ccc;font-size:14px}
+button{background:#111;color:#fff;border:none;cursor:pointer}
+
+/* LEDGER */
+.ledger{padding:10px}
+.ledger-table{background:#fff;border-radius:14px;overflow:hidden}
+.ledger-head,.ledger-row{display:grid;grid-template-columns:1.4fr 1fr .8fr 1fr 1.6fr;gap:6px;padding:10px;font-size:13px}
+.ledger-head{background:#111;color:#fff;font-weight:600}
+.ledger-row{border-bottom:1px solid #eee;align-items:center}
+.ledger-row:last-child{border-bottom:none}
+.ledger-row.invest{border-left:4px solid #1976d2}
+.ledger-row.profit{border-left:4px solid #2e7d32}
+.ledger-row.withdraw{border-left:4px solid #c62828}
+.amount-pos{color:#2e7d32;font-weight:600}
+.amount-neg{color:#c62828;font-weight:600}
+
+/* PAGINATION */
+.pagination{display:flex;justify-content:center;gap:10px;padding:12px}
+.pagination button{padding:8px 14px;border-radius:8px;border:none;background:#111;color:#fff}
+
+/* MOBILE STACK */
+@media(max-width:700px){
+  .ledger-head{display:none}
+  .ledger-row{grid-template-columns:1fr;font-size:14px}
+  .ledger-row span::before{content: attr(data-label) ": ";font-weight:600;color:#555"}
+}
+</style>
 </head>
 <body>
 
-<header class="topbar">
-  <h1>Owner Ledger</h1>
-  <div class="filters">
-    <select id="ownerFilter">
-      <option value="">All Owners</option>
-    </select>
-    <select id="dateFilter">
-      <option value="all">All Time</option>
-      <option value="today">Today</option>
-      <option value="week">This Week</option>
-      <option value="month">This Month</option>
-      <option value="year">This Year</option>
-    </select>
-  </div>
+<header>
+  <h1>Owner Dashboard</h1>
 </header>
 
-<section class="summary">
-  <div class="card blue">
-    <h3>Total Investment</h3>
-    <p id="sumInvestment">₹0</p>
-  </div>
-  <div class="card green">
-    <h3>Total Profit</h3>
-    <p id="sumProfit">₹0</p>
-  </div>
-  <div class="card red">
-    <h3>Total Withdrawal</h3>
-    <p id="sumWithdrawal">₹0</p>
-  </div>
-  <div class="card dark">
-    <h3>Net Balance</h3>
-    <p id="sumBalance">₹0</p>
-  </div>
-</section>
+<div class="search-box">
+  <input id="searchOwner" placeholder="Search owner by name">
+</div>
 
-<section class="owners" id="ownersList"></section>
+<div class="owners" id="ownersList"></div>
 
-<!-- Add Owner Form -->
-<section class="form-card">
-  <h2>Add Owner</h2>
+<!-- ADD OWNER -->
+<div class="form-card">
+  <h3>Add Owner</h3>
   <form id="addOwnerForm">
-    <input type="text" id="ownerNameInput" placeholder="Owner Name" required />
-    <button type="submit">Add Owner</button>
+    <input id="ownerNameInput" placeholder="Owner name" required>
+    <button>Add Owner</button>
   </form>
-</section>
+</div>
 
-<!-- Ledger Entry Form -->
-<section class="form-card">
-  <h2>Add Ledger Entry</h2>
+<!-- ADD LEDGER ENTRY -->
+<div class="form-card">
+  <h3>Add Entry</h3>
   <form id="ledgerForm">
     <select id="ownerSelect" required></select>
-    <select id="typeSelect" required>
-      <option value="INVEST">Investment</option>
-      <option value="PROFIT">Profit</option>
-      <option value="WITHDRAW">Withdrawal</option>
+    <select id="typeSelect">
+      <option value="INVEST">INVEST</option>
+      <option value="PROFIT">PROFIT</option>
+      <option value="WITHDRAW">WITHDRAW</option>
     </select>
-    <input type="number" id="amountInput" placeholder="Amount" required />
-    <input type="text" id="noteInput" placeholder="Note (optional)" />
-    <input type="date" id="dateInput" />
-    <button type="submit">Save</button>
+    <input id="amountInput" type="number" placeholder="Amount" required>
+    <input id="dateInput" type="datetime-local">
+    <input id="noteInput" placeholder="Note">
+    <button>Add Entry</button>
   </form>
-</section>
+</div>
 
-<section class="ledger">
-  <h2>Ledger</h2>
-  <div class="ledger-list" id="ledgerList"></div>
-</section>
+<div class="ledger">
+  <h3>Ledger</h3>
+  <div class="ledger-table">
+    <div class="ledger-head">
+      <span>Date</span>
+      <span>Owner</span>
+      <span>Type</span>
+      <span>Amount</span>
+      <span>Note</span>
+    </div>
+    <div id="ledgerList"></div>
+  </div>
+</div>
 
-<script src="/pages/owner/owner-ledger.js"></script>
+<div class="pagination">
+  <button onclick="prevPage()">Prev</button>
+  <button onclick="nextPage()">Next</button>
+</div>
+
+<script>
+const API="/api";
+
+// Elements
+const ownersList=document.getElementById("ownersList");
+const ledgerList=document.getElementById("ledgerList");
+const ownerSelect=document.getElementById("ownerSelect");
+const searchOwner=document.getElementById("searchOwner");
+const ownerNameInput=document.getElementById("ownerNameInput");
+const ledgerForm=document.getElementById("ledgerForm");
+const typeSelect=document.getElementById("typeSelect");
+const amountInput=document.getElementById("amountInput");
+const dateInput=document.getElementById("dateInput");
+const noteInput=document.getElementById("noteInput");
+
+let owners=[], ledger=[], page=1, perPage=8, totalProfit=0;
+
+/* LOAD ALL DATA */
+async function loadAll(){
+  owners = await (await fetch(API+"/owners")).json();
+  ledger = await (await fetch(API+"/ledger")).json();
+
+  // calculate total company profit (sum of all profit entries)
+  totalProfit = ledger.filter(l=>l.type==="PROFIT").reduce((s,l)=>s+l.amount,0);
+
+  renderOwners();
+  renderLedger();
+}
+
+/* RENDER OWNER CARDS */
+function renderOwners(){
+  const totalNetInvest = owners.reduce((sum,o)=>{
+    const invest = ledger.filter(l=>l.ownerId===o._id && l.type==="INVEST").reduce((s,l)=>s+l.amount,0);
+    const withdraw = ledger.filter(l=>l.ownerId===o._id && l.type==="WITHDRAW").reduce((s,l)=>s+Math.abs(l.amount),0);
+    return sum + Math.max(invest - withdraw,0);
+  },0);
+
+  ownersList.innerHTML="";
+  ownerSelect.innerHTML="";
+
+  owners
+    .filter(o=>o.name.toLowerCase().includes(searchOwner.value.toLowerCase()))
+    .forEach(o=>{
+      const invest = ledger.filter(l=>l.ownerId===o._id && l.type==="INVEST").reduce((s,l)=>s+l.amount,0);
+      const withdraw = ledger.filter(l=>l.ownerId===o._id && l.type==="WITHDRAW").reduce((s,l)=>s+Math.abs(l.amount),0);
+      const netInvest = invest - withdraw;
+      const ownershipPct = totalNetInvest>0?((netInvest/totalNetInvest)*100).toFixed(2):0;
+      const profitShare = Math.round((ownershipPct/100)*totalProfit);
+      const overdraw = withdraw - (invest + profitShare);
+
+      ownersList.innerHTML += `
+        <div class="owner-card">
+          <h3>${o.name}</h3>
+          <div class="owner-row"><span>Invested</span><span>₹${invest} (Ownership ${ownershipPct}%)</span></div>
+          <div class="owner-row"><span>Profit Share</span><span>₹${profitShare} (${ownershipPct}%)</span></div>
+          <div class="owner-row"><span>Withdrawn</span><span>₹${withdraw}</span></div>
+          ${overdraw>0?`<div class="warn">⚠ Overdrawn ₹${overdraw}</div>`:`<div class="ok">✔ Balance OK</div>`}
+        </div>`;
+
+      ownerSelect.innerHTML += `<option value="${o._id}">${o.name}</option>`;
+    });
+}
+
+/* LEDGER */
+function renderLedger(){
+  const start=(page-1)*perPage;
+  const data=ledger.slice(start,start+perPage);
+  ledgerList.innerHTML="";
+  data.forEach(l=>{
+    ledgerList.innerHTML += `
+      <div class="ledger-row ${l.type.toLowerCase()}">
+        <span data-label="Date">${new Date(l.date).toLocaleString()}</span>
+        <span data-label="Owner">${l.owner}</span>
+        <span data-label="Type">${l.type}</span>
+        <span data-label="Amount" class="${l.amount>=0?'amount-pos':'amount-neg'}">₹${Math.abs(l.amount)}</span>
+        <span data-label="Note">${l.note||"-"}</span>
+      </div>`;
+  });
+}
+
+function nextPage(){page++;renderLedger()}
+function prevPage(){if(page>1){page--;renderLedger()}}
+
+/* ADD OWNER */
+document.getElementById("addOwnerForm").onsubmit = async e=>{
+  e.preventDefault();
+  await fetch(API+"/owners",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:ownerNameInput.value})});
+  ownerNameInput.value="";
+  loadAll();
+};
+
+/* ADD LEDGER ENTRY */
+ledgerForm.onsubmit = async e=>{
+  e.preventDefault();
+  await fetch(API+"/ledger",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      ownerId:ownerSelect.value,
+      type:typeSelect.value,
+      amount:typeSelect.value==="WITHDRAW"?-amountInput.value:+amountInput.value,
+      date:dateInput.value||new Date(),
+      note:noteInput.value
+    })});
+  ledgerForm.reset();
+  loadAll();
+};
+
+searchOwner.oninput=renderOwners;
+
+loadAll();
+</script>
+
 </body>
 </html>

@@ -139,59 +139,63 @@ footer { text-align:center; padding:20px; color:#555; margin-top:40px; }
     </div>
   </section>
 
+
   <section id="employees">
-    <h2>कर्मचारी सूची</h2>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-              <th>नाम</th>
-              <th>अग्रिम</th>
-              <th>खर्च</th>
-              <th>कुल ईंट</th>
-              <th>कुल उत्पादन</th>
-              <th>बैलेंस</th>
-          </tr>
-        </thead>
-        <tbody id="employeeTable">
-          <!-- JS will populate -->
-        </tbody>
-      </table>
-    </div>
+  <h2>👷 कर्मचारी सूची</h2>
+
+  <div class="table-container">
+    <table class="employee-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>नाम</th>
+          <th>Advance</th>
+          <th>खर्च</th>
+          <th>ईंट (Qty)</th>
+          <th>उत्पादन ₹</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+
+      <tbody id="employeeTableBody">
+        <tr>
+          <td colspan="7" class="loading-row">Loading employees…</td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="2">कुल (Page)</td>
+          <td id="tfootAdvance">₹0</td>
+          <td id="tfootExpense">₹0</td>
+          <td id="tfootBricks">0</td>
+          <td id="tfootProduction">₹0</td>
+          <td id="tfootBalance">₹0</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="employee-controls">
     <div class="pagination">
       <button id="prevPage">⬅ Prev</button>
-      <span id="pageInfo"></span>
+      <span id="pageInfo">Page 1</span>
       <button id="nextPage">Next ➡</button>
-      <button id="showAll">Show All</button>
-    </div>  
-    <select id="pageLimitSelect">
-      <option value="10">10 rows</option>
-      <option value="20">20 rows</option>
-      <option value="50">50 rows</option>
-    </select>
-
-
-  </section>
-
-  <section id="investments">
-    <h2>निवेश विवरण</h2>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>तारीख</th>
-            <th>राशि</th>
-            <th>ईंट बिक्री</th>
-            <th>लाभ</th>
-          </tr>
-        </thead>
-        <tbody id="investmentTable">
-          <!-- JS will populate -->
-        </tbody>
-      </table>
     </div>
-  </section>
+
+    <div class="page-limit">
+      <label>Rows:</label>
+      <select id="pageLimitSelect">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+      </select>
+
+      <button id="showAll" class="show-all">Show All</button>
+    </div>
+  </div>
+</section>
+
 
   <section id="production">
     <h2>उत्पादन रिकॉर्ड</h2>
@@ -239,10 +243,10 @@ function logout(){
 // Example: Populate tables dynamically with JS
 // You can replace this with actual API calls
 
-const employees = [
-  { name:"राहुल", role:"प्रबंधक", advance:1000, production:5000, earning:3500 },
-  { name:"अजय", role:"सहायक", advance:500, production:3000, earning:2100 },
-];
+// const employees = [
+//   { name:"राहुल", role:"प्रबंधक", advance:1000, production:5000, earning:3500 },
+//   { name:"अजय", role:"सहायक", advance:500, production:3000, earning:2100 },
+// ];
 const investments = [
   { date:"2025-12-28", amount:50000, bricks:1200, profit:18000 },
 ];

@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const ExpenseSchema = new mongoose.Schema({
@@ -7,9 +6,20 @@ const ExpenseSchema = new mongoose.Schema({
     ref: "Employee",
     required: true
   },
-  amount: { type: Number, required: true },
+  ownerName: {
+    type: String,
+    required: true
+  },
+  amount: {
+    type: Number,
+    required: true
+  },
   note: String,
-  date: { type: Date, default: Date.now }
+  expenseDate: Date,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
-module.exports = mongoose.models.Expense || mongoose.model("Expense", ExpenseSchema);
+module.exports = mongoose.model("Expense", ExpenseSchema);
