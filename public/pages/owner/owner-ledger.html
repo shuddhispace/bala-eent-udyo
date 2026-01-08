@@ -4,67 +4,321 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Owner Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
+:root{
+  --dark:#0f172a;
+  --primary:#2563eb;
+  --success:#16a34a;
+  --danger:#dc2626;
+  --warning:#f59e0b;
+  --bg:#f1f5f9;
+  --card:#ffffff;
+}
+
 *{box-sizing:border-box;font-family:Poppins,sans-serif}
-body{margin:0;background:#f4f6fa;color:#222}
+body{margin:0;background:var(--bg);color:#111}
 
 /* HEADER */
-header{background:#111;color:#fff;padding:14px;display:flex;justify-content:space-between;align-items:center}
-header h1{font-size:16px;margin:0}
+header{
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:#fff;
+  padding:16px;
+}
+header h1{margin:0;font-size:18px}
+
+/* COMPANY SUMMARY */
+.summary{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+  padding:12px;
+}
+.summary-card{
+  background:var(--card);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+.summary-card h4{margin:0 0 6px;font-size:13px;color:#555}
+.summary-card strong{font-size:18px}
 
 /* SEARCH */
-.search-box{padding:10px}
-.search-box input{width:100%;padding:12px;border-radius:10px;border:1px solid #ccc}
+.search-box{padding:12px}
+.search-box input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
 
-/* OWNER CARDS */
-.owners{display:flex;gap:12px;overflow-x:auto;padding:10px}
-.owner-card{background:#fff;min-width:240px;border-radius:14px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+/* OWNERS */
+.owners{
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  padding:12px;
+}
+.owner-card{
+  min-width:280px;
+  background:var(--card);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 6px 16px rgba(0,0,0,.1);
+}
 .owner-card h3{margin:0 0 6px;font-size:16px}
-.owner-row{display:flex;justify-content:space-between;font-size:14px;margin:4px 0}
-.warn{color:#c62828;font-weight:600}
-.ok{color:#2e7d32;font-weight:600}
+.owner-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin:4px 0;
+}
+.tag{
+  font-size:12px;
+  padding:3px 8px;
+  border-radius:20px;
+}
+.tag.green{background:#dcfce7;color:#166534}
+.tag.red{background:#fee2e2;color:#991b1b}
 
 /* FORMS */
-.form-card{background:#fff;margin:10px;padding:12px;border-radius:14px}
+.form-card{
+  background:var(--card);
+  margin:12px;
+  padding:14px;
+  border-radius:16px;
+}
 .form-card h3{margin:0 0 10px;font-size:15px}
-form{display:grid;gap:8px}
-input,select,button{padding:10px;border-radius:8px;border:1px solid #ccc;font-size:14px}
-button{background:#111;color:#fff;border:none;cursor:pointer}
+form{display:grid;gap:10px}
+input,select,button{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+button{
+  background:var(--dark);
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
 
 /* LEDGER */
-.ledger{padding:10px}
-.ledger-table{background:#fff;border-radius:14px;overflow:hidden}
-.ledger-head,.ledger-row{display:grid;grid-template-columns:1.4fr 1fr .8fr 1fr 1.6fr;gap:6px;padding:10px;font-size:13px}
-.ledger-head{background:#111;color:#fff;font-weight:600}
-.ledger-row{border-bottom:1px solid #eee;align-items:center}
+.ledger{padding:12px}
+.ledger h3{margin-bottom:6px}
+
+.ledger-table{
+  background:var(--card);
+  border-radius:16px;
+  overflow:hidden;
+}
+.ledger-head,.ledger-row{
+  display:grid;
+  grid-template-columns:1.4fr 1fr .8fr 1fr 1.6fr;
+  gap:8px;
+  padding:12px;
+  font-size:13px;
+}
+.ledger-head{
+  background:var(--dark);
+  color:#fff;
+  font-weight:600;
+}
+.ledger-row{border-bottom:1px solid #eee}
 .ledger-row:last-child{border-bottom:none}
-.ledger-row.invest{border-left:4px solid #1976d2}
-.ledger-row.profit{border-left:4px solid #2e7d32}
-.ledger-row.withdraw{border-left:4px solid #c62828}
-.amount-pos{color:#2e7d32;font-weight:600}
-.amount-neg{color:#c62828;font-weight:600}
+
+.invest{border-left:4px solid var(--primary)}
+.profit{border-left:4px solid var(--success)}
+.withdraw{border-left:4px solid var(--danger)}
+
+.pos{color:var(--success);font-weight:600}
+.neg{color:var(--danger);font-weight:600}
 
 /* PAGINATION */
-.pagination{display:flex;justify-content:center;gap:10px;padding:12px}
-.pagination button{padding:8px 14px;border-radius:8px;border:none;background:#111;color:#fff}
-
-/* MOBILE STACK */
-@media(max-width:700px){
-  .ledger-head{display:none}
-  .ledger-row{grid-template-columns:1fr;font-size:14px}
-  .ledger-row span::before{content: attr(data-label) ": ";font-weight:600;color:#555}
+.pagination{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  padding:12px;
 }
+.pagination button{
+  background:var(--dark);
+  color:#fff;
+  border:none;
+  padding:8px 14px;
+  border-radius:10px;
+}
+
+/* MOBILE IMPROVEMENTS */
+@media (max-width: 700px) {
+
+  /* Ledger container scroll */
+  .ledger-table {
+    overflow-x: auto;
+  }
+
+  /* Keep rows horizontal */
+  .ledger-head,
+  .ledger-row {
+    grid-template-columns: 140px 120px 90px 110px 200px;
+    min-width: 760px;
+    font-size: 13px;
+  }
+
+  .ledger-head span,
+  .ledger-row span {
+    white-space: nowrap;
+  }
+
+  /* Pagination spacing */
+  .pagination {
+    flex-wrap: wrap;
+  }
+
+  /* Owner cards */
+  .owners {
+    padding-bottom: 8px;
+  }
+
+  .owner-card {
+    min-width: 260px;
+  }
+
+  /* Summary cards tighter */
+  .summary {
+    gap: 10px;
+  }
+
+  .summary-card strong {
+    font-size: 16px;
+  }
+}
+
+/* ==========================
+   GLOBAL ANIMATIONS
+========================== */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Page load */
+body {
+  animation: fadeUp .5s ease-out;
+}
+
+/* ==========================
+   SUMMARY CARDS
+========================== */
+
+.summary-card {
+  animation: fadeUp .4s ease-out;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+@media (hover:hover) {
+  .summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,.12);
+  }
+}
+
+/* ==========================
+   OWNER CARDS
+========================== */
+
+.owner-card {
+  animation: slideIn .4s ease forwards;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+@media (hover:hover) {
+  .owner-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,.15);
+  }
+}
+
+/* ==========================
+   LEDGER ROWS
+========================== */
+
+.ledger-row {
+  animation: fadeUp .35s ease;
+  transition: background .2s ease;
+}
+
+.ledger-row:nth-child(even) {
+  background: #fafafa;
+}
+
+@media (hover:hover) {
+  .ledger-row:hover {
+    background: #eef2ff;
+  }
+}
+
+/* ==========================
+   BUTTON INTERACTIONS
+========================== */
+
+button {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+button:active {
+  transform: scale(.96);
+  box-shadow: 0 4px 10px rgba(0,0,0,.2) inset;
+}
+
+
 </style>
 </head>
+
 <body>
 
 <header>
-  <h1>Owner Dashboard</h1>
+  <h1>🏭 Owner Dashboard</h1>
 </header>
 
+<!-- COMPANY SUMMARY -->
+<div class="summary">
+  <div class="summary-card">
+    <h4>Total Investment</h4>
+    <strong id="sumInvest">₹0</strong>
+  </div>
+  <div class="summary-card">
+    <h4>Total Withdrawn</h4>
+    <strong id="sumWithdraw">₹0</strong>
+  </div>
+  <div class="summary-card">
+    <h4>Total Profit (Company)</h4>
+    <strong id="sumProfit">₹0</strong>
+  </div>
+</div>
+
 <div class="search-box">
-  <input id="searchOwner" placeholder="Search owner by name">
+  <input id="searchOwner" placeholder="Search owner">
 </div>
 
 <div class="owners" id="ownersList"></div>
@@ -78,14 +332,14 @@ button{background:#111;color:#fff;border:none;cursor:pointer}
   </form>
 </div>
 
-<!-- ADD LEDGER ENTRY -->
+<!-- ADD LEDGER -->
 <div class="form-card">
-  <h3>Add Entry</h3>
+  <h3>Add Ledger Entry</h3>
   <form id="ledgerForm">
     <select id="ownerSelect" required></select>
     <select id="typeSelect">
       <option value="INVEST">INVEST</option>
-      <option value="PROFIT">PROFIT</option>
+      <option value="PROFIT">PROFIT (Brick Sale)</option>
       <option value="WITHDRAW">WITHDRAW</option>
     </select>
     <input id="amountInput" type="number" placeholder="Amount" required>
@@ -95,8 +349,9 @@ button{background:#111;color:#fff;border:none;cursor:pointer}
   </form>
 </div>
 
+<!-- LEDGER -->
 <div class="ledger">
-  <h3>Ledger</h3>
+  <h3>Ledger (All Owners)</h3>
   <div class="ledger-table">
     <div class="ledger-head">
       <span>Date</span>
@@ -116,79 +371,71 @@ button{background:#111;color:#fff;border:none;cursor:pointer}
 
 <script>
 const API="/api";
-
-// Elements
 const ownersList=document.getElementById("ownersList");
 const ledgerList=document.getElementById("ledgerList");
 const ownerSelect=document.getElementById("ownerSelect");
 const searchOwner=document.getElementById("searchOwner");
-const ownerNameInput=document.getElementById("ownerNameInput");
-const ledgerForm=document.getElementById("ledgerForm");
-const typeSelect=document.getElementById("typeSelect");
-const amountInput=document.getElementById("amountInput");
-const dateInput=document.getElementById("dateInput");
-const noteInput=document.getElementById("noteInput");
 
-let owners=[], ledger=[], page=1, perPage=8, totalProfit=0;
+let owners=[],ledger=[],page=1,perPage=8;
 
-/* LOAD ALL DATA */
 async function loadAll(){
-  owners = await (await fetch(API+"/owners")).json();
-  ledger = await (await fetch(API+"/ledger")).json();
-
-  // calculate total company profit (sum of all profit entries)
-  totalProfit = ledger.filter(l=>l.type==="PROFIT").reduce((s,l)=>s+l.amount,0);
-
+  owners=await (await fetch(API+"/owners")).json();
+  ledger=await (await fetch(API+"/ledger")).json();
+  renderSummary();
   renderOwners();
   renderLedger();
 }
 
-/* RENDER OWNER CARDS */
-function renderOwners(){
-  const totalNetInvest = owners.reduce((sum,o)=>{
-    const invest = ledger.filter(l=>l.ownerId===o._id && l.type==="INVEST").reduce((s,l)=>s+l.amount,0);
-    const withdraw = ledger.filter(l=>l.ownerId===o._id && l.type==="WITHDRAW").reduce((s,l)=>s+Math.abs(l.amount),0);
-    return sum + Math.max(invest - withdraw,0);
-  },0);
-
-  ownersList.innerHTML="";
-  ownerSelect.innerHTML="";
-
-  owners
-    .filter(o=>o.name.toLowerCase().includes(searchOwner.value.toLowerCase()))
-    .forEach(o=>{
-      const invest = ledger.filter(l=>l.ownerId===o._id && l.type==="INVEST").reduce((s,l)=>s+l.amount,0);
-      const withdraw = ledger.filter(l=>l.ownerId===o._id && l.type==="WITHDRAW").reduce((s,l)=>s+Math.abs(l.amount),0);
-      const netInvest = invest - withdraw;
-      const ownershipPct = totalNetInvest>0?((netInvest/totalNetInvest)*100).toFixed(2):0;
-      const profitShare = Math.round((ownershipPct/100)*totalProfit);
-      const overdraw = withdraw - (invest + profitShare);
-
-      ownersList.innerHTML += `
-        <div class="owner-card">
-          <h3>${o.name}</h3>
-          <div class="owner-row"><span>Invested</span><span>₹${invest} (Ownership ${ownershipPct}%)</span></div>
-          <div class="owner-row"><span>Profit Share</span><span>₹${profitShare} (${ownershipPct}%)</span></div>
-          <div class="owner-row"><span>Withdrawn</span><span>₹${withdraw}</span></div>
-          ${overdraw>0?`<div class="warn">⚠ Overdrawn ₹${overdraw}</div>`:`<div class="ok">✔ Balance OK</div>`}
-        </div>`;
-
-      ownerSelect.innerHTML += `<option value="${o._id}">${o.name}</option>`;
-    });
+function renderSummary(){
+  const invest=ledger.filter(l=>l.type==="INVEST").reduce((s,l)=>s+l.amount,0);
+  const withdraw=ledger.filter(l=>l.type==="WITHDRAW").reduce((s,l)=>s+Math.abs(l.amount),0);
+  const profit=ledger.filter(l=>l.type==="PROFIT").reduce((s,l)=>s+l.amount,0);
+  sumInvest.innerText="₹"+invest;
+  sumWithdraw.innerText="₹"+withdraw;
+  sumProfit.innerText="₹"+profit;
 }
 
-/* LEDGER */
+function renderOwners(){
+  ownersList.innerHTML="";
+  ownerSelect.innerHTML="";
+  const totalNet=owners.reduce((s,o)=>{
+    const i=ledger.filter(l=>l.ownerId===o._id&&l.type==="INVEST").reduce((a,b)=>a+b.amount,0);
+    const w=ledger.filter(l=>l.ownerId===o._id&&l.type==="WITHDRAW").reduce((a,b)=>a+Math.abs(b.amount),0);
+    return s+Math.max(i-w,0);
+  },0);
+  const totalProfit=ledger.filter(l=>l.type==="PROFIT").reduce((s,l)=>s+l.amount,0);
+
+  owners.filter(o=>o.name.toLowerCase().includes(searchOwner.value.toLowerCase()))
+  .forEach(o=>{
+    const invest=ledger.filter(l=>l.ownerId===o._id&&l.type==="INVEST").reduce((s,l)=>s+l.amount,0);
+    const withdraw=ledger.filter(l=>l.ownerId===o._id&&l.type==="WITHDRAW").reduce((s,l)=>s+Math.abs(l.amount),0);
+    const generated=ledger.filter(l=>l.ownerId===o._id&&l.type==="PROFIT").reduce((s,l)=>s+l.amount,0);
+    const net=invest-withdraw;
+    const pct=totalNet>0?((net/totalNet)*100).toFixed(2):0;
+    const share=Math.round((pct/100)*totalProfit);
+
+    ownersList.innerHTML+=`
+      <div class="owner-card">
+        <h3>${o.name}</h3>
+        <div class="owner-row"><span>Invested</span><span>₹${invest}</span></div>
+        <div class="owner-row"><span>Withdrawn</span><span>₹${withdraw}</span></div>
+        <div class="owner-row"><span>Generated Profit</span><span>₹${generated}</span></div>
+        <div class="owner-row"><span>Profit Share</span><span>₹${share} (${pct}%)</span></div>
+        ${net<0?`<span class="tag red">Overdrawn</span>`:`<span class="tag green">OK</span>`}
+      </div>`;
+    ownerSelect.innerHTML+=`<option value="${o._id}">${o.name}</option>`;
+  });
+}
+
 function renderLedger(){
-  const start=(page-1)*perPage;
-  const data=ledger.slice(start,start+perPage);
   ledgerList.innerHTML="";
-  data.forEach(l=>{
-    ledgerList.innerHTML += `
+  ledger.slice((page-1)*perPage,page*perPage).forEach(l=>{
+    ledgerList.innerHTML+=`
       <div class="ledger-row ${l.type.toLowerCase()}">
         <span data-label="Date">${new Date(l.date).toLocaleString()}</span>
         <span data-label="Owner">${l.owner}</span>
         <span data-label="Type">${l.type}</span>
-        <span data-label="Amount" class="${l.amount>=0?'amount-pos':'amount-neg'}">₹${Math.abs(l.amount)}</span>
+        <span data-label="Amount" class="${l.amount>=0?'pos':'neg'}">₹${Math.abs(l.amount)}</span>
         <span data-label="Note">${l.note||"-"}</span>
       </div>`;
   });
@@ -197,16 +444,14 @@ function renderLedger(){
 function nextPage(){page++;renderLedger()}
 function prevPage(){if(page>1){page--;renderLedger()}}
 
-/* ADD OWNER */
-document.getElementById("addOwnerForm").onsubmit = async e=>{
+document.getElementById("addOwnerForm").onsubmit=async e=>{
   e.preventDefault();
   await fetch(API+"/owners",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:ownerNameInput.value})});
   ownerNameInput.value="";
   loadAll();
 };
 
-/* ADD LEDGER ENTRY */
-ledgerForm.onsubmit = async e=>{
+ledgerForm.onsubmit=async e=>{
   e.preventDefault();
   await fetch(API+"/ledger",{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
@@ -221,7 +466,6 @@ ledgerForm.onsubmit = async e=>{
 };
 
 searchOwner.oninput=renderOwners;
-
 loadAll();
 </script>
 
