@@ -116,126 +116,185 @@ async function safeFetch(url,options){const res=await fetch(url,options);const t
 async function addAdvance(){advSuccess.style.display='none';advError.style.display='none';try{const data=await safeFetch(apiBase+'/advances',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile:aMobile.value,name:aName.value,address:aAddress.value,amount:aAmount.value,owner:aOwner.value})});if(!data.success)throw new Error(data.message);advSuccess.innerText='✅ Advance Added Successfully';advSuccess.style.display='block';aMobile.value=aName.value=aAddress.value=aAmount.value=aOwner.value=''}catch(err){advError.innerText='❌ '+err.message;advError.style.display='block'}}
 async function saveChallan(){challanSuccess.style.display='none';challanError.style.display='none';pdfActions.style.display='none';try{const data=await safeFetch(apiBase+'/challans',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile:mobile.value,brick:brick.value,qty:qty.value,amount:Number(amount.value)})});if(!data.success)throw new Error(data.message);challanSuccess.innerText='✅ Challan Saved';challanSuccess.style.display='block';lastData=data.data;pdfActions.style.display='flex'}catch(err){challanError.innerText='❌ '+err.message;challanError.style.display='block'}}
 downloadPDF.onclick=function(){if(lastData)generatePDF(lastData)}
-shareWhatsApp.onclick=function(){if(!lastData)return;const msg=`Hello ${lastData.buyerName},\nChallan No: ${lastData.challanNo}\nTotal: Rs. ${lastData.amount}\nThank you for your business!`;window.open(`https://wa.me/${lastData.buyerMobile}?text=${encodeURIComponent(msg)}`)}
+shareWhatsApp.onclick = function () {
+  if (!lastData) return;
+
+  const msg =
+`🙏 श्री बालाजी ईंट उद्योग 🙏
+
+नमस्ते,
+
+कृपया नीचे चालान विवरण देखें:
+
+🧾 चालान नंबर: ${lastData.challanNo}
+👤 खरीदार का नाम: ${lastData.buyerName}
+🧱 ईंट का प्रकार: ${lastData.brick}
+📦 मात्रा: ${lastData.qty}
+💰 कुल राशि: ₹${lastData.amount}
+💵 देय राशि: ₹${lastData.payable}
+
+आपके सहयोग के लिए धन्यवाद।
+— श्री बालाजी ईंट उद्योग`;
+
+  // WhatsApp will let user pick ANY contact or group
+  window.open(
+    `https://wa.me/?text=${encodeURIComponent(msg)}`,
+    "_blank"
+  );
+};
+
 function generatePDF(c) {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF("p", "mm", "a4");
-  let y = 20;
+
+  let y = 18;
 
   /* ===== HEADER ===== */
-  pdf.setFillColor(37, 99, 235); // Solid blue header
-  pdf.rect(0, 0, 210, 35, "F");
-  pdf.setTextColor(255);
-  pdf.setFontSize(20);
-  pdf.setFont("helvetica", "bold");
-  pdf.text("SHREE BALAJI EENT UDYOG", 105, 18, { align: "center" });
+  pdf.setFillColor(37, 99, 235);
+  pdf.rect(0, 0, 210, 30, "F");
 
-  pdf.setFontSize(11);
+  pdf.setTextColor(255);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(18);
+  pdf.text("SHREE BALAJI EENT UDYOG", 105, 14, { align: "center" });
+
   pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
   pdf.text(
     "Sitholi Pani Tanki, Prayagraj, Uttar Pradesh",
     105,
-    27,
+    22,
     { align: "center" }
   );
 
-  /* ===== PAID / UNPAID WATERMARK ===== */
-  const paid = Number(c.payable) <= 0;
-  pdf.setFontSize(60);
-  pdf.setTextColor(0, 0, 0, 0.05); // very light
-  pdf.text(paid ? "PAID" : "UNPAID", 105, 140, { align: "center", angle: 45 });
-
-  y = 50;
+  y = 40;
   pdf.setTextColor(0);
-  pdf.setFontSize(12);
+  pdf.setFontSize(11);
 
   /* ===== BUYER & CHALLAN INFO ===== */
   pdf.setFillColor(245, 245, 245);
-  pdf.roundedRect(14, y, 182, 45, 4, 4, "FD");
+  pdf.roundedRect(12, y, 186, 42, 4, 4, "FD");
 
-  // Left Column (Buyer Details)
-  pdf.text(`Buyer Name: ${c.buyerName}`, 20, y + 12);
-  pdf.textWithLink(`Mobile: ${c.buyerMobile}`, 20, y + 20, {
-    url: `tel:${c.buyerMobile}`,
-  });
-  pdf.textWithLink(`Address: ${c.address}`, 20, y + 28, {
-    url: `https://www.google.com/maps/search/${encodeURIComponent(c.address)}`,
-  });
+  // Left
+  pdf.text(`Buyer Name: ${c.buyerName || "-"}`, 16, y + 10);
+  pdf.text(`Mobile: ${c.buyerMobile || "-"}`, 16, y + 18);
+  pdf.text(`Address: ${c.address || "-"}`, 16, y + 26);
 
-  // Right Column (Challan Info)
-  pdf.text(`Challan No: ${c.challanNo}`, 110, y + 12);
-  pdf.text(`Date: ${new Date(c.createdAt).toLocaleDateString()}`, 110, y + 20);
-  pdf.text(`Time: ${new Date(c.createdAt).toLocaleTimeString()}`, 110, y + 28);
+  // Right
+  pdf.text(`Challan No: ${c.challanNo}`, 120, y + 10);
+  pdf.text(
+    `Date: ${new Date(c.createdAt).toLocaleDateString()}`,
+    120,
+    y + 18
+  );
+  pdf.text(
+    `Time: ${new Date(c.createdAt).toLocaleTimeString()}`,
+    120,
+    y + 26
+  );
 
-  y += 55;
+  y += 52;
 
   /* ===== BRICK DETAILS ===== */
-  pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(12);
   pdf.text("Brick Details", 105, y, { align: "center" });
-  y += 7;
+
+  y += 6;
   pdf.setFont("helvetica", "normal");
-  pdf.setFillColor(230, 230, 250);
-  pdf.roundedRect(55, y, 100, 12, 3, 3, "FD");
-  pdf.text(`Type: ${c.brick} | Qty: ${c.qty}`, 105, y + 9, { align: "center" });
-  y += 25;
+  pdf.roundedRect(40, y, 130, 12, 4, 4, "S");
+  pdf.text(
+    `Type: ${c.brick}   |   Quantity: ${c.qty}`,
+    105,
+    y + 8,
+    { align: "center" }
+  );
+
+  y += 22;
 
   /* ===== AMOUNT SUMMARY ===== */
-  const boxWidth = 58;
-  const boxHeight = 28;
-  const startX = 14;
-  const gap = 7;
-  const boxes = [
-    { label: "TOTAL AMOUNT", value: `Rs. ${Number(c.amount).toLocaleString()}`, color: [37, 99, 235] },
-    { label: "ADVANCE USED", value: `Rs. ${Number(c.advanceUsed).toLocaleString()}`, color: [5, 150, 105] },
-    { label: "PAYABLE", value: `Rs. ${Number(c.payable).toLocaleString()}`, color: [185, 28, 28] },
+  const summary = [
+    ["Total Amount", c.amount],
+    ["Advance Used", c.advanceUsed],
+    ["Payable Amount", c.payable],
+    ["Remaining Advance", c.remainingAdvance],
   ];
 
-  boxes.forEach((b, i) => {
-    pdf.setFillColor(...b.color);
-    pdf.roundedRect(startX + i * (boxWidth + gap), y, boxWidth, boxHeight, 4, 4, "F");
-    pdf.setTextColor(255);
-    pdf.setFontSize(11);
-    pdf.text(b.label, startX + i * (boxWidth + gap) + boxWidth / 2, y + 8, { align: "center" });
-    pdf.setFontSize(13);
-    pdf.text(b.value, startX + i * (boxWidth + gap) + boxWidth / 2, y + 19, { align: "center" });
+  summary.forEach((row) => {
+    pdf.roundedRect(25, y, 160, 10, 3, 3, "S");
+    pdf.text(row[0], 30, y + 7);
+    pdf.text(
+      `Rs. ${Number(row[1] || 0).toLocaleString()}`,
+      175,
+      y + 7,
+      { align: "right" }
+    );
+    y += 12;
   });
 
-  y += boxHeight + 10;
+  y += 8;
 
-  /* ===== REMAINING ADVANCE ===== */
+  /* ===== PAYMENT STATUS ===== */
+  pdf.setFont("helvetica", "bold");
   pdf.setFontSize(12);
-  pdf.setTextColor(c.remainingAdvance > 0 ? 22 : 185, c.remainingAdvance > 0 ? 163 : 28, 0);
-  pdf.text(`Remaining Advance: Rs. ${Number(c.remainingAdvance).toLocaleString()}`, 105, y, { align: "center" });
-  y += 15;
+  pdf.setTextColor(c.payable <= 0 ? 22 : 185, c.payable <= 0 ? 163 : 28, 0);
+  pdf.text(
+    c.payable <= 0 ? "PAYMENT RECEIVED" : "PAYMENT PENDING",
+    105,
+    y,
+    { align: "center" }
+  );
 
-  /* ===== PAYMENT INFO ===== */
-  pdf.setFillColor(245, 245, 245);
-  pdf.roundedRect(50, y, 110, 20, 4, 4, "FD");
-  pdf.setFontSize(11);
-  pdf.setTextColor(0);
-  pdf.textWithLink("UPI ID: ajayk20166@okhdfcbank", 105, y + 12, { align: "center", url: "upi://pay?pa=ajayk20166@okhdfcbank" });
-  y += 30;
+  y += 12;
+
+  /* ===== THANK YOU MESSAGE ===== */
+  pdf.setFillColor(220, 252, 231);
+  pdf.roundedRect(20, y, 170, 26, 6, 6, "FD");
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(12);
+  pdf.setTextColor(22, 101, 52);
+  pdf.text("THANK YOU", 105, y + 10, { align: "center" });
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  pdf.text(
+    "Thank you for choosing Shree Balaji Eent Udyog.\nWe truly appreciate your business.",
+    105,
+    y + 18,
+    { align: "center" }
+  );
+
+  y += 38;
 
   /* ===== OWNER CONTACT ===== */
-  pdf.setFillColor(245, 245, 245);
-  pdf.roundedRect(50, y, 110, 28, 4, 4, "FD");
-  pdf.setFontSize(11);
+  pdf.setFontSize(10);
   pdf.setTextColor(0);
-  pdf.textWithLink("Ajay: 9839454542", 105, y + 10, { align: "center", url: "tel:9839454542" });
-  pdf.textWithLink("Rahul: 8736002647", 105, y + 20, { align: "center", url: "tel:8736002647" });
-  y += 40;
+  pdf.text("Contact Details", 105, y, { align: "center" });
+
+  y += 6;
+  pdf.text(
+    "Ajay: 9839454542   |   Rahul: 8736002647",
+    105,
+    y,
+    { align: "center" }
+  );
 
   /* ===== FOOTER ===== */
   pdf.setDrawColor(200);
-  pdf.line(14, 280, 196, 280);
-  pdf.setFontSize(10);
-  pdf.setTextColor(100);
-  pdf.text("Thank you for your business with Shree Balaji Eent Udyog", 105, 287, { align: "center" });
+  pdf.line(15, 280, 195, 280);
+  pdf.setFontSize(9);
+  pdf.setTextColor(120);
+  pdf.text(
+    "This is a computer generated challan",
+    105,
+    287,
+    { align: "center" }
+  );
 
-  /* ===== AUTO DOWNLOAD ===== */
   pdf.save(`${c.challanNo}.pdf`);
 }
+
 
 let currentPage=1;
 async function loadHistory(){const s=search.value||'';const data=await safeFetch(`${apiBase}/challans?search=${s}&page=${currentPage}`);lastData=data.data;historyBody.innerHTML='';data.data.forEach(c=>{historyBody.innerHTML+=`<tr><td>${c.challanNo}</td><td>${c.buyerName}</td><td>${c.buyerMobile}</td><td>₹${c.amount}</td><td>₹${c.advanceUsed}</td><td>₹${c.payable}</td><td style="font-weight:600;color:${c.remainingAdvance>0?'#166534':'#991b1b'}">₹${c.remainingAdvance}</td><td>${new Date(c.createdAt).toLocaleString()}</td></tr>`});pageNum.innerText=currentPage}
