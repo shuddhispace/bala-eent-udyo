@@ -31,6 +31,55 @@ th{background:#f1f5f9;text-align:left}
 .tabbar button{flex:1;background:#e5e7eb;color:#000}
 .tabbar button.active{background:#2563eb;color:#fff}
 @media(max-width:600px){th,td{font-size:12px}}
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:14px;
+  margin-top:10px;
+}
+
+.brick-card{
+  background:#f8fafc;
+  border-radius:12px;
+  padding:14px;
+  border-left:6px solid #2563eb;
+  box-shadow:0 4px 10px rgba(0,0,0,.05);
+}
+
+.brick-card h4{
+  margin:0 0 8px;
+  font-size:15px;
+  color:#1f2937;
+}
+
+.brick-card p{
+  margin:4px 0;
+  font-size:14px;
+  color:#374151;
+  font-weight:500;
+}
+
+.brick-card .amount{
+  color:#065f46;
+  font-weight:700;
+}
+
+.total-card{
+  background:#ecfeff;
+  border-left-color:#0ea5e9;
+}
+
+.total-card h4{
+  color:#0f172a;
+}
+
+@media(max-width:600px){
+  .brick-card{
+    padding:12px;
+  }
+}
+
+
 </style>
 </head>
 
@@ -87,13 +136,18 @@ th{background:#f1f5f9;text-align:left}
 
 <!-- HISTORY TAB -->
 <div id="tab-history" class="card" style="display:none">
+<div class="card" id="brickSummaryCard">
+  <h3>📊 ईंट बिक्री सारांश (Owner)</h3>
+  <div id="brickSummaryList" class="summary-grid"></div>
+</div>
+
 <h3>📜 Challan History</h3>
 <input id="search" placeholder="Search Buyer Name / Mobile" oninput="loadHistory()" />
 <div style="overflow-x:auto">
 <table>
 <thead>
 <tr>
-<th>Challan</th><th>Buyer</th><th>Mobile</th><th>Amt</th><th>Advance Used</th><th>Payable</th><th>Remaining Adv.</th><th>Date</th>
+<th>Challan</th><th>Buyer</th><th>Mobile</th><th>Amt</th><th>Advance Used</th><th>Payable</th><th>Remaining Adv.</th><th>Date</th><th>PDF</th>
 </tr>
 </thead>
 <tbody id="historyBody"></tbody>
@@ -119,29 +173,37 @@ downloadPDF.onclick=function(){if(lastData)generatePDF(lastData)}
 shareWhatsApp.onclick = function () {
   if (!lastData) return;
 
-  const msg =
-`🙏 श्री बालाजी ईंट उद्योग 🙏
+  // 1️⃣ Download PDF first
+  generatePDF(lastData);
 
-नमस्ते,
+  // 2️⃣ WhatsApp message (Emoji Color Style)
+  const msg = `🟦🧱 *श्री बालाजी ईंट उद्योग* 🧱🟦
 
-कृपया नीचे चालान विवरण देखें:
+🙏 नमस्ते  
+आपके *चालान का विवरण* नीचे दिया गया है 👇
 
-🧾 चालान नंबर: ${lastData.challanNo}
-👤 खरीदार का नाम: ${lastData.buyerName}
-🧱 ईंट का प्रकार: ${lastData.brick}
-📦 मात्रा: ${lastData.qty}
-💰 कुल राशि: ₹${lastData.amount}
-💵 देय राशि: ₹${lastData.payable}
+🟨🧾 *चालान नंबर:* ${lastData.challanNo}
 
-आपके सहयोग के लिए धन्यवाद।
-— श्री बालाजी ईंट उद्योग`;
+🟦👤 *खरीदार का नाम:* ${lastData.buyerName}  
+🟦📱 *मोबाइल नंबर:* ${lastData.buyerMobile}
 
-  // WhatsApp will let user pick ANY contact or group
+🟫🧱 *ईंट का प्रकार:* ${lastData.brick}  
+🟫📦 *कुल मात्रा:* ${lastData.qty}
+
+🟢💰 *कुल राशि:* ₹${lastData.amount}  
+🔴💵 *देय राशि:* ₹${lastData.payable}
+
+📄⚠️ *कृपया चालान की PDF संलग्न करें।*
+
+🙏 *आपके विश्वास और सहयोग के लिए हार्दिक धन्यवाद*  
+— *श्री बालाजी ईंट उद्योग* 🧱`;
+
   window.open(
     `https://wa.me/?text=${encodeURIComponent(msg)}`,
     "_blank"
   );
 };
+
 
 function generatePDF(c) {
   const { jsPDF } = window.jspdf;
@@ -297,9 +359,54 @@ function generatePDF(c) {
 
 
 let currentPage=1;
-async function loadHistory(){const s=search.value||'';const data=await safeFetch(`${apiBase}/challans?search=${s}&page=${currentPage}`);lastData=data.data;historyBody.innerHTML='';data.data.forEach(c=>{historyBody.innerHTML+=`<tr><td>${c.challanNo}</td><td>${c.buyerName}</td><td>${c.buyerMobile}</td><td>₹${c.amount}</td><td>₹${c.advanceUsed}</td><td>₹${c.payable}</td><td style="font-weight:600;color:${c.remainingAdvance>0?'#166534':'#991b1b'}">₹${c.remainingAdvance}</td><td>${new Date(c.createdAt).toLocaleString()}</td></tr>`});pageNum.innerText=currentPage}
+async function loadHistory(){const s=search.value||'';const data=await safeFetch(`${apiBase}/challans?search=${s}&page=${currentPage}`);lastData=data.data;
+  // 👑 OWNER SUMMARY (यही Step 4 है)
+  renderBrickSummary(data.data);
+historyBody.innerHTML='';data.data.forEach(c=>{historyBody.innerHTML+=`<tr><td>${c.challanNo}</td><td>${c.buyerName}</td><td>${c.buyerMobile}</td><td>₹${c.amount}</td><td>₹${c.advanceUsed}</td><td>₹${c.payable}</td><td style="font-weight:600;color:${c.remainingAdvance>0?'#166534':'#991b1b'}">₹${c.remainingAdvance}</td><td>${new Date(c.createdAt).toLocaleString()}</td> <td>
+    <button onclick='generatePDF(${JSON.stringify(c)})'>
+      📄 PDF
+    </button>
+  </td></tr>`});pageNum.innerText=currentPage}
 function prevPage(){if(currentPage>1){currentPage--;loadHistory()}}
 function nextPage(){currentPage++;loadHistory()}
+function renderBrickSummary(challans){
+  const box = document.getElementById('brickSummaryList');
+  box.innerHTML = '';
+
+  const map = {};
+  let grandQty = 0;
+  let grandAmount = 0;
+
+  challans.forEach(c => {
+    if(!map[c.brick]){
+      map[c.brick] = { qty:0, amount:0 };
+    }
+    map[c.brick].qty += Number(c.qty || 0);
+    map[c.brick].amount += Number(c.amount || 0);
+
+    grandQty += Number(c.qty || 0);
+    grandAmount += Number(c.amount || 0);
+  });
+Object.keys(map).forEach(brick => {
+  box.innerHTML += `
+    <div class="brick-card">
+      <h4>🧱 ${brick}</h4>
+      <p>मात्रा : <b>${map[brick].qty}</b></p>
+      <p class="amount">बिक्री : ₹${map[brick].amount}</p>
+    </div>
+  `;
+});
+
+box.innerHTML += `
+  <div class="brick-card total-card">
+    <h4>🔢 कुल योग</h4>
+    <p>कुल ईंट : <b>${grandQty}</b></p>
+    <p class="amount">कुल राशि : ₹${grandAmount}</p>
+  </div>
+`;
+
+}
+
 </script>
 </body>
 </html>
