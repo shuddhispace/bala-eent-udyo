@@ -1,58 +1,246 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brick Challan</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ईंट चालान | श्री बालाजी ईंट उद्योग</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{font-family:Poppins,sans-serif;margin:0;background:#f4f6fb}
+header{background:#1f2937;color:#fff;padding:14px;text-align:center;font-size:18px;font-weight:600}
+.container{max-width:1100px;margin:auto;padding:12px}
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
+h3{margin:0 0 10px}
+input,select,button{width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ddd;font-family:inherit}
+button{background:#2563eb;color:#fff;font-weight:600;cursor:pointer;border:none}
+button.secondary{background:#10b981}
+button.whatsapp{background:#25D366}
+.msg{margin-top:10px;padding:10px;border-radius:8px;display:none}
+.msg.success{background:#dcfce7;color:#166534}
+.msg.error{background:#fee2e2;color:#991b1b}
+.flex{display:flex;gap:12px;flex-wrap:wrap}
+.flex>div{flex:1;min-width:220px}
+table{width:100%;border-collapse:collapse;margin-top:10px;overflow-x:auto;display:block}
+th,td{padding:8px;border-bottom:1px solid #eee;font-size:13px;white-space:nowrap}
+th{background:#f1f5f9;text-align:left}
+.tabbar{display:flex;gap:10px;margin-bottom:10px}
+.tabbar button{flex:1;background:#e5e7eb;color:#000}
+.tabbar button.active{background:#2563eb;color:#fff}
+@media(max-width:600px){th,td{font-size:12px}}
+</style>
 </head>
+
 <body>
+<header>🧱 श्री बालाजी ईंट उद्योग – चालान</header>
+<div class="container">
 
-<h2>🧱 ईंट चालान</h2>
+<div class="tabbar">
+  <button class="active" onclick="showTab('challan')">चालान</button>
+  <button onclick="showTab('advance')">Advance</button>
+  <button onclick="showTab('history')">History</button>
+</div>
 
-<input id="mobile" placeholder="मोबाइल नंबर"><br><br>
-<input id="buyerNameHi" placeholder="खरीदार नाम"><br><br>
-<input id="driverHi" placeholder="ड्राइवर नाम"><br><br>
-<input id="vehicle" placeholder="वाहन नंबर"><br><br>
+<!-- CHALLAN TAB -->
+<div id="tab-challan" class="card">
+<h3>🧾 नया चालान</h3>
+<div class="flex">
+  <div><input id="mobile" placeholder="Buyer Mobile" /></div>
+  <div>
+    <select id="brick">
+      <option>First Class Brick</option>
+      <option>Second Class Brick</option>
+      <option>Third Class (Sema)</option>
+      <option>Khanjar Brick</option>
+      <option>Gudiya Brick</option>
+    </select>
+  </div>
+</div>
+<div class="flex">
+  <div><input id="qty" type="number" placeholder="Qty" /></div>
+  <div><input id="amount" type="number" placeholder="Total Amount" /></div>
+</div>
+<button onclick="saveChallan()">Save Challan</button>
+<div class="flex" id="pdfActions" style="margin-top:10px; display:none; gap:10px">
+  <button id="downloadPDF" class="secondary">Download PDF</button>
+  <button id="shareWhatsApp" class="whatsapp">Share WhatsApp</button>
+</div>
+<div class="msg success" id="challanSuccess"></div>
+<div class="msg error" id="challanError"></div>
+</div>
 
-<select id="brick">
-  <option value="1 नंबर">1 नंबर</option>
-  <option value="2 नंबर">2 नंबर</option>
-  <option value="सेमा (3 नंबर)">सेमा (3 नंबर)</option>
-  <option value="खंजर">खंजर</option>
-  <option value="गुडिया">गुडिया</option>
-</select><br><br>
+<!-- ADVANCE TAB -->
+<div id="tab-advance" class="card" style="display:none">
+<h3>💰 Advance Entry</h3>
+<input id="aMobile" placeholder="Buyer Mobile" />
+<input id="aName" placeholder="Buyer Name (optional)" />
+<input id="aAddress" placeholder="Address (optional)" />
+<input id="aAmount" type="number" placeholder="Advance Amount" />
+<input id="aOwner" placeholder="Owner Name" />
+<button class="secondary" onclick="addAdvance()">Add Advance</button>
+<div class="msg success" id="advSuccess"></div>
+<div class="msg error" id="advError"></div>
+</div>
 
-<input id="qty" type="number" placeholder="मात्रा"><br><br>
-<input id="amount" type="number" placeholder="राशि"><br><br>
-<input id="usedNow" type="number" placeholder="Advance Used (0 if none)"><br><br>
-
-<button onclick="save()">चालान बनाएं</button>
+<!-- HISTORY TAB -->
+<div id="tab-history" class="card" style="display:none">
+<h3>📜 Challan History</h3>
+<input id="search" placeholder="Search Buyer Name / Mobile" oninput="loadHistory()" />
+<div style="overflow-x:auto">
+<table>
+<thead>
+<tr>
+<th>Challan</th><th>Buyer</th><th>Mobile</th><th>Amt</th><th>Advance Used</th><th>Payable</th><th>Remaining Adv.</th><th>Date</th>
+</tr>
+</thead>
+<tbody id="historyBody"></tbody>
+</table>
+</div>
+<div style="margin-top:10px; display:flex; justify-content:center; gap:10px">
+<button onclick="prevPage()">Prev</button>
+<span id="pageNum">1</span>
+<button onclick="nextPage()">Next</button>
+</div>
+</div>
+</div>
 
 <script>
-function save() {
-  const data = {
-    mobile: document.getElementById("mobile").value,
-    buyerNameHi: document.getElementById("buyerNameHi").value,
-    driverHi: document.getElementById("driverHi").value,
-    vehicle: document.getElementById("vehicle").value,
-    brick: document.getElementById("brick").value,
-    qty: document.getElementById("qty").value,
-    amount: document.getElementById("amount").value,
-    usedNow: document.getElementById("usedNow").value,
-    kiske: "स्वयं"
-  };
+const apiBase='/api';
+let page=1;
+let lastData=null;
+function showTab(tab){document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');document.getElementById('tab-challan').style.display='none';document.getElementById('tab-advance').style.display='none';document.getElementById('tab-history').style.display='none';document.getElementById('tab-'+tab).style.display='block';if(tab==='history') loadHistory()}
+async function safeFetch(url,options){const res=await fetch(url,options);const text=await res.text();try{return JSON.parse(text)}catch{throw new Error('Server returned HTML instead of JSON')}}
+async function addAdvance(){advSuccess.style.display='none';advError.style.display='none';try{const data=await safeFetch(apiBase+'/advances',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile:aMobile.value,name:aName.value,address:aAddress.value,amount:aAmount.value,owner:aOwner.value})});if(!data.success)throw new Error(data.message);advSuccess.innerText='✅ Advance Added Successfully';advSuccess.style.display='block';aMobile.value=aName.value=aAddress.value=aAmount.value=aOwner.value=''}catch(err){advError.innerText='❌ '+err.message;advError.style.display='block'}}
+async function saveChallan(){challanSuccess.style.display='none';challanError.style.display='none';pdfActions.style.display='none';try{const data=await safeFetch(apiBase+'/challans',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile:mobile.value,brick:brick.value,qty:qty.value,amount:Number(amount.value)})});if(!data.success)throw new Error(data.message);challanSuccess.innerText='✅ Challan Saved';challanSuccess.style.display='block';lastData=data.data;pdfActions.style.display='flex'}catch(err){challanError.innerText='❌ '+err.message;challanError.style.display='block'}}
+downloadPDF.onclick=function(){if(lastData)generatePDF(lastData)}
+shareWhatsApp.onclick=function(){if(!lastData)return;const msg=`Hello ${lastData.buyerName},\nChallan No: ${lastData.challanNo}\nTotal: Rs. ${lastData.amount}\nThank you for your business!`;window.open(`https://wa.me/${lastData.buyerMobile}?text=${encodeURIComponent(msg)}`)}
+function generatePDF(c) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p", "mm", "a4");
+  let y = 20;
 
-  google.script.run
-    .withSuccessHandler(r => {
-      if (r.success) {
-        window.open(r.pdfUrl);
-      } else {
-        alert(r.message);
-      }
-    })
-    .submitChallan(data);
+  /* ===== HEADER ===== */
+  pdf.setFillColor(37, 99, 235); // Solid blue header
+  pdf.rect(0, 0, 210, 35, "F");
+  pdf.setTextColor(255);
+  pdf.setFontSize(20);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("SHREE BALAJI EENT UDYOG", 105, 18, { align: "center" });
+
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica", "normal");
+  pdf.text(
+    "Sitholi Pani Tanki, Prayagraj, Uttar Pradesh",
+    105,
+    27,
+    { align: "center" }
+  );
+
+  /* ===== PAID / UNPAID WATERMARK ===== */
+  const paid = Number(c.payable) <= 0;
+  pdf.setFontSize(60);
+  pdf.setTextColor(0, 0, 0, 0.05); // very light
+  pdf.text(paid ? "PAID" : "UNPAID", 105, 140, { align: "center", angle: 45 });
+
+  y = 50;
+  pdf.setTextColor(0);
+  pdf.setFontSize(12);
+
+  /* ===== BUYER & CHALLAN INFO ===== */
+  pdf.setFillColor(245, 245, 245);
+  pdf.roundedRect(14, y, 182, 45, 4, 4, "FD");
+
+  // Left Column (Buyer Details)
+  pdf.text(`Buyer Name: ${c.buyerName}`, 20, y + 12);
+  pdf.textWithLink(`Mobile: ${c.buyerMobile}`, 20, y + 20, {
+    url: `tel:${c.buyerMobile}`,
+  });
+  pdf.textWithLink(`Address: ${c.address}`, 20, y + 28, {
+    url: `https://www.google.com/maps/search/${encodeURIComponent(c.address)}`,
+  });
+
+  // Right Column (Challan Info)
+  pdf.text(`Challan No: ${c.challanNo}`, 110, y + 12);
+  pdf.text(`Date: ${new Date(c.createdAt).toLocaleDateString()}`, 110, y + 20);
+  pdf.text(`Time: ${new Date(c.createdAt).toLocaleTimeString()}`, 110, y + 28);
+
+  y += 55;
+
+  /* ===== BRICK DETAILS ===== */
+  pdf.setFontSize(12);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Brick Details", 105, y, { align: "center" });
+  y += 7;
+  pdf.setFont("helvetica", "normal");
+  pdf.setFillColor(230, 230, 250);
+  pdf.roundedRect(55, y, 100, 12, 3, 3, "FD");
+  pdf.text(`Type: ${c.brick} | Qty: ${c.qty}`, 105, y + 9, { align: "center" });
+  y += 25;
+
+  /* ===== AMOUNT SUMMARY ===== */
+  const boxWidth = 58;
+  const boxHeight = 28;
+  const startX = 14;
+  const gap = 7;
+  const boxes = [
+    { label: "TOTAL AMOUNT", value: `Rs. ${Number(c.amount).toLocaleString()}`, color: [37, 99, 235] },
+    { label: "ADVANCE USED", value: `Rs. ${Number(c.advanceUsed).toLocaleString()}`, color: [5, 150, 105] },
+    { label: "PAYABLE", value: `Rs. ${Number(c.payable).toLocaleString()}`, color: [185, 28, 28] },
+  ];
+
+  boxes.forEach((b, i) => {
+    pdf.setFillColor(...b.color);
+    pdf.roundedRect(startX + i * (boxWidth + gap), y, boxWidth, boxHeight, 4, 4, "F");
+    pdf.setTextColor(255);
+    pdf.setFontSize(11);
+    pdf.text(b.label, startX + i * (boxWidth + gap) + boxWidth / 2, y + 8, { align: "center" });
+    pdf.setFontSize(13);
+    pdf.text(b.value, startX + i * (boxWidth + gap) + boxWidth / 2, y + 19, { align: "center" });
+  });
+
+  y += boxHeight + 10;
+
+  /* ===== REMAINING ADVANCE ===== */
+  pdf.setFontSize(12);
+  pdf.setTextColor(c.remainingAdvance > 0 ? 22 : 185, c.remainingAdvance > 0 ? 163 : 28, 0);
+  pdf.text(`Remaining Advance: Rs. ${Number(c.remainingAdvance).toLocaleString()}`, 105, y, { align: "center" });
+  y += 15;
+
+  /* ===== PAYMENT INFO ===== */
+  pdf.setFillColor(245, 245, 245);
+  pdf.roundedRect(50, y, 110, 20, 4, 4, "FD");
+  pdf.setFontSize(11);
+  pdf.setTextColor(0);
+  pdf.textWithLink("UPI ID: ajayk20166@okhdfcbank", 105, y + 12, { align: "center", url: "upi://pay?pa=ajayk20166@okhdfcbank" });
+  y += 30;
+
+  /* ===== OWNER CONTACT ===== */
+  pdf.setFillColor(245, 245, 245);
+  pdf.roundedRect(50, y, 110, 28, 4, 4, "FD");
+  pdf.setFontSize(11);
+  pdf.setTextColor(0);
+  pdf.textWithLink("Ajay: 9839454542", 105, y + 10, { align: "center", url: "tel:9839454542" });
+  pdf.textWithLink("Rahul: 8736002647", 105, y + 20, { align: "center", url: "tel:8736002647" });
+  y += 40;
+
+  /* ===== FOOTER ===== */
+  pdf.setDrawColor(200);
+  pdf.line(14, 280, 196, 280);
+  pdf.setFontSize(10);
+  pdf.setTextColor(100);
+  pdf.text("Thank you for your business with Shree Balaji Eent Udyog", 105, 287, { align: "center" });
+
+  /* ===== AUTO DOWNLOAD ===== */
+  pdf.save(`${c.challanNo}.pdf`);
 }
-</script>
 
+let currentPage=1;
+async function loadHistory(){const s=search.value||'';const data=await safeFetch(`${apiBase}/challans?search=${s}&page=${currentPage}`);lastData=data.data;historyBody.innerHTML='';data.data.forEach(c=>{historyBody.innerHTML+=`<tr><td>${c.challanNo}</td><td>${c.buyerName}</td><td>${c.buyerMobile}</td><td>₹${c.amount}</td><td>₹${c.advanceUsed}</td><td>₹${c.payable}</td><td style="font-weight:600;color:${c.remainingAdvance>0?'#166534':'#991b1b'}">₹${c.remainingAdvance}</td><td>${new Date(c.createdAt).toLocaleString()}</td></tr>`});pageNum.innerText=currentPage}
+function prevPage(){if(currentPage>1){currentPage--;loadHistory()}}
+function nextPage(){currentPage++;loadHistory()}
+</script>
 </body>
 </html>

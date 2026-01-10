@@ -6,7 +6,7 @@
 <title>🏭 Production Entry</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--brand:#2e7d32}
+:root{--brand:#2e7d32;}
 body{margin:0;font-family:Poppins;background:#f4f6f9;color:#333;}
 .container{max-width:950px;margin:auto;padding:16px;}
 .panel{background:#fff;padding:20px;border-radius:14px;margin-bottom:20px;box-shadow:0 4px 20px rgba(0,0,0,.08);}
@@ -19,9 +19,9 @@ button:disabled{opacity:0.6;cursor:not-allowed;}
 .search-panel{margin-bottom:10px;}
 .search-panel input{width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;font-size:0.95rem;}
 .total-bricks{background:#e8f5e9;color:var(--brand);font-weight:600;padding:12px;border-radius:8px;margin-bottom:10px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.1);}
-.table-wrap{overflow-x:auto;background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);padding:10px;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th, td{padding:10px;border-bottom:1px solid #ddd;text-align:left;}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);padding:10px;scroll-behavior:smooth;}
+table{width:100%;border-collapse:collapse;margin-top:10px;min-width:600px;}
+th, td{padding:10px;border-bottom:1px solid #ddd;text-align:left;white-space:nowrap;}
 th{background:#f0f0f0;font-weight:600;}
 .pagination{display:flex;gap:5px;justify-content:center;align-items:center;margin-top:10px;}
 .page-btn{padding:5px 10px;border:1px solid var(--brand);color:var(--brand);border-radius:5px;cursor:pointer;}
@@ -29,7 +29,14 @@ th{background:#f0f0f0;font-weight:600;}
 #toast{position:fixed;bottom:20px;right:20px;min-width:260px;padding:16px 18px;border-radius:14px;font-weight:600;color:#fff;display:none;text-align:center;z-index:10000;transition:all .4s ease;}
 .spinner{width:18px;height:18px;border:3px solid #fff;border-top:3px solid rgba(255,255,255,0.4);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;margin-left:8px;vertical-align:middle;}
 @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-@media(max-width:600px){.flex{flex-direction:column;}input, select, button{width:100%;}}
+
+/* Mobile adjustments */
+@media(max-width:600px){
+  .flex{flex-direction:column;}
+  input, select, button{width:100%; font-size:0.9rem; padding:10px;}
+  th, td{padding:8px; font-size:0.85rem;}
+  .total-bricks{font-size:0.95rem; padding:10px;}
+}
 </style>
 </head>
 <body>
@@ -197,7 +204,6 @@ addProdBtn.addEventListener('click', async ()=>{
  const originalText = addProdBtn.textContent;
  addProdBtn.innerHTML='⏳ जोड़ रहे हैं... <span class="spinner"></span>';
 
- // Date logic
  const now = new Date();
  const productionDate = dateInputVal ? (() => {
    const d = new Date(dateInputVal);
@@ -214,7 +220,6 @@ addProdBtn.addEventListener('click', async ()=>{
   const data = await res.json();
   if(!res.ok) throw new Error(data.msg || 'Server Error');
 
-  // Merge employee name for immediate display
   if(!data.employee?.name) data.employee = employeesMap[employee] || {name:'-', empId:''};
 
   productionData.unshift(data);

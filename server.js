@@ -26,8 +26,9 @@ app.use("/api/expenses", require("./routes/expenses"));
 app.use("/api/owners", require("./routes/owners"));
 app.use("/api/ledger", require("./routes/ownerLedger"));
 app.use("/api/dev", require("./routes/devClean"));
-
-
+app.use("/api/buyers", require("./routes/buyers"));
+app.use("/api/challans", require("./routes/challans"));
+app.use("/api/advances", require("./routes/advances"));
 
 /* ===== Frontend ===== */
 app.get('/', (req, res) => {
