@@ -5,63 +5,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>👑 Owner Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
 :root{
-  --primary:#6a1b9a;
-  --green:#2e7d32;
-  --red:#c62828;
-  --orange:#ef6c00;
+  --primary:#2563eb;
+  --green:#16a34a;
+  --red:#dc2626;
+  --orange:#f97316;
   --bg:#f4f6f9;
   --card:#ffffff;
+  --sidebar-width:260px;
+  --sidebar-collapsed:70px;
+  --transition-speed:.3s;
 }
-*{box-sizing:border-box}
+
+*{box-sizing:border-box;}
 body{
   margin:0;
-  font-family:Poppins;
+  font-family:Poppins,sans-serif;
   background:var(--bg);
   color:#333;
-}
-
-/* ===== HEADER ===== */
-header{
-  background:var(--primary);
-  color:#fff;
-  padding:16px 20px;
   display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-header h1{margin:0;font-size:20px}
-.menu-btn{
-  font-size:26px;
-  cursor:pointer;
 }
 
-/* ===== SIDEBAR ===== */
+/* SIDEBAR */
 .sidebar{
-  position:fixed;
-  top:0; left:-260px;
-  width:260px; height:100%;
+  width:var(--sidebar-width);
+  height:100vh;
   background:#fff;
   box-shadow:4px 0 20px rgba(0,0,0,.15);
   padding:20px;
-  transition:.3s;
+  position:fixed;
+  top:0;
+  left:0;
   z-index:9999;
+  transition:width var(--transition-speed), left var(--transition-speed);
+  overflow:hidden;
 }
-.sidebar.open{left:0}
+.sidebar.collapsed{
+  width:var(--sidebar-collapsed);
+}
 .sidebar a{
-  display:block;
-  padding:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
   margin-bottom:10px;
   border-radius:12px;
   color:#333;
   text-decoration:none;
   font-weight:600;
+  white-space:nowrap;
 }
-.sidebar a:hover{background:#eee}
+.sidebar a:hover{background:#eee;}
+.sidebar a span{flex:1;}
 
-/* overlay */
+/* MOBILE */
+@media(max-width:1024px){
+  .sidebar{left:-260px;}
+  .sidebar.open{left:0;}
+}
+
+/* OVERLAY */
 .overlay{
   display:none;
   position:fixed;
@@ -69,212 +73,187 @@ header h1{margin:0;font-size:20px}
   background:rgba(0,0,0,.4);
   z-index:9998;
 }
-.overlay.show{display:block}
+.overlay.show{display:block;}
 
-/* ===== MAIN ===== */
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
+/* HEADER */
+header{
+  background:var(--primary);
+  color:#fff;
+  padding:16px 20px;
+  font-size:20px;
+  font-weight:600;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+  width:100%;
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:1000;
 }
 
-/* ===== SUMMARY CARDS ===== */
-.grid{
+/* HAMBURGER */
+.menu-btn, .collapse-btn{
+  font-size:28px;
+  cursor:pointer;
+  display:none;
+}
+@media(max-width:1024px){ .menu-btn{display:block;} }
+
+/* COLLAPSE BUTTON DESKTOP */
+.collapse-btn{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-top:20px;
+  padding:10px;
+  background:#f1f5f9;
+  border-radius:12px;
+  cursor:pointer;
+}
+.collapse-btn:hover{background:#e5e7eb;}
+
+/* MAIN CONTENT */
+.main{
+  margin-left:var(--sidebar-width);
+  width:100%;
+  padding:100px 20px 20px 20px;
+  transition:margin-left var(--transition-speed);
+}
+.sidebar.collapsed ~ .main{
+  margin-left:var(--sidebar-collapsed);
+}
+@media(max-width:1024px){ .main{margin-left:0; padding:80px 16px 16px 16px;} }
+
+/* SUMMARY GRID */
+.summary-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:16px;
+  gap:20px;
 }
+
 .card{
   background:var(--card);
-  padding:20px;
+  padding:28px 20px;
   border-radius:16px;
   box-shadow:0 6px 20px rgba(0,0,0,.08);
+  text-align:center;
+  transition: transform .2s;
 }
-.card h3{margin:0 0 8px;font-size:14px;color:#777}
-.card span{
-  font-size:26px;
-  font-weight:700;
-}
-.green{color:var(--green)}
-.red{color:var(--red)}
-.orange{color:var(--orange)}
-
-/* ===== OWNER PROFIT ===== */
-.owner-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:16px;
-  margin-top:20px;
-}
-.owner-card{
-  background:#fff;
-  padding:16px;
-  border-radius:14px;
-  box-shadow:0 4px 16px rgba(0,0,0,.08);
-}
-.owner-card.loss{
-  border:2px solid var(--red);
-  background:#ffebee;
-}
-.owner-card h4{margin:0;font-size:16px}
-.owner-card small{color:#777}
-.owner-card .profit{
-  font-size:22px;
-  font-weight:700;
-  margin-top:6px;
-}
-.badge{
-  display:inline-block;
-  background:var(--red);
-  color:#fff;
-  padding:4px 8px;
-  border-radius:8px;
-  font-size:12px;
-  margin-top:6px;
-}
-
-/* ===== MOBILE ===== */
+.card:hover{transform:translateY(-4px);}
+.card h3{margin:0 0 12px;font-size:16px;color:#555;}
+.card span{font-size:28px;font-weight:700;display:block;color:#111;}
+.card.green span{color:var(--green);}
+.card.red span{color:var(--red);}
+.card.orange span{color:var(--orange);}
 @media(max-width:600px){
-  header h1{font-size:18px}
+  .card{padding:20px 12px;}
+  .card span{font-size:24px;}
+  .card h3{font-size:14px;}
 }
 </style>
 </head>
 
 <body>
-
-<header>
-  <h1>👑 Owner Dashboard</h1>
-  <div class="menu-btn" id="menuBtn">☰</div>
-</header>
-
+<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-  <a href="/pages/owner/karmchari.html">👷 कर्मचारी</a>
-  <a href="/pages/owner/employee-kharch.html">💸 खर्च</a>
-  <a href="/pages/owner/production-entry.html">🏭 उत्पादन</a>
-  <a href="/pages/owner/owner-ledger.html">📒 Owner Ledger</a>
-  <a href="/pages/owner/challan.html"> 🚚 चालान</a>
+  <a href="/pages/owner/karmchari.html">👷 <span>कर्मचारी</span></a>
+  <a href="/pages/owner/employee-kharch.html">💸 <span>खर्च</span></a>
+  <a href="/pages/owner/production-entry.html">🏭 <span>उत्पादन</span></a>
+  <a href="/pages/owner/owner-ledger.html">📒 <span>Owner Ledger</span></a>
+  <a href="/pages/owner/challan.html">🚚 <span>चालान</span></a>
+
+  <div class="collapse-btn" id="collapseBtn">⇆</div>
 </div>
 <div class="overlay" id="overlay"></div>
 
-<div class="container">
+<header>
+  👑 Owner Dashboard
+  <div class="menu-btn" id="menuBtn">☰</div>
+</header>
 
-<!-- SUMMARY -->
-<div class="grid">
-  <div class="card">
-    <h3>कुल कर्मचारी</h3>
-    <span id="totalEmployees">0</span>
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="summary-grid">
+    <div class="card">
+      <h3>कुल कर्मचारी</h3>
+      <span id="totalEmployees">0</span>
+    </div>
+    <div class="card orange">
+      <h3>कुल Advance</h3>
+      <span id="totalAdvance">₹0</span>
+    </div>
+    <div class="card">
+      <h3>कुल ईंट Qty</h3>
+      <span id="totalBricks">0</span>
+    </div>
+    <div class="card green">
+      <h3>उत्पादन राशि</h3>
+      <span id="totalProduction">₹0</span>
+    </div>
+    <div class="card red">
+      <h3>कुल खर्च</h3>
+      <span id="totalExpense">₹0</span>
+    </div>
   </div>
-  <div class="card">
-    <h3>कुल Advance</h3>
-    <span id="totalAdvance">₹0</span>
-  </div>
-  <div class="card">
-    <h3>कुल ईंट Qty</h3>
-    <span id="totalBricks">0</span>
-  </div>
-  <div class="card">
-    <h3>उत्पादन राशि</h3>
-    <span class="green" id="totalProduction">₹0</span>
-  </div>
-  <div class="card">
-    <h3>कुल खर्च</h3>
-    <span class="red" id="totalExpense">₹0</span>
-  </div>
-</div>
-
-<!-- OWNER PROFIT -->
-<!-- <h2 style="margin-top:30px">👑 Owner-wise Profit / Loss</h2> -->
-<!-- <div class="owner-grid" id="ownerGrid"></div> -->
-
 </div>
 
 <script>
-/* ===== MENU LOGIC ===== */
-const sidebar=document.getElementById("sidebar");
-const overlay=document.getElementById("overlay");
-const menuBtn=document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const menuBtn = document.getElementById("menuBtn");
+const collapseBtn = document.getElementById("collapseBtn");
 
-function closeMenu(){
+// MOBILE MENU TOGGLE
+menuBtn.onclick = () => {
+  sidebar.classList.toggle("open");
+  overlay.classList.toggle("show");
+};
+overlay.onclick = () => {
   sidebar.classList.remove("open");
   overlay.classList.remove("show");
-}
-menuBtn.onclick=()=>{
-  sidebar.classList.add("open");
-  overlay.classList.add("show");
 };
-overlay.onclick=closeMenu;
-window.onresize=closeMenu;
-document.querySelectorAll(".sidebar a").forEach(a=>{
-  a.onclick=closeMenu;
+document.querySelectorAll(".sidebar a").forEach(a => {
+  a.onclick = () => {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
+  };
 });
 
-/* ===== DASHBOARD LOGIC ===== */
+// DESKTOP COLLAPSE
+collapseBtn.onclick = () => {
+  sidebar.classList.toggle("collapsed");
+};
+
+// DASHBOARD DATA
 async function loadDashboard(){
-  /* EMPLOYEES */
-  const empRes=await fetch("/api/employees/all");
-  const empJson=await empRes.json();
-  const employees=empJson.data||[];
-  document.getElementById("totalEmployees").innerText=employees.length;
+  const empRes = await fetch("/api/employees/all");
+  const empJson = await empRes.json();
+  const employees = empJson.data || [];
+  document.getElementById("totalEmployees").innerText = employees.length;
+  const totalAdvance = employees.reduce((sum,e)=>sum+(e.advance||0),0);
+  document.getElementById("totalAdvance").innerText = "₹"+totalAdvance;
 
-  let adv=0;
-  employees.forEach(e=>adv+=e.advance||0);
-  document.getElementById("totalAdvance").innerText="₹"+adv;
+  const expRes = await fetch("/api/expenses?limit=100000");
+  const expJson = await expRes.json();
+  const expenses = expJson.data || [];
+  const totalExp = expenses.reduce((sum,e)=>sum+(e.amount||0),0);
+  document.getElementById("totalExpense").innerText = "₹"+totalExp;
 
-  /* EXPENSES */
-  const expRes=await fetch("/api/expenses?limit=100000");
-  const expJson=await expRes.json();
-  const expenses=expJson.data||[];
-
-  let totalExp=0;
-  expenses.forEach(e=>totalExp+=e.amount||0);
-  document.getElementById("totalExpense").innerText="₹"+totalExp;
-
-  /* PRODUCTION */
-  const prodRes=await fetch("/api/production");
-  const productions=await prodRes.json();
-
-  let bricks=0, prodAmt=0;
+  const prodRes = await fetch("/api/production");
+  const productions = await prodRes.json() || [];
+  let totalBricks = 0, totalProdAmt = 0;
   productions.forEach(p=>{
-    bricks+=p.qty||0;
-    prodAmt+=(p.qty||0)*(p.price||0);
+    totalBricks += p.qty || 0;
+    totalProdAmt += (p.qty || 0) * (p.price || 0);
   });
-  document.getElementById("totalBricks").innerText=bricks;
-  document.getElementById("totalProduction").innerText="₹"+prodAmt;
-
-  /* OWNER PROFIT */
-  const ownersRes=await fetch("/api/owners");
-  const owners=await ownersRes.json();
-
-  const ownerGrid=document.getElementById("ownerGrid");
-  ownerGrid.innerHTML="";
-
-  owners.forEach(o=>{
-    const oExp=expenses.filter(e=>e.ownerName===o.name)
-                       .reduce((s,e)=>s+e.amount,0);
-
-    const oProd=productions
-      .filter(p=>expenses.some(e=>e.employee==p.employee && e.ownerName===o.name))
-      .reduce((s,p)=>s+(p.qty*p.price),0);
-
-    const profit=oProd-oExp;
-
-    const div=document.createElement("div");
-    div.className="owner-card"+(profit<0?" loss":"");
-    div.innerHTML=`
-      <h4>${o.name}</h4>
-      <small>Production: ₹${oProd}</small><br>
-      <small>Expense: ₹${oExp}</small>
-      <div class="profit ${profit<0?'red':'green'}">
-        ₹${profit}
-      </div>
-      ${profit<0?'<div class="badge">⚠️ Loss</div>':''}
-    `;
-    ownerGrid.appendChild(div);
-  });
+  document.getElementById("totalBricks").innerText = totalBricks;
+  document.getElementById("totalProduction").innerText = "₹"+totalProdAmt;
 }
 
+// Load dashboard on page load
 loadDashboard();
 </script>
-
 </body>
 </html>

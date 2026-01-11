@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Owner Dashboard</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <style>
 :root{
   --dark:#0f172a;
@@ -162,7 +160,6 @@ tbody tr:hover{background:#eef2ff}
 </head>
 
 <body>
-  
 <div class="container">
 
 <header>
@@ -243,7 +240,6 @@ tbody tr:hover{background:#eef2ff}
 </div>
 
 <script>
-
 const API="/api";
 
 let owners=[], ledger=[], page=1, perPage=10;
@@ -252,6 +248,13 @@ const ownersList=document.getElementById("ownersList");
 const ledgerBody=document.getElementById("ledgerBody");
 const ownerSelect=document.getElementById("ownerSelect");
 const searchOwner=document.getElementById("searchOwner");
+
+function formatCurrency(num){ return '₹'+num.toLocaleString(); }
+
+function debounce(fn, delay=300){
+  let timer;
+  return (...args)=>{ clearTimeout(timer); timer=setTimeout(()=>fn(...args), delay); };
+}
 
 async function loadAll(){
   owners = await (await fetch(API+"/owners")).json();
@@ -263,157 +266,97 @@ async function loadAll(){
 
 /* SUMMARY */
 function renderSummary(){
-  sumInvest.innerText = "₹" + ledger
-    .filter(l=>l.type==="INVEST")
-    .reduce((s,l)=>s+l.amount,0);
-
-  sumWithdraw.innerText = "₹" + ledger
-    .filter(l=>l.type==="WITHDRAW")
-    .reduce((s,l)=>s+Math.abs(l.amount),0);
-
-  sumProfit.innerText = "₹" + ledger
-    .filter(l=>l.type==="PROFIT")
-    .reduce((s,l)=>s+l.amount,0);
+  sumInvest.innerText = formatCurrency(ledger.filter(l=>l.type==="INVEST").reduce((s,l)=>s+l.amount,0));
+  sumWithdraw.innerText = formatCurrency(ledger.filter(l=>l.type==="WITHDRAW").reduce((s,l)=>s+Math.abs(l.amount),0));
+  sumProfit.innerText = formatCurrency(ledger.filter(l=>l.type==="PROFIT").reduce((s,l)=>s+l.amount,0));
 }
 
 /* OWNERS */
 function renderOwners(){
   ownersList.innerHTML="";
   ownerSelect.innerHTML="";
+  const frag = document.createDocumentFragment();
 
-  const totalInvest = ledger
-    .filter(l=>l.type==="INVEST")
-    .reduce((s,l)=>s+l.amount,0);
-
-  const totalProfit = ledger
-    .filter(l=>l.type==="PROFIT")
-    .reduce((s,l)=>s+l.amount,0);
-
-  owners
-    .filter(o=>o.name.toLowerCase().includes(searchOwner.value.toLowerCase()))
-    .forEach(o=>{
-      const invest = ledger
-        .filter(l=>l.ownerId===o._id && l.type==="INVEST")
-        .reduce((s,l)=>s+l.amount,0);
-
-      const withdraw = ledger
-        .filter(l=>l.ownerId===o._id && l.type==="WITHDRAW")
-        .reduce((s,l)=>s+Math.abs(l.amount),0);
-
-      const balance = invest - withdraw;
-      const pct = totalInvest ? ((invest/totalInvest)*100).toFixed(2) : 0;
-      const share = Math.round((pct/100)*totalProfit);
-
-      ownersList.innerHTML += `
-        <div class="owner-card">
-          <h3>${o.name}</h3>
-          <div class="owner-row"><span>Invested</span><span>₹${invest}</span></div>
-          <div class="owner-row"><span>Withdrawn</span><span>₹${withdraw}</span></div>
-          <div class="owner-row"><span>Balance</span>
-            <span class="${balance>=0?'pos':'neg'}">₹${balance}</span>
-          </div>
-          <div class="owner-row"><span>Profit Share</span>
-            <span>₹${share} (${pct}%)</span>
-          </div>
-          <span class="tag ${balance<0?'red':'green'}">
-            ${balance<0?'Overdrawn':'OK'}
-          </span>
-        </div>
-      `;
-
-      ownerSelect.innerHTML += `<option value="${o._id}">${o.name}</option>`;
-    });
-}
-
-/* LEDGER (OWNER SEARCH FIXED PROPERLY) */
-function renderLedger(){
-  ledgerBody.innerHTML="";
-
+  const totalInvest = ledger.filter(l=>l.type==="INVEST").reduce((s,l)=>s+l.amount,0);
+  const totalProfit = ledger.filter(l=>l.type==="PROFIT").reduce((s,l)=>s+l.amount,0);
   const keyword = searchOwner.value.toLowerCase();
 
-  // ownerId → ownerName map
-  const ownerMap = {};
-  owners.forEach(o => ownerMap[o._id] = o.name);
+  owners.filter(o=>o.name.toLowerCase().includes(keyword)).forEach(o=>{
+    const invest = ledger.filter(l=>l.ownerId===o._id && l.type==="INVEST").reduce((s,l)=>s+l.amount,0);
+    const withdraw = ledger.filter(l=>l.ownerId===o._id && l.type==="WITHDRAW").reduce((s,l)=>s+Math.abs(l.amount),0);
+    const balance = invest - withdraw;
+    const pct = totalInvest ? ((invest/totalInvest)*100).toFixed(2) : 0;
+    const share = Math.round((pct/100)*totalProfit);
 
-  const filtered = ledger.filter(l=>{
-    const ownerName = ownerMap[l.ownerId] || "";
-    return ownerName.toLowerCase().includes(keyword);
-  });
-
-  const start=(page-1)*perPage;
-
-  filtered.slice(start,start+perPage).forEach(l=>{
-    ledgerBody.innerHTML += `
-      <tr>
-        <td>${new Date(l.date).toLocaleString()}</td>
-        <td>${ownerMap[l.ownerId] || "-"}</td>
-        <td class="type-${l.type.toLowerCase()}">${l.type}</td>
-        <td class="amt ${l.amount>=0?'pos':'neg'}">
-          ₹${Math.abs(l.amount)}
-        </td>
-        <td>${l.note || "-"}</td>
-      </tr>
+    const div = document.createElement("div");
+    div.className = "owner-card";
+    div.innerHTML=`
+      <h3>${o.name}</h3>
+      <div class="owner-row"><span>Invested</span><span>₹${invest}</span></div>
+      <div class="owner-row"><span>Withdrawn</span><span>₹${withdraw}</span></div>
+      <div class="owner-row"><span>Balance</span><span class="${balance>=0?'pos':'neg'}">₹${balance}</span></div>
+      <div class="owner-row"><span>Profit Share</span><span>₹${share} (${pct}%)</span></div>
+      <span class="tag ${balance<0?'red':'green'}">${balance<0?'Overdrawn':'OK'}</span>
     `;
+    frag.appendChild(div);
+    ownerSelect.innerHTML += `<option value="${o._id}">${o.name}</option>`;
   });
+  ownersList.appendChild(frag);
+}
 
-  pageInfo.innerText =
-    `Page ${page} of ${Math.ceil(filtered.length/perPage)}`;
+/* LEDGER */
+function renderLedger(){
+  ledgerBody.innerHTML="";
+  const keyword = searchOwner.value.toLowerCase();
+  const ownerMap = {}; owners.forEach(o=>ownerMap[o._id]=o.name);
+
+  const filtered = ledger.filter(l=> (ownerMap[l.ownerId]||"").toLowerCase().includes(keyword) );
+  const start=(page-1)*perPage;
+  const frag = document.createDocumentFragment();
+  filtered.slice(start,start+perPage).forEach(l=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML=`
+      <td>${new Date(l.date).toLocaleString()}</td>
+      <td>${ownerMap[l.ownerId] || "-"}</td>
+      <td class="type-${l.type.toLowerCase()}">${l.type}</td>
+      <td class="amt ${l.amount>=0?'pos':'neg'}">₹${Math.abs(l.amount)}</td>
+      <td>${l.note||"-"}</td>
+    `;
+    frag.appendChild(tr);
+  });
+  ledgerBody.appendChild(frag);
+  pageInfo.innerText = `Page ${page} of ${Math.ceil(filtered.length/perPage) || 1}`;
 }
 
 /* PAGINATION */
-function nextPage(){
-  if(page*perPage < ledger.length){
-    page++;
-    renderLedger();
-  }
-}
-function prevPage(){
-  if(page>1){
-    page--;
-    renderLedger();
-  }
-}
+function nextPage(){ page++; renderLedger(); }
+function prevPage(){ if(page>1){ page--; renderLedger(); } }
 
 /* FORMS */
 addOwnerForm.onsubmit = async e=>{
   e.preventDefault();
-  await fetch(API+"/owners",{
-    method:"POST",
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name:ownerNameInput.value})
-  });
-  ownerNameInput.value="";
-  loadAll();
+  await fetch(API+"/owners",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({name:ownerNameInput.value})});
+  ownerNameInput.value=""; loadAll();
 };
 
 ledgerForm.onsubmit = async e=>{
   e.preventDefault();
-  await fetch(API+"/ledger",{
-    method:"POST",
-    headers:{'Content-Type':'application/json'},
+  await fetch(API+"/ledger",{method:"POST",headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       ownerId: ownerSelect.value,
       type: typeSelect.value,
-      amount: typeSelect.value==="WITHDRAW"
-        ? -amountInput.value
-        : +amountInput.value,
+      amount: typeSelect.value==="WITHDRAW"? -amountInput.value : +amountInput.value,
       date: dateInput.value || new Date(),
       note: noteInput.value
-    })
-  });
-  ledgerForm.reset();
-  loadAll();
+    })});
+  ledgerForm.reset(); loadAll();
 };
 
 /* SEARCH */
-searchOwner.oninput = ()=>{
-  page=1;
-  renderOwners();
-  renderLedger();
-};
+searchOwner.addEventListener('input',debounce(()=>{ page=1; renderOwners(); renderLedger(); }));
 
 loadAll();
 </script>
-
+</div>
 </body>
 </html>
