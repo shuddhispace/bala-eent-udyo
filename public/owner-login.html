@@ -3,155 +3,200 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owner Login • Shri Bala Eent Udyog</title>
+<title>👑 Owner Login • श्री बालाजी ईंट उद्योग</title>
+<meta name="description" content="Secure owner login for Shri Balaji Eent Udyog management system.">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --primary:#b53030;
-  --primary-dark:#8e1f1f;
-  --bg-gradient:linear-gradient(135deg,#fbeaea,#f6eaea);
-  --glass:rgba(255,255,255,0.15);
-  --glass-hover:rgba(255,255,255,0.25);
-  --transition:.35s ease-in-out;
+:root {
+  --primary: #b53030;
+  --primary-dark: #8e1f1f;
+  --bg-gradient: linear-gradient(135deg,#fbeaea,#f6eaea);
+  --card-bg: rgba(255,255,255,0.95);
+  --input-bg: #fff;
+  --input-focus: #fddede;
+  --transition: 0.3s ease;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif;}
-
-body{
-  min-height:100vh;
-  background:var(--bg-gradient);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Poppins, sans-serif;
 }
 
-.login-card{
-  background:var(--glass);
-  backdrop-filter:blur(18px);
-  width:100%;
-  max-width:420px;
-  padding:40px 30px;
-  border-radius:28px;
-  box-shadow:0 25px 60px rgba(0,0,0,.2);
-  border:1px solid rgba(255,255,255,.2);
-  transition:all var(--transition);
+body {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
 
-.login-card:hover{
-  background:var(--glass-hover);
-  box-shadow:0 30px 70px rgba(0,0,0,.25);
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--card-bg);
+  padding: 50px 35px;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+  text-align: center;
+  transition: transform var(--transition);
+}
+.login-card:hover {
+  transform: translateY(-3px);
 }
 
-h1{
-  text-align:center;
-  color:var(--primary);
-  margin-bottom:8px;
-  font-size:28px;
+.login-card h1 {
+  font-size: 30px;
+  color: var(--primary);
+  margin-bottom: 12px;
 }
 
-p{
-  text-align:center;
-  color:#fff;
-  font-size:14px;
-  margin-bottom:22px;
-}
-input{
-  width:100%;
-  padding:16px;
-  margin-bottom:16px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,0.3);
-  font-size:16px;
-  background:rgba(255,255,255,0.25); /* lighter so text is visible */
-  color:#000; /* black for input text */
-  outline:none;
-  transition:all var(--transition);
+.login-card p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 28px;
 }
 
-input::placeholder{
-  color:rgba(0,0,0,0.6);
+.input-wrap {
+  position: relative;
+  margin-bottom: 12px; /* small space between ID and Password */
 }
 
-input:focus{
-  border:1px solid var(--primary);
-  box-shadow:0 4px 16px rgba(181,48,48,.35);
-  background:rgba(255,255,255,0.35);
+input {
+  width: 100%;
+  padding: 16px 16px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  background: var(--input-bg);
+  color: #111;
+  outline: none;
+  transition: all var(--transition);
 }
 
-
-button{
-  width:100%;
-  padding:16px;
-  border:none;
-  border-radius:16px;
-  font-size:18px;
-  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-  box-shadow:0 12px 30px rgba(181,48,48,.5);
-  transition:all var(--transition);
+input:focus {
+  border-color: var(--primary);
+  background: var(--input-focus);
+  box-shadow: 0 4px 14px rgba(181,48,48,0.2);
 }
 
-button:hover{
-  transform:translateY(-3px);
-  box-shadow:0 16px 36px rgba(181,48,48,.55);
+.toggle-pass {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+  user-select: none;
 }
 
-#msg{
-  margin-top:14px;
-  text-align:center;
-  font-size:14px;
+button {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg,var(--primary),var(--primary-dark));
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 18px;
+}
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(181,48,48,0.4);
+}
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
-.success{color:#2e7d32}
-.error{color:#c62828}
+#msg {
+  margin-top: 14px;
+  font-size: 14px;
+  min-height: 18px;
+}
+#msg.success { color: #2e7d32; }
+#msg.error { color: #c62828; }
+
+.footer {
+  margin-top: 24px;
+  font-size: 12px;
+  color: #777;
+}
 
 /* Responsive */
 @media(max-width:480px){
-  .login-card{
-    padding:30px 20px;
+  .login-card {
+    padding: 40px 20px;
   }
-  h1{font-size:24px;}
-  input, button{padding:14px;font-size:16px;}
+  h1 {
+    font-size: 26px;
+  }
+  input, button {
+    padding: 14px;
+    font-size: 15px;
+  }
 }
-
-@media(min-width:768px){
-  .login-card{padding:45px 40px;}
-  h1{font-size:32px;}
-  input, button{padding:18px;font-size:17px;}
-}
-
 </style>
 </head>
 
 <body>
 
 <div class="login-card">
-  <h1>श्री बाला ईंट उद्योग</h1>
+  <h1>🧱 श्री बालाजी ईंट उद्योग</h1>
   <p>Owner Secure Login</p>
 
-  <input id="userid" placeholder="Owner ID">
-  <input id="password" type="password" placeholder="Password">
+  <input id="userid" placeholder="Owner ID" autocomplete="username">
 
-  <button onclick="loginOwner()">Login</button>
+  <div class="input-wrap">
+    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+    <span class="toggle-pass" onclick="togglePass()">👁️</span>
+  </div>
+
+  <button id="loginBtn" onclick="loginOwner()">Login</button>
   <div id="msg"></div>
+
+  <div class="footer">Authorized Access Only</div>
 </div>
 
 <script>
+let isLogging = false;
+
+// Toggle password visibility
+function togglePass(){
+  password.type = password.type === "password" ? "text" : "password";
+}
+
+// Press Enter to login
+document.addEventListener("keydown", e => {
+  if(e.key === "Enter") loginOwner();
+});
+
+// Login function
 async function loginOwner(){
+  if(isLogging) return;
+
   const id = userid.value.trim();
   const pass = password.value.trim();
   const msg = document.getElementById("msg");
+  const btn = document.getElementById("loginBtn");
 
   if(!id || !pass){
-    msg.textContent="सभी विवरण भरें";
-    msg.className="error";
+    msg.textContent = "सभी विवरण भरें";
+    msg.className = "error";
     return;
   }
+
+  isLogging = true;
+  btn.disabled = true;
+  btn.textContent = "Logging in...";
 
   try{
     const res = await fetch('/api/auth/login',{
@@ -164,24 +209,26 @@ async function loginOwner(){
 
     if(res.ok){
       localStorage.setItem("OWNER_AUTH","YES");
-      localStorage.setItem("OWNER_NAME",data.owner.name);
-      msg.textContent=data.msg;
-      msg.className="success";
-      setTimeout(()=>{
-        window.location.href="pages/owner/owner-dashboard.html";
-      },700);
+      localStorage.setItem("OWNER_NAME",data.owner.name || "Owner");
+      msg.textContent = "Login successful";
+      msg.className = "success";
+      setTimeout(()=>{ window.location.href="/pages/owner/owner-dashboard.html"; },500);
     } else {
-      msg.textContent=data.msg || "Login failed";
-      msg.className="error";
+      msg.textContent = data.msg || "Invalid credentials";
+      msg.className = "error";
     }
+
   } catch(err){
-    msg.textContent="Server Error";
-    msg.className="error";
     console.error(err);
+    msg.textContent = "Server not responding";
+    msg.className = "error";
+  } finally{
+    isLogging = false;
+    btn.disabled = false;
+    btn.textContent = "Login";
   }
 }
 </script>
-
 
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>👑 Owner Dashboard</title>
+<title>👑 Owner Dashboard • श्री बालाजी ईंट उद्योग</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -41,9 +41,7 @@ body{
   transition:width var(--transition-speed), left var(--transition-speed);
   overflow:hidden;
 }
-.sidebar.collapsed{
-  width:var(--sidebar-collapsed);
-}
+.sidebar.collapsed{width:var(--sidebar-collapsed);}
 .sidebar a{
   display:flex;
   align-items:center;
@@ -156,6 +154,7 @@ header{
 </head>
 
 <body>
+
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <a href="/pages/owner/karmchari.html">👷 <span>कर्मचारी</span></a>
@@ -163,7 +162,6 @@ header{
   <a href="/pages/owner/production-entry.html">🏭 <span>उत्पादन</span></a>
   <a href="/pages/owner/owner-ledger.html">📒 <span>Owner Ledger</span></a>
   <a href="/pages/owner/challan.html">🚚 <span>चालान</span></a>
-
   <div class="collapse-btn" id="collapseBtn">⇆</div>
 </div>
 <div class="overlay" id="overlay"></div>
@@ -200,59 +198,65 @@ header{
 </div>
 
 <script>
+// ===== SIDEBAR TOGGLE =====
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 const menuBtn = document.getElementById("menuBtn");
 const collapseBtn = document.getElementById("collapseBtn");
 
-// MOBILE MENU TOGGLE
-menuBtn.onclick = () => {
-  sidebar.classList.toggle("open");
-  overlay.classList.toggle("show");
-};
-overlay.onclick = () => {
-  sidebar.classList.remove("open");
-  overlay.classList.remove("show");
-};
-document.querySelectorAll(".sidebar a").forEach(a => {
-  a.onclick = () => {
-    sidebar.classList.remove("open");
-    overlay.classList.remove("show");
-  };
-});
+menuBtn.onclick = () => { sidebar.classList.toggle("open"); overlay.classList.toggle("show"); };
+overlay.onclick = () => { sidebar.classList.remove("open"); overlay.classList.remove("show"); };
+document.querySelectorAll(".sidebar a").forEach(a => a.onclick = () => { sidebar.classList.remove("open"); overlay.classList.remove("show"); });
+collapseBtn.onclick = () => { sidebar.classList.toggle("collapsed"); };
 
-// DESKTOP COLLAPSE
-collapseBtn.onclick = () => {
-  sidebar.classList.toggle("collapsed");
-};
+// ===== CHECK LOGIN =====
+if(!localStorage.getItem("OWNER_AUTH")) location.href="/owner-login.html";
 
-// DASHBOARD DATA
+// ===== DASHBOARD DATA =====
 async function loadDashboard(){
-  const empRes = await fetch("/api/employees/all");
-  const empJson = await empRes.json();
-  const employees = empJson.data || [];
-  document.getElementById("totalEmployees").innerText = employees.length;
-  const totalAdvance = employees.reduce((sum,e)=>sum+(e.advance||0),0);
-  document.getElementById("totalAdvance").innerText = "₹"+totalAdvance;
+  try{
+    const [empRes, expRes, prodRes] = await Promise.all([
+      fetch("/api/employees/all"),
+      fetch("/api/expenses?limit=100000"),
+      fetch("/api/production")
+    ]);
 
-  const expRes = await fetch("/api/expenses?limit=100000");
-  const expJson = await expRes.json();
-  const expenses = expJson.data || [];
-  const totalExp = expenses.reduce((sum,e)=>sum+(e.amount||0),0);
-  document.getElementById("totalExpense").innerText = "₹"+totalExp;
+    const emp = (await empRes.json()).data || [];
+    const exp = (await expRes.json()).data || [];
+    const prod = await prodRes.json() || [];
 
-  const prodRes = await fetch("/api/production");
-  const productions = await prodRes.json() || [];
-  let totalBricks = 0, totalProdAmt = 0;
-  productions.forEach(p=>{
-    totalBricks += p.qty || 0;
-    totalProdAmt += (p.qty || 0) * (p.price || 0);
-  });
-  document.getElementById("totalBricks").innerText = totalBricks;
-  document.getElementById("totalProduction").innerText = "₹"+totalProdAmt;
+    const totalEmp = emp.length;
+    const totalAdv = emp.reduce((s,e)=>s+(e.advance||0),0);
+    let totalQty = 0, totalProdAmt = 0;
+    prod.forEach(p=>{ totalQty += p.qty||0; totalProdAmt += (p.qty||0)*(p.price||0); });
+    const totalExp = exp.reduce((s,e)=>s+(e.amount||0),0);
+
+    // Render smoothly
+    updateNumber("totalEmployees", totalEmp);
+    updateNumber("totalAdvance", totalAdv, true);
+    updateNumber("totalBricks", totalQty);
+    updateNumber("totalProduction", totalProdAmt, true);
+    updateNumber("totalExpense", totalExp, true);
+
+  } catch(e){ console.error("Dashboard Error:", e); }
 }
 
-// Load dashboard on page load
+// ===== SMOOTH NUMBER ANIMATION =====
+function updateNumber(id, value, isCurrency=false){
+  const el = document.getElementById(id);
+  let start = 0;
+  const duration = 600; // ms
+  const stepTime = 20;
+  const steps = Math.ceil(duration/stepTime);
+  const increment = value/steps;
+  let current = start;
+  const timer = setInterval(()=>{
+    current += increment;
+    if(current >= value){ current = value; clearInterval(timer); }
+    el.innerText = isCurrency ? "₹"+Math.floor(current) : Math.floor(current);
+  }, stepTime);
+}
+
 loadDashboard();
 </script>
 </body>
