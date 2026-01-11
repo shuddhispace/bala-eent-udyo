@@ -78,8 +78,6 @@ th{background:#f1f5f9;text-align:left}
     padding:12px;
   }
 }
-
-
 </style>
 </head>
 
@@ -87,6 +85,7 @@ th{background:#f1f5f9;text-align:left}
 <header>🧱 श्री बालाजी ईंट उद्योग – चालान</header>
 <div class="container">
 
+<!-- Tabs -->
 <div class="tabbar">
   <button class="active" onclick="showTab('challan')">चालान</button>
   <button onclick="showTab('advance')">Advance</button>
@@ -98,6 +97,7 @@ th{background:#f1f5f9;text-align:left}
 <h3>🧾 नया चालान</h3>
 <div class="flex">
   <div><input id="mobile" placeholder="Buyer Mobile" /></div>
+  <div><input id="address" placeholder="Buyer Address (optional)" /></div>
   <div>
     <select id="brick">
       <option>First Class Brick</option>
@@ -142,12 +142,12 @@ th{background:#f1f5f9;text-align:left}
 </div>
 
 <h3>📜 Challan History</h3>
-<input id="search" placeholder="Search Buyer Name / Mobile" oninput="loadHistory()" />
+<input id="search" placeholder="Search Buyer Name / Mobile / Challan No / Address" oninput="loadHistory()" />
 <div style="overflow-x:auto">
 <table>
 <thead>
 <tr>
-<th>Challan</th><th>Buyer</th><th>Mobile</th><th>Amt</th><th>Advance Used</th><th>Payable</th><th>Remaining Adv.</th><th>Date</th><th>PDF</th>
+<th>Challan</th><th>Buyer</th><th>Mobile</th><th>Address</th><th>Amt</th><th>Advance Used</th><th>Payable</th><th>Remaining Adv.</th><th>Date</th><th>PDF</th>
 </tr>
 </thead>
 <tbody id="historyBody"></tbody>
@@ -159,254 +159,237 @@ th{background:#f1f5f9;text-align:left}
 <button onclick="nextPage()">Next</button>
 </div>
 </div>
+
 </div>
 
 <script>
-const apiBase='/api';
-let page=1;
-let lastData=null;
-function showTab(tab){document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');document.getElementById('tab-challan').style.display='none';document.getElementById('tab-advance').style.display='none';document.getElementById('tab-history').style.display='none';document.getElementById('tab-'+tab).style.display='block';if(tab==='history') loadHistory()}
-async function safeFetch(url,options){const res=await fetch(url,options);const text=await res.text();try{return JSON.parse(text)}catch{throw new Error('Server returned HTML instead of JSON')}}
-async function addAdvance(){advSuccess.style.display='none';advError.style.display='none';try{const data=await safeFetch(apiBase+'/advances',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile:aMobile.value,name:aName.value,address:aAddress.value,amount:aAmount.value,owner:aOwner.value})});if(!data.success)throw new Error(data.message);advSuccess.innerText='✅ Advance Added Successfully';advSuccess.style.display='block';aMobile.value=aName.value=aAddress.value=aAmount.value=aOwner.value=''}catch(err){advError.innerText='❌ '+err.message;advError.style.display='block'}}
-async function saveChallan(){challanSuccess.style.display='none';challanError.style.display='none';pdfActions.style.display='none';try{const data=await safeFetch(apiBase+'/challans',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile:mobile.value,brick:brick.value,qty:qty.value,amount:Number(amount.value)})});if(!data.success)throw new Error(data.message);challanSuccess.innerText='✅ Challan Saved';challanSuccess.style.display='block';lastData=data.data;pdfActions.style.display='flex'}catch(err){challanError.innerText='❌ '+err.message;challanError.style.display='block'}}
-downloadPDF.onclick=function(){if(lastData)generatePDF(lastData)}
-shareWhatsApp.onclick = function () {
-  if (!lastData) return;
+// ------------------ GLOBALS ------------------
+const apiBase = '/api';
+let currentPage = 1;
+let lastChallan = null;
 
-  // 1️⃣ Download PDF first
-  generatePDF(lastData);
+// ------------------ TAB SWITCH ------------------
+function showTab(tab) {
+  document.querySelectorAll('.tabbar button').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  ['challan','advance','history'].forEach(t => document.getElementById(`tab-${t}`).style.display = t===tab?'block':'none');
+  if(tab==='history') loadHistory();
+}
 
-  // 2️⃣ WhatsApp message (Emoji Color Style)
-  const msg = `🟦🧱 *श्री बालाजी ईंट उद्योग* 🧱🟦
+// ------------------ SAFE FETCH ------------------
+async function safeFetch(url, options={}) {
+  try {
+    const res = await fetch(url, options);
+    const text = await res.text();
+    return JSON.parse(text);
+  } catch(e) {
+    throw new Error('Server returned invalid JSON');
+  }
+}
 
-🙏 नमस्ते  
-आपके *चालान का विवरण* नीचे दिया गया है 👇
+// ------------------ ADVANCE ------------------
+async function addAdvance() {
+  advSuccess.style.display = advError.style.display = 'none';
+  try {
+    const data = await safeFetch(`${apiBase}/advances`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        mobile:aMobile.value,
+        name:aName.value,
+        address:aAddress.value,
+        amount:aAmount.value,
+        owner:aOwner.value
+      })
+    });
+    if(!data.success) throw new Error(data.message);
+    advSuccess.innerText='✅ Advance Added Successfully';
+    advSuccess.style.display='block';
+    aMobile.value=aName.value=aAddress.value=aAmount.value=aOwner.value='';
+  } catch(err){
+    advError.innerText='❌ '+err.message;
+    advError.style.display='block';
+  }
+}
 
-🟨🧾 *चालान नंबर:* ${lastData.challanNo}
+// ------------------ SAVE CHALLAN ------------------
+async function saveChallan() {
+  challanSuccess.style.display = challanError.style.display = 'none';
+  pdfActions.style.display='none';
+  try{
+    const data = await safeFetch(`${apiBase}/challans`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        mobile:mobile.value,
+        address:address.value,
+        brick:brick.value,
+        qty:qty.value,
+        amount:Number(amount.value)
+      })
+    });
+    if(!data.success) throw new Error(data.message);
+    challanSuccess.innerText='✅ Challan Saved';
+    challanSuccess.style.display='block';
+    lastChallan=data.data;
+    pdfActions.style.display='flex';
+  } catch(err){
+    challanError.innerText='❌ '+err.message;
+    challanError.style.display='block';
+  }
+}
 
-🟦👤 *खरीदार का नाम:* ${lastData.buyerName}  
-🟦📱 *मोबाइल नंबर:* ${lastData.buyerMobile}
+// ------------------ GENERATE PDF ------------------
+function generatePDF(c){
+  if(!c) return alert('Challan data missing!');
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF('p','mm','a4');
+  let y=18;
 
-🟫🧱 *ईंट का प्रकार:* ${lastData.brick}  
-🟫📦 *कुल मात्रा:* ${lastData.qty}
+  // Header
+  pdf.setFillColor(37,99,235); pdf.rect(0,0,210,30,'F');
+  pdf.setTextColor(255); pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
+  pdf.text('SHREE BALAJI EENT UDYOG',105,14,{align:'center'});
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(10);
+  pdf.text('Sitholi Pani Tanki, Prayagraj, Uttar Pradesh',105,22,{align:'center'});
 
-🟢💰 *कुल राशि:* ₹${lastData.amount}  
-🔴💵 *देय राशि:* ₹${lastData.payable}
+  y=40; pdf.setTextColor(0); pdf.setFontSize(11);
+  // Buyer info
+  pdf.setFillColor(245,245,245); pdf.roundedRect(12,y,186,50,4,4,'FD');
+  pdf.text(`Buyer Name: ${c.buyerName||'-'}`,16,y+10);
+  pdf.text(`Mobile: ${c.buyerMobile||'-'}`,16,y+18);
+  pdf.text(`Address: ${c.address||'-'}`,16,y+26);
+  pdf.text(`Challan No: ${c.challanNo}`,120,y+10);
+  pdf.text(`Date: ${new Date(c.createdAt).toLocaleDateString()}`,120,y+18);
+  pdf.text(`Time: ${new Date(c.createdAt).toLocaleTimeString()}`,120,y+26);
 
-📄⚠️ *कृपया चालान की PDF संलग्न करें।*
+  y+=55;
+  // Brick Details
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
+  pdf.text('Brick Details',105,y,{align:'center'});
+  y+=6; pdf.setFont('helvetica','normal');
+  pdf.roundedRect(40,y,130,12,4,4,'S');
+  pdf.text(`Type: ${c.brick} | Quantity: ${c.qty}`,105,y+8,{align:'center'});
+  y+=22;
 
-🙏 *आपके विश्वास और सहयोग के लिए हार्दिक धन्यवाद*  
-— *श्री बालाजी ईंट उद्योग* 🧱`;
-
-  window.open(
-    `https://wa.me/?text=${encodeURIComponent(msg)}`,
-    "_blank"
-  );
-};
-
-
-function generatePDF(c) {
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF("p", "mm", "a4");
-
-  let y = 18;
-
-  /* ===== HEADER ===== */
-  pdf.setFillColor(37, 99, 235);
-  pdf.rect(0, 0, 210, 30, "F");
-
-  pdf.setTextColor(255);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
-  pdf.text("SHREE BALAJI EENT UDYOG", 105, 14, { align: "center" });
-
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10);
-  pdf.text(
-    "Sitholi Pani Tanki, Prayagraj, Uttar Pradesh",
-    105,
-    22,
-    { align: "center" }
-  );
-
-  y = 40;
-  pdf.setTextColor(0);
-  pdf.setFontSize(11);
-
-  /* ===== BUYER & CHALLAN INFO ===== */
-  pdf.setFillColor(245, 245, 245);
-  pdf.roundedRect(12, y, 186, 42, 4, 4, "FD");
-
-  // Left
-  pdf.text(`Buyer Name: ${c.buyerName || "-"}`, 16, y + 10);
-  pdf.text(`Mobile: ${c.buyerMobile || "-"}`, 16, y + 18);
-  pdf.text(`Address: ${c.address || "-"}`, 16, y + 26);
-
-  // Right
-  pdf.text(`Challan No: ${c.challanNo}`, 120, y + 10);
-  pdf.text(
-    `Date: ${new Date(c.createdAt).toLocaleDateString()}`,
-    120,
-    y + 18
-  );
-  pdf.text(
-    `Time: ${new Date(c.createdAt).toLocaleTimeString()}`,
-    120,
-    y + 26
-  );
-
-  y += 52;
-
-  /* ===== BRICK DETAILS ===== */
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(12);
-  pdf.text("Brick Details", 105, y, { align: "center" });
-
-  y += 6;
-  pdf.setFont("helvetica", "normal");
-  pdf.roundedRect(40, y, 130, 12, 4, 4, "S");
-  pdf.text(
-    `Type: ${c.brick}   |   Quantity: ${c.qty}`,
-    105,
-    y + 8,
-    { align: "center" }
-  );
-
-  y += 22;
-
-  /* ===== AMOUNT SUMMARY ===== */
-  const summary = [
-    ["Total Amount", c.amount],
-    ["Advance Used", c.advanceUsed],
-    ["Payable Amount", c.payable],
-    ["Remaining Advance", c.remainingAdvance],
-  ];
-
-  summary.forEach((row) => {
-    pdf.roundedRect(25, y, 160, 10, 3, 3, "S");
-    pdf.text(row[0], 30, y + 7);
-    pdf.text(
-      `Rs. ${Number(row[1] || 0).toLocaleString()}`,
-      175,
-      y + 7,
-      { align: "right" }
-    );
-    y += 12;
+  // Amount summary
+  const summary=[["Total Amount",c.amount],["Advance Used",c.advanceUsed],["Payable Amount",c.payable],["Remaining Advance",c.remainingAdvance]];
+  summary.forEach(row=>{
+    pdf.roundedRect(25,y,160,10,3,3,'S');
+    pdf.text(row[0],30,y+7);
+    pdf.text(`Rs. ${Number(row[1]||0).toLocaleString()}`,175,y+7,{align:'right'});
+    y+=12;
   });
 
-  y += 8;
+  y+=8; pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
+  pdf.setTextColor(c.payable<=0?22:185,c.payable<=0?163:28,0);
+  pdf.text(c.payable<=0?"PAYMENT RECEIVED":"PAYMENT PENDING",105,y,{align:'center'});
+  y+=12;
 
-  /* ===== PAYMENT STATUS ===== */
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(12);
-  pdf.setTextColor(c.payable <= 0 ? 22 : 185, c.payable <= 0 ? 163 : 28, 0);
-  pdf.text(
-    c.payable <= 0 ? "PAYMENT RECEIVED" : "PAYMENT PENDING",
-    105,
-    y,
-    { align: "center" }
-  );
+  // Thank You
+  pdf.setFillColor(220,252,231); pdf.roundedRect(20,y,170,26,6,6,'FD');
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.setTextColor(22,101,52);
+  pdf.text('THANK YOU',105,y+10,{align:'center'});
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(10);
+  pdf.text('Thank you for choosing Shree Balaji Eent Udyog.\nWe truly appreciate your business.',105,y+18,{align:'center'});
+  y+=38;
 
-  y += 12;
+  // Owner contact
+  pdf.setFontSize(10); pdf.setTextColor(0);
+  pdf.text('Contact Details',105,y,{align:'center'}); y+=6;
+  pdf.text('Ajay: 9839454542 | Rahul: 8736002647',105,y,{align:'center'});
 
-  /* ===== THANK YOU MESSAGE ===== */
-  pdf.setFillColor(220, 252, 231);
-  pdf.roundedRect(20, y, 170, 26, 6, 6, "FD");
-
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(12);
-  pdf.setTextColor(22, 101, 52);
-  pdf.text("THANK YOU", 105, y + 10, { align: "center" });
-
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10);
-  pdf.text(
-    "Thank you for choosing Shree Balaji Eent Udyog.\nWe truly appreciate your business.",
-    105,
-    y + 18,
-    { align: "center" }
-  );
-
-  y += 38;
-
-  /* ===== OWNER CONTACT ===== */
-  pdf.setFontSize(10);
-  pdf.setTextColor(0);
-  pdf.text("Contact Details", 105, y, { align: "center" });
-
-  y += 6;
-  pdf.text(
-    "Ajay: 9839454542   |   Rahul: 8736002647",
-    105,
-    y,
-    { align: "center" }
-  );
-
-  /* ===== FOOTER ===== */
-  pdf.setDrawColor(200);
-  pdf.line(15, 280, 195, 280);
-  pdf.setFontSize(9);
-  pdf.setTextColor(120);
-  pdf.text(
-    "This is a computer generated challan",
-    105,
-    287,
-    { align: "center" }
-  );
+  // Footer
+  pdf.setDrawColor(200); pdf.line(15,280,195,280);
+  pdf.setFontSize(9); pdf.setTextColor(120);
+  pdf.text('This is a computer generated challan',105,287,{align:'center'});
 
   pdf.save(`${c.challanNo}.pdf`);
 }
 
+// ------------------ DOWNLOAD & WHATSAPP ------------------
+downloadPDF.onclick=()=>{
+  if(!lastChallan) return alert("Please save a challan first!");
+  generatePDF(lastChallan);
+};
 
-let currentPage=1;
-async function loadHistory(){const s=search.value||'';const data=await safeFetch(`${apiBase}/challans?search=${s}&page=${currentPage}`);lastData=data.data;
-  // 👑 OWNER SUMMARY (यही Step 4 है)
-  renderBrickSummary(data.data);
-historyBody.innerHTML='';data.data.forEach(c=>{historyBody.innerHTML+=`<tr><td>${c.challanNo}</td><td>${c.buyerName}</td><td>${c.buyerMobile}</td><td>₹${c.amount}</td><td>₹${c.advanceUsed}</td><td>₹${c.payable}</td><td style="font-weight:600;color:${c.remainingAdvance>0?'#166534':'#991b1b'}">₹${c.remainingAdvance}</td><td>${new Date(c.createdAt).toLocaleString()}</td> <td>
-    <button onclick='generatePDF(${JSON.stringify(c)})'>
-      📄 PDF
-    </button>
-  </td></tr>`});pageNum.innerText=currentPage}
-function prevPage(){if(currentPage>1){currentPage--;loadHistory()}}
-function nextPage(){currentPage++;loadHistory()}
-function renderBrickSummary(challans){
-  const box = document.getElementById('brickSummaryList');
-  box.innerHTML = '';
+shareWhatsApp.onclick=()=>{
+  if(!lastChallan) return alert("Please save a challan first!");
+  generatePDF(lastChallan);
+  const msg=`Shree Balaji Eent Udyog
+Buyer Name: ${lastChallan.buyerName||'-'}
+Mobile: ${lastChallan.buyerMobile||'-'}
+Address: ${lastChallan.address||'-'}
+Challan No: ${lastChallan.challanNo}
+Brick Type: ${lastChallan.brick}
+Quantity: ${lastChallan.qty}
+Total Amount: ₹${lastChallan.amount}
+Payable Amount: ₹${lastChallan.payable}
+Thank you for your business.`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+};
 
-  const map = {};
-  let grandQty = 0;
-  let grandAmount = 0;
+// ------------------ HISTORY ------------------
+async function loadHistory(){
+  const s=document.getElementById('search').value.toLowerCase();
+  const data=await safeFetch(`${apiBase}/challans?page=${currentPage}`);
+  if(!data.data) return;
 
-  challans.forEach(c => {
-    if(!map[c.brick]){
-      map[c.brick] = { qty:0, amount:0 };
-    }
-    map[c.brick].qty += Number(c.qty || 0);
-    map[c.brick].amount += Number(c.amount || 0);
-
-    grandQty += Number(c.qty || 0);
-    grandAmount += Number(c.amount || 0);
+  // Filter client-side
+  const filtered=data.data.filter(c=>{
+    return (c.buyerName && c.buyerName.toLowerCase().includes(s))||
+           (c.buyerMobile && c.buyerMobile.toLowerCase().includes(s))||
+           (c.address && c.address.toLowerCase().includes(s))||
+           (c.challanNo && c.challanNo.toLowerCase().includes(s));
   });
-Object.keys(map).forEach(brick => {
-  box.innerHTML += `
-    <div class="brick-card">
-      <h4>🧱 ${brick}</h4>
-      <p>मात्रा : <b>${map[brick].qty}</b></p>
-      <p class="amount">बिक्री : ₹${map[brick].amount}</p>
-    </div>
-  `;
-});
 
-box.innerHTML += `
-  <div class="brick-card total-card">
-    <h4>🔢 कुल योग</h4>
-    <p>कुल ईंट : <b>${grandQty}</b></p>
-    <p class="amount">कुल राशि : ₹${grandAmount}</p>
-  </div>
-`;
+  historyBody.innerHTML='';
+  filtered.forEach(c=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${c.challanNo}</td>
+<td>${c.buyerName||'-'}</td>
+<td>${c.buyerMobile||'-'}</td>
+<td>${c.address||'-'}</td>
+<td>₹${c.amount}</td>
+<td>₹${c.advanceUsed}</td>
+<td>₹${c.payable}</td>
+<td style="font-weight:600;color:${c.remainingAdvance>0?'#166534':'#991b1b'}">₹${c.remainingAdvance}</td>
+<td>${new Date(c.createdAt).toLocaleString()}</td>
+<td><button class="pdfBtn">📄 PDF</button></td>`;
+    tr.querySelector('.pdfBtn').addEventListener('click',()=>generatePDF(c));
+    historyBody.appendChild(tr);
+  });
 
+  lastChallan=filtered[0]||lastChallan;
+  pageNum.innerText=currentPage;
 }
 
+// ------------------ PAGINATION ------------------
+function prevPage(){if(currentPage>1){currentPage--; loadHistory();}}
+function nextPage(){currentPage++; loadHistory();}
+
+// ------------------ BRICK SUMMARY ------------------
+function renderBrickSummary(challans){
+  const box=document.getElementById('brickSummaryList');
+  const map={}; let totalQty=0,totalAmount=0;
+  challans.forEach(c=>{
+    if(!map[c.brick]) map[c.brick]={qty:0,amount:0};
+    map[c.brick].qty+=Number(c.qty||0);
+    map[c.brick].amount+=Number(c.amount||0);
+    totalQty+=Number(c.qty||0);
+    totalAmount+=Number(c.amount||0);
+  });
+  const html=Object.keys(map).map(brick=>`<div class="brick-card">
+<h4>${brick}</h4>
+<p>मात्रा : <b>${map[brick].qty}</b></p>
+<p class="amount">बिक्री : ₹${map[brick].amount}</p>
+</div>`).join('');
+  box.innerHTML=html+`<div class="brick-card total-card">
+<h4>कुल योग</h4>
+<p>कुल ईंट : <b>${totalQty}</b></p>
+<p class="amount">कुल राशि : ₹${totalAmount}</p>
+</div>`;
+}
 </script>
 </body>
 </html>
