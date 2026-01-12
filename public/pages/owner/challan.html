@@ -240,69 +240,192 @@ async function saveChallan() {
 }
 
 // ------------------ GENERATE PDF ------------------
-function generatePDF(c){
-  if(!c) return alert('Challan data missing!');
-  const {jsPDF} = window.jspdf;
-  const pdf = new jsPDF('p','mm','a4');
-  let y=18;
+function generatePDF(c) {
+  if (!c) return alert('Challan data missing!');
 
-  // Header
-  pdf.setFillColor(37,99,235); pdf.rect(0,0,210,30,'F');
-  pdf.setTextColor(255); pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
-  pdf.text('SHREE BALAJI EENT UDYOG',105,14,{align:'center'});
-  pdf.setFont('helvetica','normal'); pdf.setFontSize(10);
-  pdf.text('Sitholi Pani Tanki, Prayagraj, Uttar Pradesh',105,22,{align:'center'});
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageW = 210;
+  let y = 18;
 
-  y=40; pdf.setTextColor(0); pdf.setFontSize(11);
-  // Buyer info
-  pdf.setFillColor(245,245,245); pdf.roundedRect(12,y,186,50,4,4,'FD');
-  pdf.text(`Buyer Name: ${c.buyerName||'-'}`,16,y+10);
-  pdf.text(`Mobile: ${c.buyerMobile||'-'}`,16,y+18);
-  pdf.text(`Address: ${c.address||'-'}`,16,y+26);
-  pdf.text(`Challan No: ${c.challanNo}`,120,y+10);
-  pdf.text(`Date: ${new Date(c.createdAt).toLocaleDateString()}`,120,y+18);
-  pdf.text(`Time: ${new Date(c.createdAt).toLocaleTimeString()}`,120,y+26);
+  /* ================= HEADER ================= */
+  pdf.setFillColor(37, 99, 235);
+  pdf.rect(0, 0, pageW, 30, 'F');
 
-  y+=55;
-  // Brick Details
-  pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
-  pdf.text('Brick Details',105,y,{align:'center'});
-  y+=6; pdf.setFont('helvetica','normal');
-  pdf.roundedRect(40,y,130,12,4,4,'S');
-  pdf.text(`Type: ${c.brick} | Quantity: ${c.qty}`,105,y+8,{align:'center'});
-  y+=22;
+  pdf.setTextColor(255);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(18);
+  pdf.text('SHREE BALAJI EENT UDYOG', pageW / 2, 14, { align: 'center' });
 
-  // Amount summary
-  const summary=[["Total Amount",c.amount],["Advance Used",c.advanceUsed],["Payable Amount",c.payable],["Remaining Advance",c.remainingAdvance]];
-  summary.forEach(row=>{
-    pdf.roundedRect(25,y,160,10,3,3,'S');
-    pdf.text(row[0],30,y+7);
-    pdf.text(`Rs. ${Number(row[1]||0).toLocaleString()}`,175,y+7,{align:'right'});
-    y+=12;
+  pdf.setFontSize(10);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text(
+    'Sitholi Pani Tanki, Prayagraj, Uttar Pradesh',
+    pageW / 2,
+    22,
+    { align: 'center' }
+  );
+
+  /* ================= BUYER DETAILS (LEFT-ALIGNED HEADER) ================= */
+  y = 40;
+
+  pdf.setTextColor(0);
+  pdf.setFillColor(245, 245, 245);
+  pdf.roundedRect(12, y, 186, 42, 5, 5, 'FD');
+
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(11);
+  pdf.text('Buyer Details', 16, y + 9);
+
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+
+  // Left column
+  pdf.text(`Buyer Name: ${c.buyerName || '-'}`, 16, y + 18);
+  pdf.text(`Mobile: ${c.buyerMobile || '-'}`, 16, y + 25);
+  pdf.text(`Address: ${c.address || '-'}`, 16, y + 32);
+
+  // Right column
+  pdf.text(`Challan No: ${c.challanNo}`, 118, y + 18);
+  pdf.text(
+    `Date: ${new Date(c.createdAt).toLocaleDateString()}`,
+    118,
+    y + 25
+  );
+  pdf.text(
+    `Time: ${new Date(c.createdAt).toLocaleTimeString()}`,
+    118,
+    y + 32
+  );
+
+  y += 55;
+
+  /* ================= BRICK DETAILS ================= */
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(12);
+  pdf.text('Brick Details', pageW / 2, y, { align: 'center' });
+
+  y += 6;
+  pdf.setFont('helvetica', 'normal');
+  pdf.roundedRect(45, y, 120, 12, 6, 6, 'S');
+  pdf.text(
+    `Type: ${c.brick}  |  Quantity: ${c.qty}`,
+    pageW / 2,
+    y + 8,
+    { align: 'center' }
+  );
+
+  y += 22;
+
+  /* ================= AMOUNT SUMMARY ================= */
+  const rows = [
+    ['Total Amount', c.amount],
+    ['Advance Used', c.advanceUsed],
+    ['Payable Amount', c.payable],
+    ['Remaining Advance', c.remainingAdvance]
+  ];
+
+  rows.forEach(r => {
+    pdf.roundedRect(25, y, 160, 10, 4, 4, 'S');
+    pdf.text(r[0], 30, y + 7);
+    pdf.text(
+      `Rs. ${Number(r[1] || 0).toLocaleString()}`,
+      180,
+      y + 7,
+      { align: 'right' }
+    );
+    y += 12;
   });
 
-  y+=8; pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
-  pdf.setTextColor(c.payable<=0?22:185,c.payable<=0?163:28,0);
-  pdf.text(c.payable<=0?"PAYMENT RECEIVED":"PAYMENT PENDING",105,y,{align:'center'});
-  y+=12;
+  /* ================= PAYMENT STATUS ================= */
+  const badgeText =
+    c.payable <= 0 ? 'PAYMENT RECEIVED' : 'PAYMENT PENDING';
 
-  // Thank You
-  pdf.setFillColor(220,252,231); pdf.roundedRect(20,y,170,26,6,6,'FD');
-  pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.setTextColor(22,101,52);
-  pdf.text('THANK YOU',105,y+10,{align:'center'});
-  pdf.setFont('helvetica','normal'); pdf.setFontSize(10);
-  pdf.text('Thank you for choosing Shree Balaji Eent Udyog.\nWe truly appreciate your business.',105,y+18,{align:'center'});
-  y+=38;
+  const badgeW = 70;
+  const badgeX = (pageW - badgeW) / 2;
 
-  // Owner contact
-  pdf.setFontSize(10); pdf.setTextColor(0);
-  pdf.text('Contact Details',105,y,{align:'center'}); y+=6;
-  pdf.text('Ajay: 9839454542 | Rahul: 8736002647',105,y,{align:'center'});
+  pdf.setFillColor(
+    c.payable <= 0 ? 220 : 254,
+    c.payable <= 0 ? 252 : 226,
+    c.payable <= 0 ? 231 : 226
+  );
+  pdf.roundedRect(badgeX, y, badgeW, 10, 6, 6, 'F');
 
-  // Footer
-  pdf.setDrawColor(200); pdf.line(15,280,195,280);
-  pdf.setFontSize(9); pdf.setTextColor(120);
-  pdf.text('This is a computer generated challan',105,287,{align:'center'});
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(11);
+  pdf.setTextColor(
+    c.payable <= 0 ? 22 : 185,
+    c.payable <= 0 ? 163 : 28,
+    0
+  );
+  pdf.text(badgeText, pageW / 2, y + 7, { align: 'center' });
+
+  y += 18;
+
+  /* ================= UPI PAYMENT ================= */
+  const upiId = 'ajayk20166@okhdfcbank';
+  const upiUrl = `upi://pay?pa=${upiId}&pn=Shree Balaji Eent Udyog`;
+
+  pdf.setFillColor(224, 242, 254);
+  pdf.roundedRect(30, y, 150, 22, 8, 8, 'FD');
+
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(3, 105, 161);
+  pdf.text('Pay via UPI', pageW / 2, y + 9, { align: 'center' });
+
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+  pdf.textWithLink(`UPI ID: ${upiId}`, pageW / 2, y + 16, {
+    align: 'center',
+    url: upiUrl
+  });
+
+  y += 30;
+
+  /* ================= THANK YOU ================= */
+  pdf.setFillColor(220, 252, 231);
+  pdf.roundedRect(20, y, 170, 24, 8, 8, 'FD');
+
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(22, 101, 52);
+  pdf.text('THANK YOU', pageW / 2, y + 9, { align: 'center' });
+
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+  pdf.text(
+    'Thank you for choosing Shree Balaji Eent Udyog.\nWe truly appreciate your business.',
+    pageW / 2,
+    y + 16,
+    { align: 'center' }
+  );
+
+  /* ================= CONTACT DETAILS ================= */
+  y = 250;
+
+  pdf.setFont('helvetica', 'bold');
+  pdf.setTextColor(0);
+  pdf.text('Contact Details', pageW / 2, y, { align: 'center' });
+
+  y += 7;
+  pdf.setFont('helvetica', 'normal');
+  pdf.textWithLink('Ajay: 9839454542', pageW / 2 - 30, y, {
+    url: 'tel:9839454542'
+  });
+  pdf.textWithLink('Rahul: 8736002647', pageW / 2 + 10, y, {
+    url: 'tel:8736002647'
+  });
+
+  /* ================= FOOTER ================= */
+  pdf.setDrawColor(200);
+  pdf.line(15, 280, 195, 280);
+  pdf.setFontSize(9);
+  pdf.setTextColor(120);
+  pdf.text(
+    'This is a computer generated challan',
+    pageW / 2,
+    287,
+    { align: 'center' }
+  );
 
   pdf.save(`${c.challanNo}.pdf`);
 }
