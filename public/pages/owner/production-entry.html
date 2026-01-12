@@ -92,7 +92,7 @@ let employeesMap = {};
 let currentPage = 1;
 const rowsPerPage = 10;
 
-// Elements
+// Cached DOM
 const prodEmployee = document.getElementById('prodEmployee');
 const prodQty = document.getElementById('prodQty');
 const prodPrice = document.getElementById('prodPrice');
@@ -121,6 +121,7 @@ async function loadEmployees(){
  try{
   const res = await fetch(`${apiBase}/employees/all`);
   const j = await res.json();
+  if(!j.data) throw new Error('Invalid JSON');
   prodEmployee.innerHTML = '<option value="">कर्मचारी चुनें</option>';
   j.data.forEach(e => {
     prodEmployee.innerHTML += `<option value="${e._id}">${e.name} (${e.empId})</option>`;
@@ -133,37 +134,31 @@ async function loadEmployees(){
 async function fetchProduction(){
  try{
   const res = await fetch(`${apiBase}/production`);
-  productionData = await res.json();
+  const j = await res.json();
+  productionData = Array.isArray(j)? j : j.data || [];
   displayTable();
  }catch(err){ showToast('Production fetch failed','error'); }
 }
 
 // Currency format
-function formatCurrency(n){ return '₹'+n.toLocaleString('hi-IN'); }
+const formatCurrency = n=>'₹'+(n||0).toLocaleString('hi-IN');
 
 // Format date
 function formatDate(p){
  const dateObj = p.date ? new Date(p.date) : new Date(p.createdAt);
- if(p.date){
-   return new Date(p.date).toLocaleDateString('hi-IN');
- }else{
-   return dateObj.toLocaleString('hi-IN',{ weekday:'long', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
- }
+ return p.date ? dateObj.toLocaleDateString('hi-IN') : dateObj.toLocaleString('hi-IN',{ weekday:'long', day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 
 // Debounce
-function debounce(fn,delay=300){
- let timer;
- return (...args)=>{ clearTimeout(timer); timer=setTimeout(()=>fn(...args),delay); };
-}
+const debounce = (fn,delay=300)=>{ let timer; return (...args)=>{ clearTimeout(timer); timer=setTimeout(()=>fn(...args),delay); }};
 
 // Display table
 function displayTable(){
  const search = prodSearch.value.toLowerCase();
  const filtered = productionData.filter(p=>{
-  const name = p.employee?.name || employeesMap[p.employee]?.name || '';
+  const emp = p.employee?.name || employeesMap[p.employee]?.name || '';
   const empId = p.employee?.empId || employeesMap[p.employee]?.empId || '';
-  return name.toLowerCase().includes(search) || empId.toLowerCase().includes(search);
+  return emp.toLowerCase().includes(search) || empId.toLowerCase().includes(search);
  });
  const totalPages = Math.ceil(filtered.length / rowsPerPage);
  if(currentPage>totalPages) currentPage = totalPages || 1;
@@ -189,11 +184,10 @@ function displayTable(){
  computeTotalBricks(filtered);
 }
 
-// Highlight search text
+// Highlight
 function highlightText(text,search){
  if(!search) return text;
- const regex = new RegExp(`(${search})`,'gi');
- return text.replace(regex,'<span class="highlight">$1</span>');
+ return text.replace(new RegExp(`(${search})`,'gi'),'<span class="highlight">$1</span>');
 }
 
 // Compute total bricks
@@ -223,11 +217,9 @@ addProdBtn.addEventListener('click', async ()=>{
   });
   const data = await res.json();
   if(!res.ok) throw new Error(data.msg || 'Server Error');
-
   if(!data.employee?.name) data.employee = employeesMap[employee] || {name:'-', empId:''};
   productionData.unshift(data);
   displayTable();
-
   prodQty.value=''; prodPrice.value=''; prodEmployee.value=''; prodDate.value='';
   showToast('Production Added!','success');
  }catch(err){ showToast(err.message,'error'); }

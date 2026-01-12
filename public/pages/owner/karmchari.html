@@ -14,9 +14,17 @@
   --card-bg:#fff;
   --hover-bg:#ffe0b2;
   --highlight:#ffff99;
+  --balance-positive:#388e3c;
+  --balance-negative:#d32f2f;
+  --text-color:#333;
+  --border-color:#ccc;
 }
+
+/* Reset & Base */
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
-body{background:var(--bg-light);padding:12px;color:#333}
+body{background:var(--bg-light);padding:12px;color:var(--text-color);}
+button, input{font-family:'Poppins',sans-serif;}
+a{text-decoration:none;color:inherit;}
 
 /* Panels */
 .panel{
@@ -29,13 +37,19 @@ body{background:var(--bg-light);padding:12px;color:#333}
 .panel h2,h3{margin-bottom:12px;color:var(--primary-dark)}
 
 /* Forms */
-.panel form{display:flex;flex-wrap:wrap;gap:10px}
+.panel form{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.panel label{font-size:14px;margin-bottom:4px;display:block;}
 .panel input{
   flex:1 1 160px;
   padding:11px 12px;
   border-radius:10px;
-  border:1px solid #ccc;
+  border:1px solid var(--border-color);
 }
+.panel input:focus{outline:none;border-color:var(--primary);}
 .panel button{
   background:var(--primary);
   color:#fff;
@@ -44,10 +58,16 @@ body{background:var(--bg-light);padding:12px;color:#333}
   border-radius:10px;
   cursor:pointer;
 }
-.panel button:hover{background:var(--primary-dark)}
+.panel button:hover{background:var(--primary-dark);}
 
-.controls{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.controls input{flex:1 1 200px}
+/* Controls */
+.controls{
+  display:flex;
+  gap:10px;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+}
+.controls input{flex:1 1 200px;}
 .controls button{
   background:#888;
   color:#fff;
@@ -56,15 +76,37 @@ body{background:var(--bg-light);padding:12px;color:#333}
   padding:6px 12px;
   cursor:pointer;
 }
-.controls button:hover{background:#555}
+.controls button:hover{background:#555;}
+.controls button:disabled{opacity:0.6;cursor:not-allowed;}
 
 /* Table */
-.table-container{overflow-x:auto;border-radius:14px;max-width:100%;}
-table{width:100%;border-collapse:collapse;min-width:1000px;}
-th,td{padding:12px;border-bottom:1px solid #eee;text-align:left;font-size:14px;}
-th{background:var(--primary);color:#fff;position:sticky;top:0;z-index:1;}
-tr:hover{background:var(--hover-bg);}
+.table-container{
+  overflow-x:auto;
+  border-radius:14px;
+  max-width:100%;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1000px;
+}
+th,td{
+  padding:12px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+  font-size:14px;
+}
+th{
+  background:var(--primary);
+  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:1;
+}
+tbody tr:hover{background:var(--hover-bg);}
 .highlight{background:var(--highlight);}
+.balance-positive{color:var(--balance-positive);}
+.balance-negative{color:var(--balance-negative);}
 
 /* Pagination */
 .pagination{
@@ -82,7 +124,8 @@ tr:hover{background:var(--hover-bg);}
   color:#fff;
   cursor:pointer;
 }
-.pagination button:disabled{background:#ccc}
+.pagination button:hover:not(:disabled){background:var(--primary-dark);}
+.pagination button:disabled{background:#ccc;cursor:not-allowed;}
 
 /* Toast */
 .toast{
@@ -91,59 +134,77 @@ tr:hover{background:var(--hover-bg);}
   margin-bottom:8px;
   color:#fff;
   font-weight:500;
-  opacity:0.9;
+  opacity:0.95;
+  animation:fadeIn 0.3s;
 }
 .toast.success{background:#388e3c}
 .toast.error{background:#d32f2f}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(-10px);}
+  to{opacity:0.95;transform:translateY(0);}
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.modal-content {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 12px;
+  max-width: 400px;
+  text-align: center;
+}
+.modal-content h3 {color: var(--primary-dark); margin-bottom:12px;}
+.modal-content p {font-size:16px; margin-bottom:18px;}
+.modal-content button {
+  background: var(--primary);
+  color: #fff;
+  border:none;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.modal-content button:hover{background:var(--primary-dark);}
 
 /* Mobile adjustments */
 @media(max-width:600px){
   th,td{font-size:13px}
-  .panel form{flex-direction:column;}
+  .panel form{flex-direction:column;gap:8px;}
+  .panel form input, .panel form button{flex:1 1 100%;}
+  .panel form button{padding:12px;font-size:16px;}
 }
-/* Mobile adjustments for Add Employee form */
-@media(max-width:600px){
-  .panel form{
-    flex-direction:column;      /* stack inputs vertically */
-    gap:8px;                     /* smaller gap between inputs */
-  }
-  .panel form input,
-  .panel form button{
-    flex:1 1 100%;               /* full width */
-  }
-  .panel form button{
-    padding:12px;
-    font-size:16px;
-  }
-}
-
 </style>
 </head>
-
 <body>
 
 <div id="toastContainer"></div>
 
-<!-- ADD EMPLOYEE -->
 <section class="panel">
   <h3>➕ नया कर्मचारी</h3>
   <form id="addEmployeeForm">
+    <label for="empName">नाम</label>
     <input id="empName" placeholder="नाम" required>
-    <input id="empPhone" placeholder="फोन नंबर">
+    <label for="empPhone">फोन नंबर</label>
+    <input id="empPhone" placeholder="फोन नंबर" pattern="\d{10}">
+    <label for="empAdvance">Advance ₹</label>
     <input id="empAdvance" type="number" placeholder="Advance ₹">
     <button type="submit">जोड़ें</button>
   </form>
 </section>
 
-<!-- EMPLOYEE LIST -->
 <section class="panel">
   <h2>👷 कर्मचारी सूची</h2>
-
   <div class="controls">
     <input id="employeeSearch" placeholder="कर्मचारी खोजें...">
-    <button id="clearSearch">❌ Clear</button>
+    <button id="clearSearch" disabled>❌ Clear</button>
   </div>
-
   <div class="table-container">
     <table>
       <thead>
@@ -159,11 +220,9 @@ tr:hover{background:var(--hover-bg);}
           <th>Balance</th>
         </tr>
       </thead>
-
       <tbody id="employeeTableBody">
         <tr><td colspan="9">Loading employees…</td></tr>
       </tbody>
-
       <tfoot>
         <tr>
           <td colspan="4"><strong>कुल (Page)</strong></td>
@@ -176,13 +235,11 @@ tr:hover{background:var(--hover-bg);}
       </tfoot>
     </table>
   </div>
-
   <div class="pagination">
     <button id="prevPage">⬅ Prev</button>
     <span id="pageInfo"></span>
     <button id="nextPage">Next ➡</button>
   </div>
-
   <select id="pageLimitSelect">
     <option value="10">10 rows</option>
     <option value="20">20 rows</option>
@@ -190,9 +247,16 @@ tr:hover{background:var(--hover-bg);}
   </select>
 </section>
 
+<div id="employeeAddedModal" class="modal">
+  <div class="modal-content">
+    <h3>कर्मचारी जोड़ा गया</h3>
+    <p id="modalEmployeeInfo"></p>
+    <button id="closeModalBtn">OK</button>
+  </div>
+</div>
+
 <script>
 const API="/api";
-
 const employeeTableBody=document.getElementById("employeeTableBody");
 const employeeSearch=document.getElementById("employeeSearch");
 const addEmployeeForm=document.getElementById("addEmployeeForm");
@@ -200,36 +264,27 @@ const empName=document.getElementById("empName");
 const empPhone=document.getElementById("empPhone");
 const empAdvance=document.getElementById("empAdvance");
 const clearSearch=document.getElementById("clearSearch");
-
 const prevBtn=document.getElementById("prevPage");
 const nextBtn=document.getElementById("nextPage");
 const pageInfo=document.getElementById("pageInfo");
 const pageLimitSelect=document.getElementById("pageLimitSelect");
-
 const tfootAdvance=document.getElementById("tfootAdvance");
 const tfootExpense=document.getElementById("tfootExpense");
 const tfootBricks=document.getElementById("tfootBricks");
 const tfootProduction=document.getElementById("tfootProduction");
 const tfootBalance=document.getElementById("tfootBalance");
+const employeeAddedModal = document.getElementById("employeeAddedModal");
+const modalEmployeeInfo = document.getElementById("modalEmployeeInfo");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const toastContainer=document.getElementById("toastContainer");
 
-let allEmployees=[];
-let filteredEmployees=[];
-let currentPage=1;
-let pageLimit=10;
-let isLoading=false;
+let allEmployees=[], filteredEmployees=[], currentPage=1, pageLimit=10, isLoading=false;
 
 /* DATE FORMAT */
 function formatDateTime(dateStr){
   if(!dateStr) return "-";
   const d=new Date(dateStr);
-  return d.toLocaleString("hi-IN",{
-    weekday:"short",
-    day:"2-digit",
-    month:"short",
-    year:"numeric",
-    hour:"2-digit",
-    minute:"2-digit"
-  });
+  return d.toLocaleString("hi-IN",{ weekday:"short", day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"});
 }
 
 /* TOAST */
@@ -244,13 +299,10 @@ function showToast(msg,type){
 /* DEBOUNCE */
 function debounce(fn, delay){
   let timer;
-  return (...args)=>{
-    clearTimeout(timer);
-    timer=setTimeout(()=>fn(...args),delay);
-  }
+  return (...args)=>{ clearTimeout(timer); timer=setTimeout(()=>fn(...args),delay);}
 }
 
-/* RENDER EMPLOYEES WITH HIGHLIGHT */
+/* RENDER EMPLOYEES */
 function renderEmployees(list){
   employeeTableBody.innerHTML="";
   const start=(currentPage-1)*pageLimit;
@@ -258,20 +310,18 @@ function renderEmployees(list){
   const pageList=list.slice(start,end);
 
   let adv=0,exp=0,prod=0,bal=0,bricks=0;
-
   if(pageList.length===0){
     employeeTableBody.innerHTML=`<tr><td colspan="9">No employees</td></tr>`;
-    tfootAdvance.innerText="₹0";
-    tfootExpense.innerText="₹0";
-    tfootBricks.innerText="0";
-    tfootProduction.innerText="₹0";
-    tfootBalance.innerText="₹0";
+    tfootAdvance.innerText="₹0"; tfootExpense.innerText="₹0"; tfootBricks.innerText="0";
+    tfootProduction.innerText="₹0"; tfootBalance.innerText="₹0";
     pageInfo.innerText="Page 0 of 0";
     prevBtn.disabled=nextBtn.disabled=true;
     return;
   }
 
   const query=employeeSearch.value.trim().toLowerCase();
+  clearSearch.disabled=!query;
+
   const fragment=document.createDocumentFragment();
 
   pageList.forEach(e=>{
@@ -281,21 +331,18 @@ function renderEmployees(list){
     const totalBricks=Number(e.totalBricks||0);
     const balance=Number(e.balance ?? (advance+production-expense));
 
-    adv+=advance;
-    exp+=expense;
-    prod+=production;
-    bal+=balance;
-    bricks+=totalBricks;
+    adv+=advance; exp+=expense; prod+=production; bal+=balance; bricks+=totalBricks;
 
     const tr=document.createElement("tr");
     const highlight=(text)=>{
       if(!query) return text||"-";
-      const regex=new RegExp(`(${query})`,"gi");
+      const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex=new RegExp(`(${safeQuery})`,"gi");
       return (text||"-").toString().replace(regex,`<span class="highlight">$1</span>`);
     }
 
     tr.innerHTML=`
-      <td>${e.empId||"-"}</td>
+      <td>${highlight(e.empId||"-")}</td>
       <td>${highlight(e.name)}</td>
       <td>${highlight(e.phone)}</td>
       <td>${formatDateTime(e.joiningDate)}</td>
@@ -303,7 +350,7 @@ function renderEmployees(list){
       <td>₹${expense}</td>
       <td>${totalBricks}</td>
       <td>₹${production}</td>
-      <td style="color:${balance>0?'#388e3c':balance<0?'#d32f2f':'#333'}">₹${balance}</td>
+      <td class="${balance>0?'balance-positive':balance<0?'balance-negative':''}">₹${balance}</td>
     `;
     fragment.appendChild(tr);
   });
@@ -322,65 +369,71 @@ function renderEmployees(list){
   nextBtn.disabled=currentPage>=totalPages;
 }
 
-/* FILTER EMPLOYEES */
+/* FILTER EMPLOYEES - GLOBAL SEARCH */
 const filterEmployees=debounce(()=>{
   const query=employeeSearch.value.trim().toLowerCase();
-  filteredEmployees=allEmployees.filter(e=>
-    (e.name&&e.name.toLowerCase().includes(query)) ||
-    (e.phone&&e.phone.includes(query))
-  );
+  filteredEmployees=allEmployees.filter(e=>{
+    return (e.name && e.name.toLowerCase().includes(query)) || 
+           (e.empId && e.empId.toString().includes(query)) ||
+           (e.phone && e.phone.includes(query));
+  });
   currentPage=1;
   renderEmployees(filteredEmployees);
 },200);
 
-/* LOAD ALL EMPLOYEES */
+/* LOAD EMPLOYEES */
 async function loadEmployees(){
   if(isLoading) return;
   isLoading=true;
   employeeTableBody.innerHTML=`<tr><td colspan="9">Loading employees…</td></tr>`;
   try{
     const res=await fetch(`${API}/employees?limit=1000`);
-    const data=await res.json();
-    allEmployees=data.data||[];
+    let data=[];
+    try { data = await res.json(); } catch(e){ data=[]; }
+    allEmployees=Array.isArray(data.data)?data.data: Array.isArray(data)?data: [];
     filteredEmployees=[...allEmployees];
     renderEmployees(filteredEmployees);
   }catch(err){
     showToast("Failed to load employees","error");
-  }finally{
-    isLoading=false;
-  }
+    employeeTableBody.innerHTML=`<tr><td colspan="9">Error loading data</td></tr>`;
+  }finally{isLoading=false;}
 }
 
 /* ADD EMPLOYEE */
 addEmployeeForm.onsubmit=async e=>{
   e.preventDefault();
-  const res=await fetch(`${API}/employees`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      name:empName.value,
-      phone:empPhone.value,
-      advance:Number(empAdvance.value)
-    })
-  });
-  if(res.ok){
-    empName.value=empPhone.value=empAdvance.value="";
-    showToast("कर्मचारी जोड़ा गया","success");
-    loadEmployees();
-  }else showToast("Error adding employee","error");
+  const newEmployee={ name: empName.value.trim(), phone: empPhone.value.trim(), advance: Number(empAdvance.value) };
+  if(!newEmployee.name){ showToast("कृपया नाम दर्ज करें","error"); return; }
+
+  try{
+    const res=await fetch(`${API}/employees`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(newEmployee)
+    });
+    if(res.ok){
+      const data = await res.json();
+      empName.value=empPhone.value=empAdvance.value="";
+      modalEmployeeInfo.innerHTML=`<strong>ID:</strong> ${data.empId||"-"}<br><strong>Name:</strong> ${data.name||newEmployee.name}`;
+      employeeAddedModal.style.display="flex";
+      setTimeout(()=>employeeAddedModal.style.display="none",3000);
+      loadEmployees();
+    }else{
+      const errData=await res.json();
+      showToast(`Failed to add employee: ${errData.message||"Server error"}`,"error");
+    }
+  }catch(err){ showToast("Network error: Unable to add employee","error"); }
 }
 
-/* EVENTS */
+/* Modal close */
+closeModalBtn.onclick=()=>employeeAddedModal.style.display="none";
+
+/* Events */
 employeeSearch.oninput=filterEmployees;
-clearSearch.onclick=()=>{
-  employeeSearch.value="";
-  filteredEmployees=[...allEmployees];
-  currentPage=1;
-  renderEmployees(filteredEmployees);
-}
-prevBtn.onclick=()=>{currentPage--;renderEmployees(filteredEmployees);}
-nextBtn.onclick=()=>{currentPage++;renderEmployees(filteredEmployees);}
-pageLimitSelect.onchange=e=>{pageLimit=+e.target.value;currentPage=1;renderEmployees(filteredEmployees);}
+clearSearch.onclick=()=>{ employeeSearch.value=""; filteredEmployees=[...allEmployees]; currentPage=1; renderEmployees(filteredEmployees); }
+prevBtn.onclick=()=>{ currentPage--; renderEmployees(filteredEmployees); }
+nextBtn.onclick=()=>{ currentPage++; renderEmployees(filteredEmployees); }
+pageLimitSelect.onchange=e=>{ pageLimit=+e.target.value; currentPage=1; renderEmployees(filteredEmployees); }
 
 /* INITIAL LOAD */
 loadEmployees();
